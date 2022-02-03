@@ -25,13 +25,13 @@ Examples:
 - `bashpass --list`
 
 ## Installation
-First you'll have to generate a GPG key. Run the following command to do so, and your key will be generated (you can use the defaults for most questions)
+First you'll have to generate a GPG key. Run the following command to do so, and your key will be generated (you can use the defaults for most questions).
 
 ```bash
 $ gpg --full-generate-key
 ```
 
-Now it's time to install BashPass. Just run the `install.sh` script and you'll be good to go
+Now it's time to install BashPass. Just run the `install.sh` script and you'll be good to go.
 
 ```bash
 $ ./install.sh
