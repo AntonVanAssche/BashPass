@@ -1,0 +1,162 @@
+#!/bin/bash
+
+# '-e' Abort the script when an error occures.
+# '-f' To ensure that globbing is globally disabled.
+# '+x' To ensure debug mode is never enabled (prevents the password from leaking).
+set -ef +x
+
+# Detect the user.
+# When the user is root exit out.
+if [[ "$UID" == 0 ]]; then
+   prinf "You must run this as a normal user"
+   exit 1
+fi
+
+# Get the necessary variables.
+#configLocation="$HOME/.config/bashpass"
+configLocation="$HOME/.config/bashpass"
+config="$configLocation/bashpass.conf"
+email="$(grep "email" $config | cut -d: -f2)"
+passLocation="$HOME/$(grep "location" $config | cut -d: -f2)"
+version="$(grep "version" $config | cut -d: -f2)"
+
+# Create the necessary directories/files if they doesn't exists
+mkdir -p "$passLocation" "$configLocation"
+touch "$config"
+
+function Help() {
+   printf "%s" "\
+BashPass version: $version
+A basic password manager written in Bash.
+
+bashpass [ add|delete|show|list ] [name]
+
+help                - Show this help message.
+version             - Show the version number
+add     [name]      - Add a password.
+delete  [name]      - Delete a password.
+show    [name]      - Show a password.
+list                - List all password.
+"
+}
+
+function Version() {
+   printf "BashPass version: %s" "$version"
+}
+
+function Add() {
+   name="$1"
+
+   if [[ -z "$name" ]]; then
+      printf "Enter a name: "
+      read -r name
+   fi
+
+   if [ -z "$name" ]; then
+      Kill "Failed to set a name"
+      exit 1
+   fi
+
+   printf "Do you want to generate a password [Y/n]: "
+   read -r random
+
+   case "$random" in
+      [Nn])
+         printf "Enter a password: "
+         read -rs password1
+            
+         printf "\nEnter the password again: "
+         read -rs password2
+
+         if [[ "$password1" != "$password2" ]]; then
+            Kill "The password didn't match"
+            exit 1
+         fi
+
+         password=$password1
+         ;;
+        *)
+         printf "Give the lenght of the password: "
+         read -r lenght
+
+         # Generate a password using '/dev/urandom'.
+         # Call the 'tr' command to translate the password to a character set.
+         password=$(LC_ALL=C tr -dc "${PASH_PATTERN:-_A-Z-a-z-0-9}" < /dev/urandom | dd ibs=1 obs=1 count="${PASH_LENGTH:-$lenght}" 2>/dev/null)
+         ;;
+   esac
+
+   if [ -z "$password" ]; then
+      Kill "Failed to set a password"
+      exit 1
+   fi
+
+   printf "%s" "$password" > "$name"
+
+   # Encrypte the password file using gpg.
+   gpg --encrypt --output "$passLocation/$name.gpg" --recipient "$email" "$name"  &> /dev/null
+
+   printf "\nPassword %s saved" "'$name'"
+
+   rm -rf "$name"
+}
+
+function Delete() {
+   name="$1"
+
+   if [[ -z "$name" ]]; then
+      printf "Enter the name of the password you want to delete: "
+      read -r name
+   fi
+
+   rm -rf "$passLocation/$name.gpg"
+   printf "\nPassword %s has successfully been deleted" "'$name'"
+}
+
+function Show() {
+   name="$1"
+
+   if [[ -z "$name" ]]; then
+      printf "Enter the name of the password you want to show: "
+      read -r name
+   fi
+
+   # Decrypte the password file.
+   gpg --decrypt --output "$passLocation/$name" "$passLocation/$name.gpg" &> /dev/null
+    
+   cat "$passLocation/$name"
+
+   # Remove the Decrypted password file after reading
+   # to prevent the password from being leaked afterwards.
+   rm -rf "$passLocation/$name"
+}
+
+function List() {
+   ls -1 "$passLocation"
+}
+
+# Function to print out errors and exit afterwards.
+function Kill() {
+   printf "A error occured: %s\n\n" "$1"
+   Help
+   exit 1
+}
+
+# Detect 'gpg'
+command -v gpg &> /dev/null || Kill "gpg is required"
+
+# Ask the e-meil address to encrypt when it can't be found in the config file.
+if [[ -z $email ]]; then
+   printf "Enter the email address you created the gpg key with: "
+   read -r email
+   printf "email:%s" "$email" >> "$config"
+fi
+
+case "$1" in
+   "--help") Help;;
+   "--version") Version;;
+   "--add") Add "$2";;
+   "--delete") Delete "$2";;
+   "--show") Show "$2";;
+   "--list") List;;
+   *) Kill "option '$1' not found";;
+esac
