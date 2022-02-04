@@ -19,14 +19,15 @@ BashPass is a simple password manager written in Bash. It uses GPG to encrypt/de
 Note: the `[name]` is optional.
 
 ```
-bashpass [--add|--update|--delete|--show|--list] [name] - Basic commands
+bashpass [--add|--update|--delete|--show|--copy|--list] [name] - Basic commands
 
 --help                                   - Show this help message.
 --version                                - Show the version number
 --add                             [name] - Add a password.
---update                          [name] - Add a password.
+--update                          [name] - Update a password.
 --delete                          [name] - Delete a password.
 --show                            [name] - Show a password.
+--copy                            [name] - Copy a password to the clipboard.
 --list                                   - List all password.
 ```
 
@@ -97,6 +98,19 @@ email:email@gmail.com
 
 ```
 email:newemail@gmail.com
+```
+
+### Updating the clipboard timer
+By default BashPass has a timer of `10` seconds. This can be changed in the config file located at `~/.config/bashpass/bashpass.conf`. To change this edit the following line.
+
+```
+timer:10
+```
+
+**Example**: if you want to update the timer to `15` seconds. You'll have to update the line to:
+
+```
+timer:15
 ```
 
 ## Feedback
