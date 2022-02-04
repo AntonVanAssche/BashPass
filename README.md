@@ -14,7 +14,8 @@ BashPass is a simple password manager written in Bash. It uses GPG to encrypt/de
 - [Feedback](#feedback)
 
 ## Dependencies
-- gpg
+- gpg (Encrypt the password files)
+- xclip (Copy the password to the clipboard)
 
 ## Usage
 Note: the `[name]` is optional.
