@@ -10,6 +10,7 @@ BashPass is a simple password manager written in Bash. It uses GPG to encrypt/de
 - [Updating the config](#updating-the-config)
     - [Updating the location where passwords are stored](#updating-the-location-where-passwords-are-stored)
     - [Updating the email address](#updating-the-e-mail-address)
+    - [Updating the clipboard timer](#updating-the-clipboard-timer)
 - [Feedback](#feedback)
 
 ## Dependencies
