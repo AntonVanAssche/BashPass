@@ -186,8 +186,9 @@ function Show() {
       read -r name
    fi
 
-   # Decrypte the password file.
-   gpg --decrypt --output "${passLocation}/${name}" "$passLocation/${name}.gpg" &> /dev/null
+   # Decrypte the password file and show the password
+   gpg -dq "${passLocation}/${name}.gpg"   
+}
     
    cat "${passLocation}/${name}"
 
