@@ -16,13 +16,13 @@ fi
 #configLocation="$HOME/.config/bashpass"
 configLocation="$HOME/.config/bashpass"
 config="$configLocation/bashpass.conf"
-email="$(grep "email" $config | cut -d: -f2)"
-passLocation="$HOME/$(grep "location" $config | cut -d: -f2)"
-version="$(grep "version" $config | cut -d: -f2)"
+email="$(grep "email" "$config" | cut -d: -f2)"
+passLocation="$HOME/$(grep "location" "$config" | cut -d: -f2)"
+version="$(grep "version" "$config" | cut -d: -f2)"
 
 # Create the necessary directories/files if they doesn't exists
-mkdir -p "$passLocation" "$configLocation"
-touch "$config"
+mkdir -p "${passLocation}" "${configLocation}"
+touch "${config}"
 
 function Help() {
    printf "%s" "\
@@ -41,7 +41,7 @@ list                - List all password.
 }
 
 function Version() {
-   printf "BashPass version: %s" "$version"
+   printf "BashPass version: %s" "${version}"
 }
 
 function Add() {
@@ -101,33 +101,34 @@ function Add() {
 }
 
 function Delete() {
-   name="$1"
+   name="${1}"
 
-   if [[ -z "$name" ]]; then
+   if [[ -z "${name}" ]]; then
       printf "Enter the name of the password you want to delete: "
       read -r name
    fi
 
-   rm -rf "$passLocation/$name.gpg"
-   printf "\nPassword %s has successfully been deleted" "'$name'"
+   rm -rf "${passLocation}/${name}.gpg"
+   printf "\nPassword %s has successfully been deleted" "'${name}'"
 }
 
 function Show() {
-   name="$1"
+   name="${1}"
 
-   if [[ -z "$name" ]]; then
+   if [[ -z "${name}" ]]; then
       printf "Enter the name of the password you want to show: "
       read -r name
    fi
 
    # Decrypte the password file.
-   gpg --decrypt --output "$passLocation/$name" "$passLocation/$name.gpg" &> /dev/null
+   gpg --decrypt --output "${passLocation}/${name}" "$passLocation/${name}.gpg" &> /dev/null
     
-   cat "$passLocation/$name"
+   cat "${passLocation}/${name}"
 
    # Remove the Decrypted password file after reading
    # to prevent the password from being leaked afterwards.
-   rm -rf "$passLocation/$name"
+   # ':?' to ensure this never expands to '/*'
+   rm -rf "${passLocation:?}/${name}"
 }
 
 function List() {
@@ -148,15 +149,16 @@ command -v gpg &> /dev/null || Kill "gpg is required"
 if [[ -z $email ]]; then
    printf "Enter the email address you created the gpg key with: "
    read -r email
-   printf "email:%s" "$email" >> "$config"
+   printf "email:%s" "${email}" >> "${config}"
 fi
 
 case "$1" in
    "--help") Help;;
    "--version") Version;;
-   "--add") Add "$2";;
+   "--add") Add "${2}";;
    "--delete") Delete "$2";;
-   "--show") Show "$2";;
+   "--delete") Delete "${2}";;
+   "--show") Show "${2}";;
    "--list") List;;
-   *) Kill "option '$1' not found";;
+   *) Kill "option '${1}' not found";;
 esac
