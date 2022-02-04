@@ -1,5 +1,16 @@
 # BashPass
-A simple password manager written in Bash.
+BashPass is a simple password manager written in Bash. It uses GPG to encrypt/decrypt the files where the passwords are stored (default: `~/.local/share/bashpass/`). This means the password are 100% stored locally, so you don't have to trust a third party to store your passwords.
+
+## Table of contents
+
+- [Dependencies](#dependencies)
+- [Usage](#usage)
+- [Installing BashPass](#installing-bashpass)
+- [Updating BashPass](#updating-bashpass)
+- [Updating the config](#updating-the-config)
+    - [Updating the location where passwords are stored](#updating-the-location-where-passwords-are-stored)
+    - [Updating the email address](#updating-the-e-mail-address)
+- [Feedback](#feedback)
 
 ## Dependencies
 - gpg
@@ -8,14 +19,15 @@ A simple password manager written in Bash.
 Note: the `[name]` is optional.
 
 ```
-bashpass [add|delete|show|list] [name] - Basic commands
+bashpass [--add|--update|--delete|--show|--list] [name] - Basic commands
 
-help                                   - Show this help message.
-version                                - Show the version number
-add                             [name] - Add a password.
-delete                          [name] - Delete a password.
-show                            [name] - Show a password.
-list                                   - List all password.
+--help                                   - Show this help message.
+--version                                - Show the version number
+--add                             [name] - Add a password.
+--update                          [name] - Add a password.
+--delete                          [name] - Delete a password.
+--show                            [name] - Show a password.
+--list                                   - List all password.
 ```
 
 Examples: 
@@ -24,7 +36,7 @@ Examples:
 - `bashpass --show gmail`
 - `bashpass --list`
 
-## Installation
+## Installing BashPass
 First you'll have to generate a GPG key. Run the following command to do so, and your key will be generated (you can use the defaults for most questions).
 
 ```bash
@@ -47,6 +59,44 @@ When you start BashPass for the first time you'll be prompted with the question 
 
 ```
 Enter the email address you created the gpg key with:
+```
+
+## Updating BashPass
+To update BashPass to the latest version, just run the install.sh script and you'll be good to go.
+
+```bash
+$ ./install.sh
+```
+
+## Updating the config
+### Updating the location where passwords are stored
+By default BashPass stores the passwords the following directory `~/.local/share/bashpass/`. In case you want to change the location you'll have to change the following line in the config file located at `~/.config/bashpass/bashpass.conf`.
+
+```
+location:.local/share/bashpass
+```
+
+**Example**: if you want to store the passwords in `.bashpass/passwords/`. You'll have to update the line to:
+
+**Note**: The new location has to be located inside **your home** (`~`) directory.
+
+```
+location:.bashpass/passwords/
+```
+
+### Updating the e-mail address
+Changing the e-mail address isn't recommended but in case you need to do this here you go. To update the e-mail address you'll have to update the following line in the config file located at `~/.config/bashpass/bashpass.conf`.
+
+```
+email:email@gmail.com
+```
+
+**Example**: if you want to update the e-mail address to `newemail@gmail.com`. You'll have to update the line to:
+
+**Note**: when you update the e-mail address you'll have to generate a new GPG key. You will also be unable to read your passwords you have stored with the old e-mail address.
+
+```
+email:newemail@gmail.com
 ```
 
 ## Feedback
