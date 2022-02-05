@@ -234,14 +234,23 @@ if [[ -z ${email} ]]; then
    printf "email:%s" "${email}" >> "${config}"
 fi
 
-case "$1" in
-   "--help"| "-h") Help;;
-   "--version"| "-v") Version;;
-   "--add"| "-a") Add "${2}";;
-   "--update"| "-u") Update "${2}";;
-   "--delete"| "-d") Delete "${2}";;
-   "--show"| "-s") Show "${2}";;
-   "--copy"| "-c") Copy "${2}";;
-   "--list"| "-l") List;;
-   *) Kill "option '${1}' not found";;
-esac
+function Main() {
+   case "$1" in
+      "--help"| "-h") Help;;
+      "--version"| "-v") Version;;
+      "--add"| "-a") Add "${2}";;
+      "--update"| "-u") Update "${2}";;
+      "--delete"| "-d") Delete "${2}";;
+      "--show"| "-s") Show "${2}";;
+      "--copy"| "-c") Copy "${2}";;
+      "--list"| "-l") List;;
+      *) Kill "option '${1}' not found";;
+   esac
+}
+
+# Check if an argument '$1' is given.
+if [[ "$1" ]]; then
+   Main "$@"
+else
+   Help
+fi
