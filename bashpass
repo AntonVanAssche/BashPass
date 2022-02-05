@@ -12,8 +12,7 @@ if [[ "$UID" == 0 ]]; then
    exit 1
 fi
 
-# Get the necessary variables.
-#configLocation="$HOME/.config/bashpass"
+# Get the necessary configurations from the configuration file.
 configLocation="$HOME/.config/bashpass"
 config="$configLocation/bashpass.conf"
 email="$(grep "email" "$config" | cut -d: -f2)"
