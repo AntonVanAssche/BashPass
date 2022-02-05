@@ -23,14 +23,14 @@ Note: the `[name]` is optional.
 ```
 bashpass [--add|--update|--delete|--show|--copy|--list] [name] - Basic commands
 
---help                                   - Show this help message.
---version                                - Show the version number
---add                             [name] - Add a password.
---update                          [name] - Update a password.
---delete                          [name] - Delete a password.
---show                            [name] - Show a password.
---copy                            [name] - Copy a password to the clipboard.
---list                                   - List all password.
+--help       or -h                            - Show this help message.
+--version    or -v                            - Show the version number
+--add        or -a                     [name] - Add a password.
+--update     or -u                     [name] - Update a password.
+--delete     or -d                     [name] - Delete a password.
+--show       or -s                     [name] - Show a password.
+--copy       or -c                     [name] - Copy a password to the clipboard.
+--list       or -c                            - List all password.
 ```
 
 Examples: 
