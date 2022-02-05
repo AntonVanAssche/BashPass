@@ -75,14 +75,14 @@ function RandomPassword() {
 
          # Generate a password using '/dev/urandom'.
          # Call the 'tr' command to translate the password to a character set.
-         password=$(LC_ALL=C tr -dc "${PASH_PATTERN:-_A-Z-a-z-0-9}" < /dev/urandom | dd ibs=1 obs=1 count="${PASH_LENGTH:-${lenght}}" 2>/dev/null)
+         password=$(</dev/urandom tr -dc '12345!@#$%qwertQWERTasdfgASDFGzxcvbZXCVB' | head -c "${lenght}"; echo "")
          ;;
    esac
 
-   if [[ -z "$password" ]]; then
-      Kill "Failed to set a password"
-      exit 1
-   fi
+   [[ -z "$password" ]] && Kill "Failed to set a password"
+
+   # Write password to the 'password' file.
+   printf "%s" "${password}" > "${passLocation}/${name}"
 }
 
 # Function to print out errors and exit afterwards.
@@ -103,10 +103,12 @@ function PasswordExists() {
       
       case "${overwrite}" in
          [Yy])
-            rm -rf "${passLocation}/${name}.gpg";;
+            rm -rf "${passLocation}/${name}.gpg"
+            ;;
          *)
             printf "Enter a new name: "
             read -r name
+            ;;
       esac
    done
 }
@@ -119,18 +121,13 @@ function Add() {
       read -r name
    fi
 
-   if [ -z "${name}" ]; then
-      Kill "Failed to set a name"
-   fi
+   [[ -z "${name}" ]] && Kill "Failed to set a name"
 
    # Check if a password with the chosen name already exists.
    PasswordExists
 
    # Ask if the user want to generate a random password.
    RandomPassword
-
-   # Write password to the 'password' file.
-   printf "%s" "${password}" > "${passLocation}/${name}"
 
    # Encrypte the password file using gpg.
    gpg --encrypt --output "${passLocation}/${name}.gpg" --recipient "${email}" "${passLocation}/${name}"  &> /dev/null
@@ -157,9 +154,6 @@ function Update() {
 
    # Ask if the user want to generate a random password.
    RandomPassword
-
-   # Write password to the 'password' file.
-   printf "%s" "${password}" > "${passLocation}/${name}"
 
    # Remove the ecrypted password file to prevent gpg from asking to overwrite.
    rm -rf "${passLocation:?}/${name}.gpg"
