@@ -31,7 +31,7 @@ Options:
 --delete     or -d                     [name] - Delete a password.
 --show       or -s                     [name] - Show a password.
 --copy       or -c                     [name] - Copy a password to the clipboard.
---list       or -c                            - List all password.
+--list       or -l                            - List all password.
 ```
 
 Examples: 
