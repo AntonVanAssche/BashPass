@@ -21,8 +21,9 @@ BashPass is a simple password manager written in Bash. It uses GPG to encrypt/de
 Note: the `[name]` is optional.
 
 ```
-bashpass [--add|--update|--delete|--show|--copy|--list] [name] - Basic commands
+bashpass [option] [name]                      - Basic command structure.
 
+Options:
 --help       or -h                            - Show this help message.
 --version    or -v                            - Show the version number
 --add        or -a                     [name] - Add a password.
