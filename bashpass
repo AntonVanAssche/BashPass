@@ -155,7 +155,7 @@ function Update() {
    printf "%s" "${password}" > "${passLocation}/${name}"
 
    # Remove the ecrypted password file to prevent gpg from asking to overwrite.
-   rm -rf "${passLocation:?}/${name}"
+   rm -rf "${passLocation:?}/${name}.gpg"
 
    # Encrypte the password file using gpg.
    gpg --encrypt --output "${passLocation}/${name}.gpg" --recipient "${email}" "${passLocation}/${name}"  &> /dev/null
