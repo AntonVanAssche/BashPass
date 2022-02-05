@@ -49,26 +49,29 @@ function Version() {
 
 function RandomPassword() {
    printf "Do you want to generate a password [Y/n]: "
-   read -re random
+   read -r random
 
    case "${random}" in
       [Nn])
          printf "Enter a password: "
-         read -res password1
+         read -rs password1
+         printf "\n"
 
          printf "Enter the password again: "
-         read -res password2
+         read -rs password2
+         printf "\n"
          
          while [[ "${password1}" != "${password2}" ]]; do
             printf "Passwords ditn't match, please try again: "
-            read -res password2
+            read -rs password2
+            printf "\n"
          done
 
          password=${password1}
          ;;
       *)
          printf "Give the lenght of the password: "
-         read -re lenght
+         read -r lenght
 
          # Generate a password using '/dev/urandom'.
          # Call the 'tr' command to translate the password to a character set.
@@ -84,15 +87,18 @@ function RandomPassword() {
 
 # Function to print out errors and exit afterwards.
 function Kill() {
-   printf "\nA error occured: %s\n\n" "${1}"
+   printf "A error occured: %s" "${1}"
+   printf "\n"
    Help
+   printf "\n"
    exit 1
 }
 
 function PasswordExists() {
    while [[ -f ${passLocation}/${name}.gpg ]]; do
       printf "A password with the name %s already exists." "'${name}'"
-      printf "\nDo you want to overwrite the existing password [y/N]: "
+      printf "\n"
+      printf "Do you want to overwrite the existing password [y/N]: "
       read -r overwrite
       
       case "${overwrite}" in
@@ -130,6 +136,7 @@ function Add() {
    gpg --encrypt --output "${passLocation}/${name}.gpg" --recipient "${email}" "${passLocation}/${name}"  &> /dev/null
 
    printf "Password %s has been successfully saved" "'${name}'"
+   printf "\n"
 
    # Remove the Decrypted password file after reading
    # to prevent the password from being leaked afterwards.
@@ -161,6 +168,7 @@ function Update() {
    gpg --encrypt --output "${passLocation}/${name}.gpg" --recipient "${email}" "${passLocation}/${name}"  &> /dev/null
 
    printf "Password %s has successfully been updated" "'${name}'"
+   printf "\n"
 
    # Remove the Decrypted password file after reading
    # to prevent the password from being leaked afterwards.
@@ -177,7 +185,8 @@ function Delete() {
    fi
 
    rm -rf "${passLocation}/${name}.gpg"
-   printf "\nPassword %s has successfully been deleted" "'${name}'"
+   printf "Password %s has successfully been deleted" "'${name}'"
+   printf "\n"
 }
 
 function Show() {
@@ -189,7 +198,8 @@ function Show() {
    fi
 
    # Decrypte the password file and show the password
-   gpg -dq "${passLocation}/${name}.gpg"   
+   printf "Password: %s" "$(gpg -dq "${passLocation}/${name}.gpg")"
+   printf "\n"
 }
 
 function Copy() {
@@ -211,6 +221,7 @@ function Copy() {
 
 function List() {
    ls -1 "$passLocation"
+   printf "\n"
 }
 
 # Detect 'gpg'
