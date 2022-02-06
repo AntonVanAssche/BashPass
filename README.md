@@ -56,7 +56,7 @@ $ ./install.sh
 After installation, you'll have to add `.local/bin` to your PATH to use BashPass. Add the following line in your `.bashrc` file.
 
 ```bash
-export PATH="/home/anton/.local/bin:$PATH"
+export PATH="$HOME/.local/bin:$PATH"
 ```
 
 When you start BashPass for the first time you'll be prompted with the question to enter an e-mail address. You must enter the same e-mail address that you've used to generate the GPG key.
