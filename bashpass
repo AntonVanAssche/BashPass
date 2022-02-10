@@ -85,6 +85,17 @@ function RandomPassword() {
    printf "%s" "${password}" > "${passLocation}/${name}"
 }
 
+# Function to ask for a name.
+function Name() {
+   name="${1}"
+   function=${2}
+
+   if [[ -z "${name}" ]]; then
+      printf "Enter the name of the password you want to %s: " "${function}"
+      read -r name
+   fi
+}
+
 # Function to print out errors and exit afterwards.
 function Kill() {
    printf "A error occured: %s" "${1}"
@@ -114,12 +125,8 @@ function PasswordExists() {
 }
 
 function Add() {
-   name="${1}"
-
-   if [[ -z "${name}" ]]; then
-      printf "Enter a name: "
-      read -r name
-   fi
+   # Ask for a name when no name was given using ${2}.
+   Name "${1}" "add"
 
    [[ -z "${name}" ]] && Kill "Failed to set a name"
 
@@ -142,12 +149,8 @@ function Add() {
 }
 
 function Update() {
-   name="${1}"
-
-   if [[ -z "${name}" ]]; then
-      printf "Enter the name of the password you want to update: "
-      read -r name
-   fi
+   # Ask for a name when no name was given using ${2}.
+   Name "${1}" "update"
 
    # Decrypte the password file.
    gpg --decrypt --output "${passLocation}/${name}" "${passLocation}/${name}.gpg" &> /dev/null
@@ -171,12 +174,8 @@ function Update() {
 }
 
 function Delete() {
-   name="${1}"
-
-   if [[ -z "${name}" ]]; then
-      printf "Enter the name of the password you want to delete: "
-      read -r name
-   fi
+   # Ask for a name when no name was given using ${2}.
+   Name "${1}" "delete"
 
    rm -rf "${passLocation}/${name}.gpg"
    printf "Password %s has successfully been deleted" "'${name}'"
@@ -184,12 +183,8 @@ function Delete() {
 }
 
 function Show() {
-   name="${1}"
-
-   if [[ -z "${name}" ]]; then
-      printf "Enter the name of the password you want to show: "
-      read -r name
-   fi
+   # Ask for a name when no name was given using ${2}.
+   Name "${1}" "show"
 
    # Decrypte the password file and show the password
    printf "Password: %s" "$(gpg -dq "${passLocation}/${name}.gpg")"
@@ -198,11 +193,6 @@ function Show() {
 
 function Copy() {
    name="${1}"
-
-   if [[ -z "${name}" ]]; then
-      printf "Enter the name of the password you want to copy: "
-      read -r name
-   fi
 
    # Pipe the show function output to xclip to copy the password to the clipboard.
    Show "${name}" | xclip -selection clipboard
