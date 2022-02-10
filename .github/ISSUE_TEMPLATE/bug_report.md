@@ -25,6 +25,10 @@ assignees: ''
 **(3) Expected behavior:**
 
 
-**(4) BashPass version:**
+**(4) Actual behavior:**
 
-**(5) GPG version:**
+**(5) BashPass version:**
+
+**(6) GPG version:**
+
+**(7) Notes:**
