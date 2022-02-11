@@ -7,6 +7,7 @@ BashPass is a simple password manager written in Bash. It uses GPG to encrypt/de
 - [Usage](#usage)
 - [Installing BashPass](#installing-bashpass)
 - [Updating BashPass](#updating-bashpass)
+- [Uninstalling BashPass](#uninstalling-bashpass)
 - [Updating the config](#updating-the-config)
     - [Updating the location where passwords are stored](#updating-the-location-where-passwords-are-stored)
     - [Updating the email address](#updating-the-e-mail-address)
@@ -47,10 +48,10 @@ First you'll have to generate a GPG key. Run the following command to do so, and
 $ gpg --full-generate-key
 ```
 
-Now it's time to install BashPass. Just run the `install.sh` script and you'll be good to go.
+Now it's time to install BashPass. Just run the `setup.sh` script and you'll be good to go.
 
 ```bash
-$ ./install.sh
+$ ./setup.sh --install
 ```
 
 After installation, you'll have to add `.local/bin` to your PATH to use BashPass. Add the following line in your `.bashrc` file.
@@ -66,10 +67,17 @@ Enter the email address you created the gpg key with:
 ```
 
 ## Updating BashPass
-To update BashPass to the latest version, just run the install.sh script and you'll be good to go.
+To update BashPass to the latest version, just run the `setup.sh` script and you'll be good to go.
 
 ```bash
-$ ./install.sh
+$ ./setup.sh --update
+```
+
+## Uninstalling BashPass
+To uninstall BashPass, just run the `setup.sh` script.
+
+```bash
+$ ./setup.sh --uninstall
 ```
 
 ## Updating the config
