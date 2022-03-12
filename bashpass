@@ -192,14 +192,16 @@ function Show() {
 }
 
 function Copy() {
-   name="${1}"
+   # Ask for a name when no name was given using ${2}.
+   Name "${1}" "copy"
 
-   # Pipe the show function output to xclip to copy the password to the clipboard.
-   Show "${name}" | xclip -selection clipboard
-
+   # Decrypte the password file and copy it to the clipboard using xclip.
+   # This WON'T show the password inside the terminal output.
+   printf "%s" "$(gpg -dq "${passLocation}/${name}.gpg")" | xclip -selection clipboard
+   
    # Wait for the timer to end clear the clipboard.
    # 'timer' can be changed in the config file.
-   sleep "$timer" || kill 0
+   sleep "${timer}" || kill 0
    xclip -selection clipboard < /dev/null
 }
 
