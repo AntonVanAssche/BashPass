@@ -19,14 +19,15 @@ email="$(grep "email" "$config" | cut -d" " -f2)"
 passLocation="$HOME/$(grep "location" "$config" | cut -d" " -f2)"
 version="$(grep "version" "$config" | cut -d" " -f2)"
 timer="$(grep "timer" "$config" | cut -d" " -f2)"
+passLength="$(grep "length" "$config" | cut -d" " -f2)"
 
 # Create the necessary directories/files if they doesn't exists
 mkdir -p "${passLocation}" "${configLocation}"
 touch "${config}"
 
-function Help() {
+Help() {
    cat << EOF
-BashPass version: $version
+BashPass version: ${version}
 A simple password manager written in Bash.
 
 bashpass [option] [name]                      - Basic command structure.
@@ -43,11 +44,11 @@ Options:
 EOF
 }
 
-function Version() {
+Version() {
    printf "BashPass version: %s" "${version}"
 }
 
-function RandomPassword() {
+RandomPassword() {
    printf "Do you want to generate a password [Y/n]: "
    read -r random
 
@@ -70,12 +71,16 @@ function RandomPassword() {
          password=${password1}
          ;;
       *)
-         printf "Give the lenght of the password: "
-         read -r lenght
+         printf "Give the length of the password (Default: 14): "
+         read -r length
+
+         if [[ -z ${length} ]]; then
+            length=${passLength}
+         fi
 
          # Generate a password using '/dev/urandom'.
          # Call the 'tr' command to translate the password to a character set.
-         password=$(</dev/urandom tr -dc '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%*()?.,/+-abcdefghijklmnopqrstuvwxyz' | head -c "${lenght}"; echo "")
+         password=$(</dev/urandom tr -dc '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%*()?.,/+-abcdefghijklmnopqrstuvwxyz' | head -c "${length}"; echo "")
          ;;
    esac
 
@@ -86,7 +91,7 @@ function RandomPassword() {
 }
 
 # Function to ask for a name.
-function Name() {
+Name() {
    name="${1}"
    function=${2}
 
@@ -97,7 +102,7 @@ function Name() {
 }
 
 # Function to print out errors and exit afterwards.
-function Kill() {
+Kill() {
    printf "A error occured: %s" "${1}"
    printf "\n"
    Help
@@ -105,7 +110,7 @@ function Kill() {
    exit 1
 }
 
-function PasswordExists() {
+PasswordExists() {
    while [[ -f ${passLocation}/${name}.gpg ]]; do
       printf "A password with the name %s already exists." "'${name}'"
       printf "\n"
@@ -124,7 +129,7 @@ function PasswordExists() {
    done
 }
 
-function Add() {
+Add() {
    # Ask for a name when no name was given using ${2}.
    Name "${1}" "add"
 
@@ -148,7 +153,7 @@ function Add() {
    rm -rf "${passLocation:?}/${name}"
 }
 
-function Update() {
+Update() {
    # Ask for a name when no name was given using ${2}.
    Name "${1}" "update"
 
@@ -173,7 +178,7 @@ function Update() {
    rm -rf "${passLocation:?}/${name}"
 }
 
-function Delete() {
+Delete() {
    # Ask for a name when no name was given using ${2}.
    Name "${1}" "delete"
 
@@ -182,7 +187,7 @@ function Delete() {
    printf "\n"
 }
 
-function Show() {
+Show() {
    # Ask for a name when no name was given using ${2}.
    Name "${1}" "show"
 
@@ -191,7 +196,7 @@ function Show() {
    printf "\n"
 }
 
-function Copy() {
+Copy() {
    # Ask for a name when no name was given using ${2}.
    Name "${1}" "copy"
 
@@ -205,8 +210,8 @@ function Copy() {
    xclip -selection clipboard < /dev/null
 }
 
-function List() {
-   ls -1 "$passLocation"
+List() {
+   ls -1 "${passLocation}"
    printf "\n"
 }
 
@@ -217,7 +222,7 @@ command -v gpg &> /dev/null || Kill "gpg is required"
 if [[ -z ${email} ]]; then
    printf "Enter the email address you created the gpg key with: "
    read -r email
-   printf "email:%s" "${email}" >> "${config}"
+   printf "email: %s" "${email}" >> "${config}"
 fi
 
 function Main() {
