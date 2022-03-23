@@ -75,7 +75,7 @@ function RandomPassword() {
 
          # Generate a password using '/dev/urandom'.
          # Call the 'tr' command to translate the password to a character set.
-         password=$(</dev/urandom tr -dc '12345!@#$%qwertQWERTasdfgASDFGzxcvbZXCVB' | head -c "${lenght}"; echo "")
+         password=$(</dev/urandom tr -dc '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%*()?.,/+-abcdefghijklmnopqrstuvwxyz' | head -c "${lenght}"; echo "")
          ;;
    esac
 
