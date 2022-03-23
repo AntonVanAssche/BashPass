@@ -41,6 +41,7 @@ Options:
 --show       or -s                     [name] - Show a password.
 --copy       or -c                     [name] - Copy a password to the clipboard.
 --list       or -l                            - List all password.
+--sync       or -S                     [name] - Synchronize a password with a other device on your local network.
 EOF
 }
 
@@ -197,6 +198,8 @@ Show() {
 }
 
 Copy() {
+   # Detect 'xclip'
+   command -v xclip &> /dev/null || Kill "xclip is required"
    # Ask for a name when no name was given using ${2}.
    Name "${1}" "copy"
 
@@ -213,6 +216,41 @@ Copy() {
 List() {
    ls -1 "${passLocation}"
    printf "\n"
+}
+
+Sync() {
+   # Detect 'ssh' and 'scp'
+   command -v ssh &> /dev/null || Kill "ssh is required"
+   command -v scp &> /dev/null || Kill "scp is required"
+
+   Name "${1}" "synchronize"
+
+   printf "Enter the username of the user on the other device: "
+   read -r username
+   printf "Enter the local IP address of the other device: "
+   read -r localIP
+   
+   scp "${passLocation}/${name}.gpg" "${username}"@"${localIP}":~/.local/share/bashpass/
+
+   printf "\n"
+   printf "Be aware you'll need to import your GPG key on the other device as well."
+   printf "\n"
+   printf "Do you want to do this now [Y/n]? "
+   read -r keyExport
+
+   case "${keyExport}" in
+      [Nn])
+         printf "You will have to manually export your keys to the other device if you haven't done so."
+         ;;
+      *)
+         gpg --list-keys
+         printf "Enter your key ID (Example: VEB8K7W2O3OOOBEREODILJ4DH046253LB68CXK21): "
+         read -r keyID
+
+         gpg --armor --export "${keyID}" | ssh "${username}"@"${localIP}" gpg --batch --import - || printf "Failed to import the public key."
+         gpg --armor --export-secret-key "${keyID}" | ssh "${username}"@"${localIP}" gpg --batch --allow-secret-key-import --import - || printf "Failed to import the private key."
+         ;;   
+   esac
 }
 
 # Detect 'gpg'
@@ -235,6 +273,7 @@ function Main() {
       "--show"| "-s") Show "${2}";;
       "--copy"| "-c") Copy "${2}";;
       "--list"| "-l") List;;
+      "--sync"| "-S") Sync "${2}";;
       *) Kill "option '${1}' not found";;
    esac
 }
