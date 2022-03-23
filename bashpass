@@ -15,10 +15,10 @@ fi
 # Get the necessary configurations from the configuration file.
 configLocation="$HOME/.config/bashpass"
 config="$configLocation/bashpass.conf"
-email="$(grep "email" "$config" | cut -d: -f2)"
-passLocation="$HOME/$(grep "location" "$config" | cut -d: -f2)"
-version="$(grep "version" "$config" | cut -d: -f2)"
-timer="$(grep "timer" "$config" | cut -d: -f2)"
+email="$(grep "email" "$config" | cut -d" " -f2)"
+passLocation="$HOME/$(grep "location" "$config" | cut -d" " -f2)"
+version="$(grep "version" "$config" | cut -d" " -f2)"
+timer="$(grep "timer" "$config" | cut -d" " -f2)"
 
 # Create the necessary directories/files if they doesn't exists
 mkdir -p "${passLocation}" "${configLocation}"
