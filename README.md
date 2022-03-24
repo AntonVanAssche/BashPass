@@ -61,7 +61,7 @@ $ gpg --full-generate-key
 Now it's time to install BashPass. Just run the `setup.sh` script and you'll be good to go.
 
 ```bash
-$ bash -c "$(wget -qO - https://raw.githubusercontent.com/AntonVanAssche/BashPass/master/setup.sh --install)"
+$ ./setup.sh --install
 ```
 
 After installation, you'll have to add `.local/bin` to your PATH to use BashPass. Add the following line in your `.bashrc` file.
@@ -81,7 +81,7 @@ Enter the email address you created the gpg key with:
 To update BashPass to the latest version, just run the `setup.sh` script and you'll be good to go.
 
 ```bash
-$ bash -c "$(wget -qO - https://raw.githubusercontent.com/AntonVanAssche/BashPass/master/setup.sh --update)"
+$ ./setup.sh --update
 ```
 
 ## Uninstalling BashPass
@@ -89,7 +89,7 @@ $ bash -c "$(wget -qO - https://raw.githubusercontent.com/AntonVanAssche/BashPas
 To uninstall BashPass, just run the `setup.sh` script.
 
 ```bash
-$ bash -c "$(wget -qO - https://raw.githubusercontent.com/AntonVanAssche/BashPass/master/setup.sh --uninstall)"
+$ ./setup.sh --uninstall
 ```
 
 ## Synchronize passwords between devices
