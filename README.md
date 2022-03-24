@@ -10,11 +10,11 @@ BashPass is a simple password manager written in Bash. It uses GPG to encrypt/de
 -  [Updating BashPass](#updating-bashpass)
 -  [Uninstalling BashPass](#uninstalling-bashpass)
 -  [Synchronize passwords between devices](#synchronize-passwords-between-devices)
--  [Updating the config](#updating-the-config)
-   -  [Updating the location where passwords are stored](#updating-the-location-where-passwords-are-stored)
-   -  [Updating the email address](#updating-the-e-mail-address)
-   -  [Updating the clipboard timer](#updating-the-clipboard-timer)
-   -  [Updating the default password length](#updating-the-default-password-length)
+-  [Configuring BashPass](#configuring-bashpass)
+   -  [Configuring the location where passwords are stored](#configuring-the-location-where-passwords-are-stored)
+   -  [Configuring the email address](#configuring-the-e-mail-address)
+   -  [Configuring the clipboard timer](#configuring-the-clipboard-timer)
+   -  [Configuring the default password length](#configuring-the-default-password-length)
 -  [Feedback](#feedback)
 
 ## Dependencies
@@ -61,7 +61,7 @@ $ gpg --full-generate-key
 Now it's time to install BashPass. Just run the `setup.sh` script and you'll be good to go.
 
 ```bash
-$ ./setup.sh --install
+$ bash -c "$(wget -qO - https://raw.githubusercontent.com/AntonVanAssche/BashPass/master/setup.sh --install)"
 ```
 
 After installation, you'll have to add `.local/bin` to your PATH to use BashPass. Add the following line in your `.bashrc` file.
@@ -81,7 +81,7 @@ Enter the email address you created the gpg key with:
 To update BashPass to the latest version, just run the `setup.sh` script and you'll be good to go.
 
 ```bash
-$ ./setup.sh --update
+$ bash -c "$(wget -qO - https://raw.githubusercontent.com/AntonVanAssche/BashPass/master/setup.sh --update)"
 ```
 
 ## Uninstalling BashPass
@@ -89,7 +89,7 @@ $ ./setup.sh --update
 To uninstall BashPass, just run the `setup.sh` script.
 
 ```bash
-$ ./setup.sh --uninstall
+$ bash -c "$(wget -qO - https://raw.githubusercontent.com/AntonVanAssche/BashPass/master/setup.sh --uninstall)"
 ```
 
 ## Synchronize passwords between devices
@@ -108,11 +108,13 @@ or:
 $ bashpass -S password
 ```
 
-## Updating the config
+## Configuring BashPass
 
-### Updating the location where passwords are stored
+BashPass has a configuration file located at `~/.config/bashpass/bashpass.conf`. Here you can change a few basic things like the email address, the default location where your passwords are stored, and a few other settings.
 
-By default BashPass stores the passwords the following directory `~/.local/share/bashpass/`. In case you want to change the location you'll have to change the following line in the config file located at `~/.config/bashpass/bashpass.conf`.
+### Configuring the location where passwords are stored
+
+By default BashPass stores the passwords the following directory `~/.local/share/bashpass/`. In case you want to change the location you'll have to change the following line in the config file.
 
 ```
 location: .local/share/bashpass
@@ -126,9 +128,9 @@ location: .local/share/bashpass
 location: .bashpass/passwords/
 ```
 
-### Updating the e-mail address
+### Configuring the e-mail address
 
-Changing the e-mail address isn't recommended but in case you need to do this here you go. To update the e-mail address you'll have to update the following line in the config file located at `~/.config/bashpass/bashpass.conf`.
+Changing the e-mail address isn't recommended but in case you need to do this here you go. To update the e-mail address you'll have to update the following line in the config file.
 
 ```
 email: email@gmail.com
@@ -142,9 +144,9 @@ email: email@gmail.com
 email: newemail@gmail.com
 ```
 
-### Updating the clipboard timer
+### Configuring the clipboard timer
 
-By default BashPass has a timer of `10` seconds. This can be changed in the config file located at `~/.config/bashpass/bashpass.conf`. To change this edit the following line.
+By default BashPass has a timer of `10` seconds. This value is the amount of seconds you have to paste your password you copied using the `copy` option. The duration of the timer can be changed in the config file. To change this edit the following line.
 
 ```
 timer: 10
@@ -156,10 +158,10 @@ timer: 10
 timer: 15
 ```
 
-### Updating the default password length
+### Configuring the default password length
 
-By default all random generated passwords will be 14 characters long when no specific length is given when prompted. You can however change this to as many characters you want.
-This can be done by editing the following line in the config file located at `~/.config/bashpass/bashpass.conf`.
+By default all random generated passwords will be 14 characters long when no specific length is given when prompted (since version: `2.0`). You can however change this to as many characters you want.
+This can be done by editing the following line in the config file.
 
 ```
 length: 14
