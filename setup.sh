@@ -9,53 +9,94 @@ configLocation="$HOME/.config/bashpass"
 config="$configLocation/bashpass.conf"
 
 # Detect user
-if [[ "$UID" == 0 ]]; then
-   prinf "You must run this as a normal user"
+if [[ "${UID}" == 0 ]]; then
+   printf "You must run this as a normal user.\nCurrent user ID: %s %s" "${UID}" "$([[ "${UID}" -eq 0 ]] && printf "(root)")"
    exit 1
 fi
 
-function Update() {
-   local oldVersion newVersion
-   oldVersion="$(grep "version" "$config" | cut -d: -f2)"
-   newVersion="$(grep "version" "$currentDir/config/bashpass.conf" | cut -d: -f2)"
-
-   printf "BashPass is already installed on your system"
-   printf "\nUpdating BashPass to version: %s..." "${newVersion}"
-
-   sed -i "1s|$oldVersion|$newVersion|g" "$config"
-   cp -r "$currentDir/bashpass" "$HOME/.local/bin/bashpass"
+GetLatestVersion() {
+   curl --silent "https://api.github.com/repos/AntonVanAssche/BashPass/releases/latest" | # Get latest release from GitHub api
+   grep '"tag_name":' |                                            # Get tag line
+   sed -E 's/.*"([^"]+)".*/\1/'                                    # Pluck JSON value
 }
 
-function Install() {
-   if [[ -f "$HOME/.local/bin/bashpass" ]]; then
+CloneLatestVersion() {
+   #git clone -b -q "$(basename "$(curl -Ls -o /dev/null -w "%{url_effective}" https://github.com/AntonVanAssche/BashPass/releases/latest)")" \
+      # https://github.com/AntonVanAssche/BashPass.git
+
+   # Current replacement for cloning the latest version.
+   git clone https://github.com/AntonVanAssche/BashPass.git
+   cd BashPass/
+   git checkout develop
+   cd ../
+}
+
+Install() {
+   if [[ -f "${HOME}/.local/bin/bashpass" ]]; then
       Update
-      exit
+      exit 1
    fi
 
-   printf "Installing BashPass..."
-   mkdir -p "$HOME/.config/bashpass"
-   mkdir -p "$HOME/.local/share/bashpass"
+   CloneLatestVersion
 
-   cp -r "$currentDir/config/bashpass.conf" "$HOME/.config/bashpass/bashpass.conf"
-   cp -r "$currentDir/bashpass" "$HOME/.local/bin/bashpass"
+   printf "Installing BashPass version: %s..." "$(GetLatestVersion)"
+   mkdir -p "${HOME}/.config/bashpass"
+   mkdir -p "${HOME}/.local/share/bashpass"
 
-   printf "\nMake sure to add '\$HOME/.local/bin/' to your \$PATH."
+   cp -r "${currentDir}/BashPass/config/bashpass.conf" "${HOME}/.config/bashpass/bashpass.conf"
+   cp -r "${currentDir}/BashPass/bashpass" "${HOME}/.local/bin/bashpass"
+
+   printf "\nMake sure to add '\${HOME}/.local/bin/' to your \$PATH."
+
+   rm -rf BashPass/
 }
 
-function Uninstall() {
-   printf "Uninstalling BashPass..."
-   rm -rf "$HOME/.config/bashpass" "$HOME/.local/share/bashpass" "$HOME/.local/bin/bashpass"
+Uninstall() {
+   printf "Uninstalling BashPass version: %s..." "$(GetLatestVersion)"
+   rm -rf "${HOME}/.config/bashpass" "${HOME}/.local/share/bashpass" "${HOME}/.local/bin/bashpass"
    printf "\n"
    printf "We hate to see you go."
 }
 
+Update() {
+   currentConfig="${config}.old"
+   
+   printf "Updating BashPass to version: %s...\n" "$(GetLatestVersion)"
+
+   CloneLatestVersion
+
+   case $(grep "version" "${config}" | cut -d: -f2) in
+      "1.0"| "1.1")
+         mv "${config}" "${currentConfig}"
+
+         cp -r "${currentDir}"/BashPass/config/bashpass.conf "${config}"
+
+         currentLocation="$(grep "location" "$currentConfig" | cut -d: -f2)"
+         currentEmail="$(grep "email" "$currentConfig" | cut -d: -f2)"
+         currentTimer="$(grep "timer" "$currentConfig" | cut -d: -f2)"
+
+         printf "email: %s" "$currentEmail" >> "${config}"
+         sed -i "2s|.local/share/bashpass|$currentLocation|g" "${config}"
+         sed -i "3s|10|$currentTimer|g" "${config}"
+         ;;
+      *)
+         currentVersion="$(grep "version" "${config}" | cut -d" " -f2)"
+         newVersion="$(grep "version" "./BashPass/config/bashpass.conf" | cut -d" " -f2)"
+         sed -i "1s|${currentVersion}|${newVersion}|g" "${config}"
+         ;;
+   esac
+
+   cp -r "${currentDir}/BashPass/bashpass" "${HOME}/.local/bin/bashpass"
+   rm -rf "${currentConfig}" BashPass/
+}
+
 function Main() {
-   case "$1" in
+   case "${1}" in
       "--install") Install;;
-      "--update") Update;;
       "--uninstall") Uninstall;;
+      "--update") Update;;
       *) printf "option '%s' not found" "${1}";;
    esac
 }
 
-Main "$1"
+Main "${1}"
