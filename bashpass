@@ -130,6 +130,12 @@ PasswordExists() {
    done
 }
 
+GetLatestVersion() {
+   curl --silent "https://api.github.com/repos/AntonVanAssche/BashPass/releases/latest" | # Get latest release from GitHub api
+   grep '"tag_name":' |                                            # Get tag line
+   sed -E 's/.*"([^"]+)".*/\1/'                                    # Pluck JSON value
+}
+
 Add() {
    # Ask for a name when no name was given using ${2}.
    Name "${1}" "add"
@@ -264,6 +270,8 @@ if [[ -z ${email} ]]; then
 fi
 
 function Main() {
+   [[ "$(GetLatestVersion)" == "${version}" ]] || printf "There is a new version available\n"
+
    case "$1" in
       "--help"| "-h") Help;;
       "--version"| "-v") Version;;
