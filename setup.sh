@@ -10,7 +10,7 @@ config="$configLocation/bashpass.conf"
 
 # Detect user
 if [[ "${UID}" == 0 ]]; then
-   printf "You must run this as a normal user.\nCurrent user ID: %s %s" "${UID}" "$([[ "${UID}" -eq 0 ]] && printf "(root)")"
+   printf "You must run this as a normal user.\nCurrent user ID: %s %s\n" "${UID}" "$([[ "${UID}" -eq 0 ]] && printf "(root)")"
    exit 1
 fi
 
@@ -90,7 +90,7 @@ Update() {
    rm -rf "${currentConfig}" BashPass/
 }
 
-function Main() {
+Main() {
    case "${1}" in
       "--install") Install;;
       "--uninstall") Uninstall;;
