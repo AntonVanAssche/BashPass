@@ -8,7 +8,7 @@ set -ef +x
 # Detect the user.
 # When the user is root exit out.
 if [[ "$UID" == 0 ]]; then
-   prinf "You must run this as a normal user"
+   printf "You must run this as a normal user.\nCurrent user ID: %s %s\n" "${UID}" "$([[ "${UID}" -eq 0 ]] && printf "(root)")"
    exit 1
 fi
 
