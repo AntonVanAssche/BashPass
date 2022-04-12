@@ -263,8 +263,8 @@ Sync() {
          printf "Enter your key ID (Example: VEB8K7W2O3OOOBEREODILJ4DH046253LB68CXK21): "
          read -r keyID
 
-         gpg --armor --export "${keyID}" | ssh "${username}"@"${localIP}" gpg --batch --import - || printf "Failed to import the public key."
-         gpg --armor --export-secret-key "${keyID}" | ssh "${username}"@"${localIP}" gpg --batch --allow-secret-key-import --import - || printf "Failed to import the private key."
+         gpg --armor --export "${keyID}" | ssh "${username}"@"${localIP}" gpg --batch --import - || Kill "Failed to import the public key." "1"
+         gpg --armor --export-secret-key "${keyID}" | ssh "${username}"@"${localIP}" gpg --batch --allow-secret-key-import --import - || Kill "Failed to import the private key." "1"
          ;;   
    esac
 }
