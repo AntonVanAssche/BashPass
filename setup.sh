@@ -61,7 +61,7 @@ Uninstall() {
 Update() {
    currentConfig="${config}.old"
    
-   printf "Updating BashPass to version: %s...\n" "$(GetLatestVersion)"
+   printf "Updating BashPass to version: %s...\n" "'$(GetLatestVersion)'"
 
    CloneLatestVersion
 
