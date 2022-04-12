@@ -107,7 +107,7 @@ Name() {
 # Function to print out errors and exit (with the correct exit code) afterwards.
 Kill() {
    printf "\n"
-   printf "An error occured: %s" "${1}"
+   printf "An error occurred: %s" "${1}"
    printf "\n"
    exit "${2}"
 }
