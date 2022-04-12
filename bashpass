@@ -72,7 +72,7 @@ RandomPassword() {
          password=${password1}
          ;;
       *)
-         printf "Give the length of the password (Default: 14): "
+         printf "Give the length of the password (Default: %s): " "${passLength}"
          read -r length
 
          if [[ -z ${length} ]]; then
