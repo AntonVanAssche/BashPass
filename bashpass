@@ -111,6 +111,14 @@ Kill() {
 }
 
 PasswordExists() {
+   name="${1}"
+
+   if [[ ! -f "${passLocation}/${name}.gpg" ]]; then
+      Kill "password '${name}' doesn't exist." "1"
+   fi
+}
+
+PasswordAlreadyExists() {
    while [[ -f ${passLocation}/${name}.gpg ]]; do
       printf "A password with the name %s already exists." "'${name}'"
       printf "\n"
@@ -142,7 +150,7 @@ Add() {
    [[ -z "${name}" ]] && Kill "failed to set a name" "1"
 
    # Check if a password with the chosen name already exists.
-   PasswordExists
+   PasswordAlreadyExists
 
    # Ask if the user want to generate a random password.
    RandomPassword
@@ -162,6 +170,7 @@ Add() {
 Update() {
    # Ask for a name when no name was given using ${2}.
    Name "${1}" "update"
+   PasswordExists "${name}"
 
    # Decrypte the password file.
    gpg --decrypt --output "${passLocation}/${name}" "${passLocation}/${name}.gpg" &> /dev/null
@@ -187,6 +196,7 @@ Update() {
 Delete() {
    # Ask for a name when no name was given using ${2}.
    Name "${1}" "delete"
+   PasswordExists "${name}"
 
    rm -rf "${passLocation}/${name}.gpg"
    printf "Password %s has successfully been deleted" "'${name}'"
@@ -196,6 +206,7 @@ Delete() {
 Show() {
    # Ask for a name when no name was given using ${2}.
    Name "${1}" "show"
+   PasswordExists "${name}"
 
    # Decrypte the password file and show the password
    printf "Password: %s" "$(gpg -dq "${passLocation}/${name}.gpg")"
@@ -207,6 +218,7 @@ Copy() {
    command -v xclip &> /dev/null || Kill "xclip is required" "127"
    # Ask for a name when no name was given using ${2}.
    Name "${1}" "copy"
+   PasswordExists "${name}"
 
    # Decrypte the password file and copy it to the clipboard using xclip.
    # This WON'T show the password inside the terminal output.
