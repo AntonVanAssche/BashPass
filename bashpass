@@ -35,6 +35,7 @@ passLength="$(grep "length" "$config" | cut -d" " -f2)"
 # Create the necessary directories/files if they doesn't exists
 mkdir -p "${passLocation}"
 
+# Return all possible options/usages of BashPass. 
 Help() {
    cat << EOF
 BashPass version: ${version}
@@ -55,10 +56,12 @@ Options:
 EOF
 }
 
+# Return the current verion of BashPass.
 Version() {
    printf "BashPass version: %s" "${version}"
 }
 
+# Ask the user whether he would like to generate a password or to enter one himself.
 RandomPassword() {
    printf "Do you want to generate a password [Y/n]: "
    read -r random
@@ -112,7 +115,7 @@ Name() {
    fi
 }
 
-# Function to print out errors and exit (with the correct exit code) afterwards.
+# Print out the errors that occurred and exit (with the correct exit code) afterwards.
 Kill() {
    printf "\n"
    printf "An error occurred: %s" "${1}"
@@ -120,6 +123,7 @@ Kill() {
    exit "${2}"
 }
 
+# Check whether the given password exists.
 PasswordExists() {
    name="${1}"
 
@@ -128,6 +132,7 @@ PasswordExists() {
    fi
 }
 
+# Ask the user whether to overwrite an existing password or not.
 PasswordAlreadyExists() {
    while [[ -f ${passLocation}/${name}.gpg ]]; do
       printf "A password with the name %s already exists." "'${name}'"
@@ -147,12 +152,14 @@ PasswordAlreadyExists() {
    done
 }
 
+# Return the latest version using the GitHub API.
 GetLatestVersion() {
    curl --silent "https://api.github.com/repos/AntonVanAssche/BashPass/releases/latest" | # Get latest release from GitHub api
    grep '"tag_name":' |                                            # Get tag line
    sed -E 's/.*"([^"]+)".*/\1/'                                    # Pluck JSON value
 }
 
+# Add a new password.
 Add() {
    # Ask for a name when no name was given using ${2}.
    Name "${1}" "add"
@@ -177,6 +184,7 @@ Add() {
    rm -rf "${passLocation:?}/${name}"
 }
 
+# Update an existing password.
 Update() {
    # Ask for a name when no name was given using ${2}.
    Name "${1}" "update"
@@ -203,6 +211,7 @@ Update() {
    rm -rf "${passLocation:?}/${name}"
 }
 
+# Delete an existing password.
 Delete() {
    # Ask for a name when no name was given using ${2}.
    Name "${1}" "delete"
@@ -213,6 +222,7 @@ Delete() {
    printf "\n"
 }
 
+# Print the password that was given. 
 Show() {
    # Ask for a name when no name was given using ${2}.
    Name "${1}" "show"
@@ -223,9 +233,12 @@ Show() {
    printf "\n"
 }
 
+# Copy the password that was given to the clipboard.
+# Clear the clipboard afterwards.
 Copy() {
    # Detect 'xclip'
    command -v xclip &> /dev/null || Kill "xclip is required" "127"
+
    # Ask for a name when no name was given using ${2}.
    Name "${1}" "copy"
    PasswordExists "${name}"
@@ -249,17 +262,21 @@ Copy() {
    printf "\n"
 }
 
+# Return a list of all the passwords that are stored on your machine.
 List() {
    ls -1 "${passLocation}"
 }
 
+# Copy a password to another device  on your local network using 'ssh' and 'scp'.
+# Export the 'gpg' keys to that device.
 Sync() {
    # Detect 'ssh' and 'scp'
    command -v ssh &> /dev/null || Kill "ssh is required" "127"
    command -v scp &> /dev/null || Kill "scp is required" "127"
 
    Name "${1}" "synchronize"
-
+   PasswordExists "${name}"
+  
    printf "Enter the username of the user on the other device: "
    read -r username
    printf "Enter the local IP address of the other device: "
@@ -299,9 +316,10 @@ if [[ -z ${email} ]]; then
 fi
 
 function Main() {
-   [[ "$(GetLatestVersion)" == "${version}" ]] || printf "There is a new version available\n"
+    # Show the user when a new version is availble. 
+    [[ "$(GetLatestVersion)" == "${version}" ]] || printf "There is a new version available.\n"
 
-   case "$1" in
+   case "${1}" in
       "--help"| "-h") Help;;
       "--version"| "-v") Version;;
       "--add"| "-a") Add "${2}";;
@@ -316,8 +334,8 @@ function Main() {
 }
 
 # Check if an argument '$1' is given.
-if [[ "$1" ]]; then
-   Main "$@"
+if [[ "${1}" ]]; then
+   Main "${@}"
 else
    Help
 fi
