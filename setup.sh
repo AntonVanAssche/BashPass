@@ -11,7 +11,7 @@ config="$configLocation/bashpass.conf"
 # Detect user
 if [[ "${UID}" == 0 ]]; then
    printf "You must run this as a normal user.\nCurrent user ID: %s %s\n" "${UID}" "$([[ "${UID}" -eq 0 ]] && printf "(root)")"
-   exit 1
+   exit 13
 fi
 
 GetLatestVersion() {
