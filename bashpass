@@ -14,9 +14,18 @@ if [[ "$UID" == 0 ]]; then
    exit 13
 fi
 
-# Get the necessary configurations from the configuration file.
+# Detect the config file.
 configLocation="$HOME/.config/bashpass"
 config="$configLocation/bashpass.conf"
+
+if [[ ! -f ${config} ]]; then
+   printf "\n"
+   printf "An error occurred: Config file not found."
+   printf "\n"
+   exit 2
+fi
+
+# Get the necessary configurations from the configuration file.
 email="$(grep "email" "$config" | cut -d" " -f2)"
 passLocation="$HOME/$(grep "location" "$config" | cut -d" " -f2)"
 version="$(grep "version" "$config" | cut -d" " -f2)"
@@ -281,11 +290,6 @@ Sync() {
 
 # Detect 'gpg'
 command -v gpg &> /dev/null || Kill "gpg is required" "127"
-
-# Detect the config file.
-if [[ ! -f ${config} ]]; then
-   Kill "Config file not found." "2"
-fi
 
 # Ask the e-meil address to encrypt when it can't be found in the config file.
 if [[ -z ${email} ]]; then
