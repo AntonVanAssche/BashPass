@@ -3,7 +3,9 @@
 # '-e' Abort the script when an error occures.
 # '-f' To ensure that globbing is globally disabled.
 # '+x' To ensure debug mode is never enabled (prevents the password from leaking).
-set -ef +x
+# '-o pipefail' To ensure that the return code of a pipeline is the value of the last command to exit with a non-zero status.
+#     Needed for the `Copy` function.
+set -ef +x -o pipefail
 
 # Detect the user.
 # When the user is root exit out.
@@ -222,12 +224,21 @@ Copy() {
 
    # Decrypte the password file and copy it to the clipboard using xclip.
    # This WON'T show the password inside the terminal output.
-   printf "%s" "$(gpg -dq "${passLocation}/${name}.gpg")" | xclip -selection clipboard
+   if ! printf "%s" "$(gpg -dq "${passLocation}/${name}.gpg")" | xclip -selection clipboard; then
+      xclip -selection clipboard < /dev/null
+      Kill "failed to copy password '${name}' to the clipboard." "1"
+   fi
+
+   printf "Password %s has been copied to the clipboard" "'${name}'"
+   printf "\n"
    
    # Wait for the timer to end clear the clipboard.
    # 'timer' can be changed in the config file.
    sleep "${timer}" || kill 0
    xclip -selection clipboard < /dev/null
+   
+   printf "Clipboard has been cleared to ensure it cannot be leaked."
+   printf "\n"
 }
 
 List() {
