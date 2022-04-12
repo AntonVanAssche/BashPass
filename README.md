@@ -110,7 +110,14 @@ $ bashpass -S password
 
 ## Configuring BashPass
 
-BashPass has a configuration file located at `~/.config/bashpass/bashpass.conf`. Here you can change a few basic things like the email address, the default location where your passwords are stored, and a few other settings.
+BashPass has a configuration file located at `~/.config/bashpass/bashpass.conf`. Here you can change a few basic things like the email address, the default location where your passwords are stored, and a few other settings. Below you can find the default configuration file.
+
+```
+version: 2.0
+location: .local/share/bashpass
+timer: 10
+length: 14
+```
 
 ### Configuring the location where passwords are stored
 
