@@ -85,7 +85,7 @@ RandomPassword() {
          ;;
    esac
 
-   [[ -z "$password" ]] && Kill "Failed to set a password"
+   [[ -z "$password" ]] && Kill "failed to set a password" "1"
 
    # Write password to the 'password' file.
    printf "%s" "${password}" > "${passLocation}/${name}"
@@ -102,13 +102,12 @@ Name() {
    fi
 }
 
-# Function to print out errors and exit afterwards.
+# Function to print out errors and exit (with the correct exit code) afterwards.
 Kill() {
-   printf "A error occured: %s" "${1}"
    printf "\n"
-   Help
+   printf "An error occured: %s" "${1}"
    printf "\n"
-   exit 1
+   exit "${2}"
 }
 
 PasswordExists() {
@@ -140,7 +139,7 @@ Add() {
    # Ask for a name when no name was given using ${2}.
    Name "${1}" "add"
 
-   [[ -z "${name}" ]] && Kill "Failed to set a name"
+   [[ -z "${name}" ]] && Kill "failed to set a name" "1"
 
    # Check if a password with the chosen name already exists.
    PasswordExists
@@ -205,7 +204,7 @@ Show() {
 
 Copy() {
    # Detect 'xclip'
-   command -v xclip &> /dev/null || Kill "xclip is required"
+   command -v xclip &> /dev/null || Kill "xclip is required" "127"
    # Ask for a name when no name was given using ${2}.
    Name "${1}" "copy"
 
@@ -221,13 +220,12 @@ Copy() {
 
 List() {
    ls -1 "${passLocation}"
-   printf "\n"
 }
 
 Sync() {
    # Detect 'ssh' and 'scp'
-   command -v ssh &> /dev/null || Kill "ssh is required"
-   command -v scp &> /dev/null || Kill "scp is required"
+   command -v ssh &> /dev/null || Kill "ssh is required" "127"
+   command -v scp &> /dev/null || Kill "scp is required" "127"
 
    Name "${1}" "synchronize"
 
@@ -260,7 +258,7 @@ Sync() {
 }
 
 # Detect 'gpg'
-command -v gpg &> /dev/null || Kill "gpg is required"
+command -v gpg &> /dev/null || Kill "gpg is required" "127"
 
 # Ask the e-meil address to encrypt when it can't be found in the config file.
 if [[ -z ${email} ]]; then
@@ -282,7 +280,7 @@ function Main() {
       "--copy"| "-c") Copy "${2}";;
       "--list"| "-l") List;;
       "--sync"| "-S") Sync "${2}";;
-      *) Kill "option '${1}' not found";;
+      *) Kill "option '${1}' not found" "22";;
    esac
 }
 
