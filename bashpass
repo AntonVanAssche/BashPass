@@ -24,8 +24,7 @@ timer="$(grep "timer" "$config" | cut -d" " -f2)"
 passLength="$(grep "length" "$config" | cut -d" " -f2)"
 
 # Create the necessary directories/files if they doesn't exists
-mkdir -p "${passLocation}" "${configLocation}"
-touch "${config}"
+mkdir -p "${passLocation}"
 
 Help() {
    cat << EOF
@@ -282,6 +281,11 @@ Sync() {
 
 # Detect 'gpg'
 command -v gpg &> /dev/null || Kill "gpg is required" "127"
+
+# Detect the config file.
+if [[ ! -f ${config} ]]; then
+   Kill "Config file not found." "2"
+fi
 
 # Ask the e-meil address to encrypt when it can't be found in the config file.
 if [[ -z ${email} ]]; then
