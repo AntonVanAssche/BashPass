@@ -34,12 +34,12 @@ CloneLatestVersion() {
 Install() {
    if [[ -f "${HOME}/.local/bin/bashpass" ]]; then
       Update
-      exit 1
+      exit 0
    fi
 
    CloneLatestVersion
 
-   printf "Installing BashPass version: %s..." "$(GetLatestVersion)"
+   printf "Installing BashPass version: '%s'..." "$(GetLatestVersion)"
    mkdir -p "${HOME}/.config/bashpass"
    mkdir -p "${HOME}/.local/share/bashpass"
 
@@ -52,7 +52,7 @@ Install() {
 }
 
 Uninstall() {
-   printf "Uninstalling BashPass version: %s..." "$(GetLatestVersion)"
+   printf "Uninstalling BashPass version: '%s'..." "$(grep "version" "${config}" | cut -d: -f2)"
    rm -rf "${HOME}/.config/bashpass" "${HOME}/.local/share/bashpass" "${HOME}/.local/bin/bashpass"
    printf "\n"
    printf "We hate to see you go."
@@ -61,7 +61,7 @@ Uninstall() {
 Update() {
    currentConfig="${config}.old"
    
-   printf "Updating BashPass to version: %s...\n" "'$(GetLatestVersion)'"
+   printf "Updating BashPass to version: '%s'...\n" "$(GetLatestVersion)"
 
    CloneLatestVersion
 
