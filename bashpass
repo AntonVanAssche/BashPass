@@ -141,10 +141,10 @@ RandomPassword() {
          ;;
    esac
 
-   [[ -z "$password" ]] && Kill "failed to set a password" "1"
-
    # Write password to the 'password' file.
-   printf "%s" "${password}" > "${passLocation}/${name}"
+   if ! printf "%s" "${password}" > "${passLocation}/${name}"; then
+       Kill "failed to save the password ${name}" "1"
+   fi
 }
 
 # Add a new password.
