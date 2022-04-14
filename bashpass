@@ -5,23 +5,27 @@
 # '+x' To ensure debug mode is never enabled (prevents the password from leaking).
 # '-o pipefail' To ensure that the return code of a pipeline is the value of the last command to exit with a non-zero status.
 #     Needed for the `Copy` function.
-set -ef +x -o pipefail
+set -e -f +x -o pipefail
 
-# Loads all the necessary configurations.
-LoadConfigurations() {
-   # Detect the config file.
-   configLocation="$HOME/.config/bashpass"
-   config="$configLocation/bashpass.conf"
+# Assign the path to the config file to the variable '${config}'.
+configLocation="$HOME/.config/bashpass"
+config="$configLocation/bashpass.conf"
 
-   [[ -f ${config} ]] || Kill "config file not found." "2"
+# Detect the config file.
+if [[ ! -f ${config} ]]; then  
+   printf "\n"
+   printf "An error occurred: config file not found." 
+   printf "\n"
+   exit 2
+fi
 
-   # Get the necessary configurations from the configuration file.
-   email="$(grep "email" "$config" | cut -d" " -f2)"
-   passLocation="$HOME/$(grep "location" "$config" | cut -d" " -f2)"
-   version="$(grep "version" "$config" | cut -d" " -f2)"
-   timer="$(grep "timer" "$config" | cut -d" " -f2)"
-   passLength="$(grep "length" "$config" | cut -d" " -f2)"
-}
+# Get the necessary configurations from the configuration file.
+# '|| :' To prevent the script from exiting if the variable is not found (especially needed for the '${email} variable').
+email="$(grep "email" "$config" | cut -d" " -f2)" || :
+passLocation="$HOME/$(grep "location" "$config" | cut -d" " -f2)" || :
+version="$(grep "version" "$config" | cut -d" " -f2)" || :
+timer="$(grep "timer" "$config" | cut -d" " -f2)" || :
+passLength="$(grep "length" "$config" | cut -d" " -f2)" || :
 
 # Print out the error that occurred and exit (with the correct exit code) afterwards.
 Kill() {
@@ -299,9 +303,6 @@ Main() {
    # When the user is root exit out.
    [[ "$UID" == 0 ]] && Kill "permission denied" "13"
 
-   # Load all the necessary configurations.
-   LoadConfigurations
-   
    # Create the necessary directories if they doesn't exists.
    mkdir -p "${passLocation}"
 
