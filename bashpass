@@ -307,7 +307,7 @@ Main() {
    mkdir -p "${passLocation}"
 
    # Show the user when a new version is availble. 
-   [[ "$(GetLatestVersion)" == "${version}" ]] || printf "There is a new version available.\n"
+   [[ "$(GetLatestVersion)" == "${version}" ]] || printf "There is a new version available (%s).\n" "$(GetLatestVersion)"
 
    # Detect 'gpg'
    command -v gpg &> /dev/null || Kill "gpg is required" "127"
