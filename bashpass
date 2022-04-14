@@ -8,7 +8,7 @@
 set -ef +x -o pipefail
 
 # Loads all the necessary configurations.
-LoadConfigurations(){
+LoadConfigurations() {
    # Detect the config file.
    configLocation="$HOME/.config/bashpass"
    config="$configLocation/bashpass.conf"
@@ -62,6 +62,7 @@ EOF
 # Return the current verion of BashPass.
 Version() {
    printf "BashPass version: %s" "${version}"
+   printf "\n"
 }
 
 # Function to ask for a name.
@@ -115,6 +116,8 @@ RandomPassword() {
          read -rs password1
          printf "\n"
 
+         [[ -z "${password1}" ]] && Kill "the password cannot be empty." "1"
+
          printf "Enter the password again: "
          read -rs password2
          printf "\n"
@@ -131,9 +134,7 @@ RandomPassword() {
          printf "Give the length of the password (Default: %s): " "${passLength}"
          read -r length
 
-         if [[ -z ${length} ]]; then
-            length=${passLength}
-         fi
+         [[ -z ${length} ]] && length=${passLength}
 
          # Generate a password using '/dev/urandom'.
          # Call the 'tr' command to translate the password to a character set.
@@ -143,7 +144,7 @@ RandomPassword() {
 
    # Write password to the 'password' file.
    if ! printf "%s" "${password}" > "${passLocation}/${name}"; then
-       Kill "failed to save the password ${name}" "1"
+      Kill "failed to save the password ${name}" "1"
    fi
 }
 
