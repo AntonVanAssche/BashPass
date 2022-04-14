@@ -162,7 +162,7 @@ Add() {
    RandomPassword
 
    # Encrypte the password file using gpg.
-   gpg --encrypt --output "${passLocation}/${name}.gpg" --recipient "${email}" "${passLocation}/${name}"  &> /dev/null
+   gpg --encrypt --quiet --output "${passLocation}/${name}.gpg" --recipient "${email}" "${passLocation}/${name}"
 
    printf "Password %s has been successfully saved" "'${name}'"
    printf "\n"
@@ -180,7 +180,7 @@ Update() {
    PasswordExists "${name}"
 
    # Decrypte the password file.
-   gpg --decrypt --output "${passLocation}/${name}" "${passLocation}/${name}.gpg" &> /dev/null
+   gpg --decrypt --quiet --output "${passLocation}/${name}" "${passLocation}/${name}.gpg"
 
    # Ask if the user want to generate a random password.
    RandomPassword
@@ -189,7 +189,7 @@ Update() {
    rm -rf "${passLocation:?}/${name}.gpg"
 
    # Encrypte the password file using gpg.
-   gpg --encrypt --output "${passLocation}/${name}.gpg" --recipient "${email}" "${passLocation}/${name}"  &> /dev/null
+   gpg --encrypt --quiet --output "${passLocation}/${name}.gpg" --recipient "${email}" "${passLocation}/${name}"
 
    printf "Password %s has successfully been updated" "'${name}'"
    printf "\n"
@@ -218,7 +218,7 @@ Show() {
    PasswordExists "${name}"
 
    # Decrypte the password file and show the password
-   printf "Password: %s" "$(gpg -dq "${passLocation}/${name}.gpg")"
+   printf "Password: %s" "$(gpg --decrypt --quiet "${passLocation}/${name}.gpg")"
    printf "\n"
 }
 
@@ -234,7 +234,7 @@ Copy() {
 
    # Decrypte the password file and copy it to the clipboard using xclip.
    # This WON'T show the password inside the terminal output.
-   if ! printf "%s" "$(gpg -dq "${passLocation}/${name}.gpg")" | xclip -selection clipboard; then
+   if ! printf "%s" "$(gpg --decrypt --quiet "${passLocation}/${name}.gpg")" | xclip -selection clipboard; then
       xclip -selection clipboard < /dev/null
       Kill "failed to copy password '${name}' to the clipboard." "1"
    fi
