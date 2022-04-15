@@ -35,13 +35,6 @@ Kill() {
    exit "${2}"
 }
 
-# Return the latest version using the GitHub API.
-GetLatestVersion() {
-   curl --silent "https://api.github.com/repos/AntonVanAssche/BashPass/releases/latest" | # Get latest release from GitHub api
-   grep '"tag_name":' |                                            # Get tag line
-   sed -E 's/.*"([^"]+)".*/\1/'                                    # Pluck JSON value
-}
-
 # Return all possible options/usages of BashPass. 
 Help() {
    cat << EOF
@@ -305,9 +298,6 @@ Main() {
 
    # Create the necessary directories if they doesn't exists.
    mkdir -p "${passLocation}"
-
-   # Show the user when a new version is availble. 
-   [[ "$(GetLatestVersion)" == "${version}" ]] || printf "There is a new version available (%s).\n" "$(GetLatestVersion)"
 
    # Detect 'gpg'
    command -v gpg &> /dev/null || Kill "gpg is required" "127"
