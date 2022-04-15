@@ -9,8 +9,6 @@ configLocation="$HOME/.config/bashpass"
 config="${configLocation}/bashpass.conf"
 oldConfig="${config}.old"
 
-mv "${config}" "${oldConfig}"
-
 currentVersion="$(grep "version" "${config}" | cut -d" " -f2)" || :
 currentLocation="$(grep "location" "${oldConfig}" | cut -d: -f2)" || :
 currentEmail="$(grep "email" "${oldConfig}" | cut -d: -f2)" || :
@@ -38,6 +36,8 @@ cd ../
 
 case $(grep "version" "${config}" | cut -d: -f2) in
    "1.0"| "1.1")
+      mv "${config}" "${oldConfig}"
+
       cp -r "${currentDir}"/BashPass/config/bashpass.conf "${config}"
 
       printf "email: %s" "${currentEmail}" >> "${config}"
