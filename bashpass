@@ -41,18 +41,18 @@ Help() {
 BashPass version: ${version}
 A password manager written in Bash.
 
-bashpass [option] [name]                      - Basic command structure.
+bashpass [option] [name]                    - Basic command structure.
 
 Options:
---help       or -h                            - Show this help message.
---version    or -v                            - Show the version number
---add        or -a                     [name] - Add a password.
---update     or -u                     [name] - Update a password.
---delete     or -d                     [name] - Delete a password.
---show       or -s                     [name] - Show a password.
---copy       or -c                     [name] - Copy a password to the clipboard.
---list       or -l                            - List all password.
---sync       or -S                     [name] - Synchronize a password with a other device on your local network.
+--help     or -h                            - Show this help message.
+--version  or -v                            - Show the version number
+--add      or -a                     [name] - Add a password.
+--update   or -u                     [name] - Update a password.
+--delete   or -d                     [name] - Delete a password.
+--show     or -s                     [name] - Show a password.
+--copy     or -c                     [name] - Copy a password to the clipboard.
+--list     or -l                            - List all password.
+--sync     or -S  [upload|download]  [name] - Synchronize a password with a other device on your local network.
 EOF
 }
 
@@ -143,6 +143,26 @@ RandomPassword() {
    if ! printf "%s" "${password}" > "${passLocation}/${name}"; then
       Kill "failed to save the password ${name}" "1"
    fi
+}
+
+# Upload your GPG key to another device on your local network.
+UploadKeys() {
+   gpg --list-keys
+   printf "Enter your key ID (Example: VEB8K7W2O3OOOBEREODILJ4DH046253LB68CXK21): "
+   read -r keyID
+
+   gpg --armor --export "${keyID}" | ssh "${username}"@"${localIP}" gpg --batch --import - || Kill "Failed to import the public key." "1"
+   gpg --armor --export-secret-key "${keyID}" | ssh "${username}"@"${localIP}" gpg --batch --allow-secret-key-import --import - || Kill "Failed to import the private key." "1"
+}
+
+# Download the GPG key from another device on your local network.
+DownloadKeys() {
+   ssh "${username}"@"${localIP}" gpg --list-keys
+   printf "Enter your key ID (Example: VEB8K7W2O3OOOBEREODILJ4DH046253LB68CXK21): "
+   read -r keyID
+
+   ssh "${username}"@"${localIP}" gpg --batch --import "${keyID}" | gpg --armor --import - || Kill "Failed to import the public key." "1"
+   ssh "${username}"@"${localIP}" gpg --batch --allow-secret-key-import --import "${keyID}" | gpg --armor --export-secret-key - || Kill "Failed to import the private key." "1"
 }
 
 # Add a new password.
@@ -253,22 +273,32 @@ List() {
    ls -1 "${passLocation}"
 }
 
-# Copy a password to another device  on your local network using 'ssh' and 'scp'.
+# Copy a password to another device  on your local network using 'ssh' and 'rsync'.
 # Export the 'gpg' keys to that device.
 Sync() {
    # Detect 'ssh' and 'scp'
    command -v ssh &> /dev/null || Kill "ssh is required" "127"
-   command -v scp &> /dev/null || Kill "scp is required" "127"
+   command -v rsync &> /dev/null || Kill "scp is required" "127"
 
-   Name "${1}" "synchronize"
-   PasswordExists "${name}"
-  
+   Name "${2}" "synchronize"
+
    printf "Enter the username of the user on the other device: "
    read -r username
    printf "Enter the local IP address of the other device: "
    read -r localIP
-   
-   scp "${passLocation}/${name}.gpg" "${username}"@"${localIP}":~/.local/share/bashpass/
+
+   case "${1}" in
+      [Uu]pload)
+         PasswordExists "${name}"
+         rsync -a "${passLocation}/${name}.gpg" "${username}"@"${localIP}":~/.local/share/bashpass/
+         ;;
+      [Dd]ownload)
+         rsync -a "${username}"@"${localIP}":"~/.local/share/bashpass/${name}.gpg" "${passLocation}/"
+         ;;
+      *)
+         Kill "unknown option '${1}" "22"
+         ;;
+   esac
 
    printf "\n"
    printf "Be aware you'll need to import your GPG key on the other device as well."
@@ -278,16 +308,14 @@ Sync() {
 
    case "${keyExport}" in
       [Nn])
-         printf "You will have to manually export your keys to the other device if you haven't done so."
+         [[ "${1}" == [Uu]pload ]] && printf "You will have to manually export your keys to the other device if you haven't done so."
+         [[ "${1}" == [Dd]ownload ]] && printf "You will have to manually import your keys from the other device if you haven't done so."
+         printf "\n"
          ;;
       *)
-         gpg --list-keys
-         printf "Enter your key ID (Example: VEB8K7W2O3OOOBEREODILJ4DH046253LB68CXK21): "
-         read -r keyID
-
-         gpg --armor --export "${keyID}" | ssh "${username}"@"${localIP}" gpg --batch --import - || Kill "Failed to import the public key." "1"
-         gpg --armor --export-secret-key "${keyID}" | ssh "${username}"@"${localIP}" gpg --batch --allow-secret-key-import --import - || Kill "Failed to import the private key." "1"
-         ;;   
+         [[ "${1}" == [Uu]pload ]] && UploadKeys
+         [[ "${1}" == [Dd]ownload ]] && DownloadKeys
+         ;;
    esac
 }
 
@@ -318,7 +346,7 @@ Main() {
       "--show"| "-s") Show "${2}";;
       "--copy"| "-c") Copy "${2}";;
       "--list"| "-l") List;;
-      "--sync"| "-S") Sync "${2}";;
+      "--sync"| "-S") Sync "${2}" "${3}";;
       *) Kill "option '${1}' not found" "22";;
    esac
 }

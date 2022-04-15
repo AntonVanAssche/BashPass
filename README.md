@@ -10,6 +10,8 @@ BashPass is a password manager written in Bash. It uses GPG to encrypt/decrypt t
 -  [Updating BashPass](#updating-bashpass)
 -  [Uninstalling BashPass](#uninstalling-bashpass)
 -  [Synchronize passwords between devices](#synchronize-passwords-between-devices)
+   -  [Upload](#upload)
+   -  [Download](#download)
 -  [Configuring BashPass](#configuring-bashpass)
    -  [Configuring the location where passwords are stored](#configuring-the-location-where-passwords-are-stored)
    -  [Configuring the email address](#configuring-the-e-mail-address)
@@ -21,26 +23,26 @@ BashPass is a password manager written in Bash. It uses GPG to encrypt/decrypt t
 
 -  gpg (Used to encrypt the password files)
 -  xclip (Used to copy the password to the clipboard)
--  scp (Used to copy the password to another device on your local network)
+-  rsync (Used to copy the password to another device on your local network)
 -  ssh (Used to import your GPG keys on another device)
 
 ## Usage
 
-Note: the `[name]` is optional.
+**Note**: the `[name]` is optional.
 
 ```
-bashpass [option] [name]                      - Basic command structure.
+bashpass [option] [name]                    - Basic command structure.
 
 Options:
---help       or -h                            - Show this help message.
---version    or -v                            - Show the version number
---add        or -a                     [name] - Add a password.
---update     or -u                     [name] - Update a password.
---delete     or -d                     [name] - Delete a password.
---show       or -s                     [name] - Show a password.
---copy       or -c                     [name] - Copy a password to the clipboard.
---list       or -l                            - List all password.
---sync       or -S                     [name] - Synchronize a password with a other device on your local network.
+--help     or -h                            - Show this help message.
+--version  or -v                            - Show the version number
+--add      or -a                     [name] - Add a password.
+--update   or -u                     [name] - Update a password.
+--delete   or -d                     [name] - Delete a password.
+--show     or -s                     [name] - Show a password.
+--copy     or -c                     [name] - Copy a password to the clipboard.
+--list     or -l                            - List all password.
+--sync     or -S  [upload|download]  [name] - Synchronize a password with a other device on your local network.
 ```
 
 Examples:
@@ -112,18 +114,40 @@ $ bash -c "$(wget -qO - https://raw.githubusercontent.com/AntonVanAssche/BashPas
 
 ## Synchronize passwords between devices
 
-The `sync` option of BashPass allows you to copy a password from your device to another device on your local network using `ssh` and `scp`. This option can used like shown below.
+The `sync` option of BashPass allows you to upload or download a password from your device to another device on your local network using `ssh` and `rsync`. This option can used like shown below.
 
 **Note**: you'll have to import your private key to view the password and the public key in case you want to add a new password **(BashPass can do this for you)**.
 
+### Upload
+
+To upload a password to another device on your local network, run the following command.
+
+**Note**: this will upload the password to the default location (`~/.local/share/bashpass/`).
+
 ```bash
-$ bashpass --sync password
+$ bashpass --sync upload password
 ```
 
 or:
 
 ```bash
-$ bashpass -S password
+$ bashpass -S upload password
+```
+
+### Download
+
+To download a password from another device on your local network, run the following command.
+
+**Note**: this will download the password from the default location (`~/.local/share/bashpass/`).
+
+```bash
+$ bashpass --sync download password
+```
+
+or
+
+```bash
+$ bashpass -S download password
 ```
 
 ## Configuring BashPass
