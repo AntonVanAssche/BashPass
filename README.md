@@ -61,7 +61,13 @@ $ gpg --full-generate-key
 Now it's time to install BashPass. Just run the `setup.sh` script and you'll be good to go.
 
 ```bash
-$ ./setup.sh --install
+$ ./scripts/install.sh
+```
+
+In case you don't want to clone the whole repository, here is a simple one-liner to install BashPass 😉. Be aware you'll still have generate your GPG key first.
+
+```bash
+$ bash -c "$(wget -qO - https://raw.githubusercontent.com/AntonVanAssche/BashPass/master/scripts/install.sh)"
 ```
 
 After installation, you'll have to add `.local/bin` to your PATH to use BashPass. Add the following line in your `.bashrc` file.
@@ -81,7 +87,13 @@ Enter the email address you created the gpg key with:
 To update BashPass to the latest version, just run the `setup.sh` script and you'll be good to go.
 
 ```bash
-$ ./setup.sh --update
+$ ./scripts/update.sh
+```
+
+In case you don't want to clone the whole repository, here is a simple one-liner to update BashPass 😉.
+
+```bash
+$ bash -c "$(wget -qO - https://raw.githubusercontent.com/AntonVanAssche/BashPass/master/scripts/update.sh)"
 ```
 
 ## Uninstalling BashPass
@@ -89,7 +101,13 @@ $ ./setup.sh --update
 To uninstall BashPass, just run the `setup.sh` script.
 
 ```bash
-$ ./setup.sh --uninstall
+$ ./scripts/uninstall.sh
+```
+
+In case you don't want to clone the whole repository, here is a simple one-liner to uninstall BashPass 😉.
+
+```bash
+$ bash -c "$(wget -qO - https://raw.githubusercontent.com/AntonVanAssche/BashPass/master/scripts/uninstall.sh)"
 ```
 
 ## Synchronize passwords between devices
