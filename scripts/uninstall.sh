@@ -6,11 +6,18 @@ set -e
 configLocation="$HOME/.config/bashpass"
 config="${configLocation}/bashpass.conf"
 
-printf "Uninstalling BashPass version: '%s'..." "$(grep "version" "${config}" | cut -d: -f2)"
+printf "This action will remove all passwords that are stored in '%s'." "${HOME}/.local/share/bashpass"
 printf "\n"
+printf "Are you sure you want to proceed [y/N]: "
+read -r answer
 
-rm -rf "${HOME}/.config/bashpass" "${HOME}/.local/share/bashpass" "${HOME}/.local/bin/bashpass"
-
-printf "\n"
-printf "We hate to see you go."
-
+case "${answer}" in
+   [yY][eE][sS]|[yY])
+      printf "Uninstalling BashPass version: '%s'...\n" "$(grep "version" "${config}" | cut -d: -f2)"
+      rm -rf "${HOME}/.config/bashpass" "${HOME}/.local/share/bashpass" "${HOME}/.local/bin/bashpass"
+      printf "\nWe hate to see you go.\n"
+      ;;
+   *)
+      printf "Aborting.\n"
+      ;;
+esac
