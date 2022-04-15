@@ -10,9 +10,6 @@ config="${configLocation}/bashpass.conf"
 oldConfig="${config}.old"
 
 currentVersion="$(grep "version" "${config}" | cut -d" " -f2)" || :
-currentLocation="$(grep "location" "${oldConfig}" | cut -d: -f2)" || :
-currentEmail="$(grep "email" "${oldConfig}" | cut -d: -f2)" || :
-currentTimer="$(grep "timer" "${oldConfig}" | cut -d: -f2)" || :
 
 latestVersion="$(curl --silent "https://api.github.com/repos/AntonVanAssche/BashPass/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')"
 
@@ -37,6 +34,9 @@ cd ../
 case $(grep "version" "${config}" | cut -d: -f2) in
    "1.0"| "1.1")
       mv "${config}" "${oldConfig}"
+      currentLocation="$(grep "location" "${oldConfig}" | cut -d: -f2)" || :
+      currentEmail="$(grep "email" "${oldConfig}" | cut -d: -f2)" || :
+      currentTimer="$(grep "timer" "${oldConfig}" | cut -d: -f2)" || :
 
       cp -r "${currentDir}"/BashPass/config/bashpass.conf "${config}"
 
