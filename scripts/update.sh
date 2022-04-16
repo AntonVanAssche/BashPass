@@ -100,9 +100,9 @@ Main() {
    fi
 
    printf "Updating BashPass to version: '%s'...\n" "${latestVersion}"
-   printf "\n
+   printf "\n"
 
-   CloneLatestVersion"
+   CloneLatestVersion
 
    case $(GetOldSetting 'version') in
       "1.0"| "1.1")
