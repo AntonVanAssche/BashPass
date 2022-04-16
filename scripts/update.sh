@@ -11,6 +11,8 @@ oldConfig="${config}.old"
 
 latestVersion="$(curl --silent "https://api.github.com/repos/AntonVanAssche/BashPass/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')"
 
+cp "${config}" "${oldConfig}"
+
 # Simple function to get the setting '${1}' from the old config file.
 # This basically replaces the '$(grep "setting" "$oldConfig" | cut -d: -f2)'.
 # It's also pure bash, which means that no sub shells are used.
@@ -98,11 +100,12 @@ Main() {
    fi
 
    printf "Updating BashPass to version: '%s'...\n" "${latestVersion}"
-   printf "\n"
+   printf "\n
+
+   CloneLatestVersion"
 
    case $(GetOldSetting 'version') in
       "1.0"| "1.1")
-         mv "${config}" "${oldConfig}"
          currentEmail="$(GetOldSetting 'email')" || :
          currentLocation="$(GetOldSetting 'location')" || :
          currentTimer="$(GetOldSetting 'timer')" || :
