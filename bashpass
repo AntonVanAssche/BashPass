@@ -19,13 +19,26 @@ if [[ ! -f ${config} ]]; then
    exit 2
 fi
 
+# Simple function to get the setting '${1}' from the config file.
+# This basically replaces the '$(grep "setting" "$config" | cut -d" " -f2)'.
+# It's also pure bash, which means that no sub shells are used.
+GetSetting() {
+   while read;
+   do
+      if [[ "$REPLY" =~ ^${1} ]]; then
+         echo "${REPLY#*: }"
+         break
+      fi
+   done < "${config}"
+}
+
 # Get the necessary configurations from the configuration file.
 # '|| :' To prevent the script from exiting if the variable is not found (especially needed for the '${email} variable').
-email="$(grep "email" "$config" | cut -d" " -f2)" || :
-passLocation="$HOME/$(grep "location" "$config" | cut -d" " -f2)" || :
-version="$(grep "version" "$config" | cut -d" " -f2)" || :
-timer="$(grep "timer" "$config" | cut -d" " -f2)" || :
-passLength="$(grep "length" "$config" | cut -d" " -f2)" || :
+email="$(GetSetting 'email')" || :
+passLocation="$HOME/$(GetSetting 'location')" || :
+version="$(GetSetting 'version')" || :
+timer="$(GetSetting 'timer')" || :
+passLength="$(GetSetting 'length')" || :
 
 # Print out the error that occurred and exit (with the correct exit code) afterwards.
 Kill() {
