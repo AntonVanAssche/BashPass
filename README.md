@@ -22,9 +22,9 @@ BashPass is a password manager written in Bash. It uses GPG to encrypt/decrypt t
 ## Dependencies
 
 -  gpg (Used to encrypt the password files)
--  xclip (Used to copy the password to the clipboard)
--  rsync (Used to copy the password to another device on your local network)
--  ssh (Used to import your GPG keys on another device)
+-  xclip (Used to copy a password to the clipboard)
+-  rsync (Used to copy a password to another device on your local network)
+-  ssh (Used to import your GPG keys on/from another device)
 
 ## Usage
 
