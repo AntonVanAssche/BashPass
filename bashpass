@@ -347,7 +347,7 @@ Main() {
    if [[ -z ${email} ]]; then
       printf "Enter the email address you created the gpg key with: "
       read -r email
-      printf "email: %s" "${email}" >> "${config}"
+      printf "email: %s\n" "${email}" >> "${config}"
    fi
 
    case "${1}" in
