@@ -50,12 +50,12 @@ Kill() {
 
 # Return all possible options/usages of BashPass. 
 Help() {
-   cat << EOF
+   printf "%s" "\
 BashPass version: ${version}
 A password manager written in Bash.
 
 bashpass [option] [name]                    - Basic command structure.
-
+ 
 Options:
 --help     or -h                            - Show this help message.
 --version  or -v                            - Show the version number
@@ -66,7 +66,7 @@ Options:
 --copy     or -c                     [name] - Copy a password to the clipboard.
 --list     or -l                            - List all password.
 --sync     or -S  [upload|download]  [name] - Synchronize a password with a other device on your local network.
-EOF
+"
 }
 
 # Return the current verion of BashPass.
