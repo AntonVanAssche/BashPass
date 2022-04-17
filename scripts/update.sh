@@ -19,8 +19,8 @@ cp "${config}" "${oldConfig}"
 GetOldSetting() {
    while read;
    do
-      if [[ "$REPLY" =~ ^${1} ]]; then
-         printf "%s" "${REPLY#*:}"
+      if [[ "${REPLY}" =~ ^${1} ]]; then
+         printf '%s' "${REPLY#*:}"
          break
       fi
    done < "${oldConfig}"
@@ -32,8 +32,8 @@ GetOldSetting() {
 GetNewSetting() {
    while read;
    do
-      if [[ "$REPLY" =~ ^${1} ]]; then
-         printf "%s" "${REPLY#*: }"
+      if [[ "${REPLY}" =~ ^${1} ]]; then
+         printf '%s' "${REPLY#*: }"
          break
       fi
    done < "${config}"
@@ -59,7 +59,7 @@ ReplaceOldSettings() {
    done < "${config}"
 
    printf '%s\n' "${setting[@]}" > "${config}"
-   printf "email: %s" "${currentEmail}" >> "${config}"
+   printf 'email: %s\n' "${currentEmail}" >> "${config}"
 }
 
 # Simple function to replace the version number inside the config file.
@@ -95,12 +95,12 @@ CloneLatestVersion() {
 Main() {
    # Detect user
    if [[ "${UID}" == 0 ]]; then
-      printf "You must run this as a normal user.\nCurrent user ID: %s %s\n" "${UID}" "$([[ "${UID}" -eq 0 ]] && printf "(root)")"
+      printf 'You must run this as a normal user.\nCurrent user ID: %s %s\n' "${UID}" "$([[ "${UID}" -eq 0 ]] && printf "(root)")"
       exit 13
    fi
 
-   printf "Updating BashPass to version: '%s'...\n" "${latestVersion}"
-   printf "\n"
+   printf 'Updating BashPass to version: '\''%s'\''...\n' "${latestVersion}"
+   printf '\n'
 
    CloneLatestVersion
 

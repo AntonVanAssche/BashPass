@@ -8,12 +8,12 @@ latestVersion="$(curl --silent "https://api.github.com/repos/AntonVanAssche/Bash
 
 # Detect user
 if [[ "${UID}" == 0 ]]; then
-   printf "You must run this as a normal user.\nCurrent user ID: %s %s\n" "${UID}" "$([[ "${UID}" -eq 0 ]] && printf "(root)")"
+   printf 'You must run this as a normal user.\nCurrent user ID: %s %s\n' "${UID}" "$([[ "${UID}" -eq 0 ]] && printf "(root)")"
    exit 13
 fi
 
-printf "Installing BashPass version: '%s'..." "${latestVersion}"
-printf "\n"
+printf 'Installing BashPass version: '\''%s'\''...' "${latestVersion}"
+printf '\n'
 
 #git clone -b -q "$(basename "$(curl -Ls -o /dev/null -w "%{url_effective}" https://github.com/AntonVanAssche/BashPass/releases/latest)")" \
    # https://github.com/AntonVanAssche/BashPass.git
@@ -30,6 +30,7 @@ mkdir -p "${HOME}/.local/share/bashpass"
 cp -r "${currentDir}/BashPass/config/bashpass.conf" "${HOME}/.config/bashpass/bashpass.conf"
 cp -r "${currentDir}/BashPass/bashpass" "${HOME}/.local/bin/bashpass"
 
-printf "\nMake sure to add '\${HOME}/.local/bin/' to your \$PATH."
+printf 'Make sure to add '\''\${HOME}/.local/bin/'\'' to your \$PATH.'
+printf '\n'
 
 rm -rf BashPass/
