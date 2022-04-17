@@ -20,7 +20,7 @@ GetOldSetting() {
    while read;
    do
       if [[ "$REPLY" =~ ^${1} ]]; then
-         echo "${REPLY#*:}"
+         printf "%s" "${REPLY#*:}"
          break
       fi
    done < "${oldConfig}"
@@ -33,7 +33,7 @@ GetNewSetting() {
    while read;
    do
       if [[ "$REPLY" =~ ^${1} ]]; then
-         echo "${REPLY#*: }"
+         printf "%s" "${REPLY#*: }"
          break
       fi
    done < "${config}"
