@@ -283,7 +283,23 @@ Copy() {
 
 # Return a list of all the passwords that are stored on your machine.
 List() {
-   ls -1 "${passLocation}"
+   # Enable globbing for only this function.
+   set +f
+   
+   # Print the list of all the passwords (without using the `ls` command).
+   for p in "${passLocation}"/*.gpg; do
+      # Remove the path to the file.
+      p="${p##*/}"
+
+      # Remove the file extension.
+      p="${p%%.gpg}"
+
+      printf 'Name: %s' "${p}"
+      printf '\n'
+   done
+
+   # Disable globbing.
+   set -f
 }
 
 # Copy a password to/from another device  on your local network using 'ssh' and 'rsync'.
