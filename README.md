@@ -21,10 +21,18 @@ BashPass is a password manager written in Bash. It uses GPG to encrypt/decrypt t
 
 ## Dependencies
 
--  gpg (Used to encrypt the password files)
--  xclip (Used to copy a password to the clipboard)
--  rsync (Used to copy a password to another device on your local network)
--  ssh (Used to import your GPG keys on/from another device)
+**Password encryption**:
+
+-  `gpg` or `gpg2`
+
+**Clipboard support**:
+
+-  `xclip`
+
+**Synchronization support**:
+
+-  `rsync`
+-  `openssh`
 
 ## Usage
 
@@ -134,6 +142,18 @@ or:
 $ bashpass -S upload password
 ```
 
+In case you want to upload all your passwords to another device, you can run the following command.
+
+```bash
+$ bashpass --sync upload all
+```
+
+or:
+
+```bash
+$ bashpass -S upload all
+```
+
 ### Download
 
 To download a password from another device on your local network, run the following command.
@@ -148,6 +168,18 @@ or
 
 ```bash
 $ bashpass -S download password
+```
+
+In case you want to upload all your passwords to another device, you can run the following command.
+
+```bash
+$ bashpass --sync download all
+```
+
+or:
+
+```bash
+$ bashpass -S download all
 ```
 
 ## Configuring BashPass

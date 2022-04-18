@@ -318,11 +318,19 @@ Sync() {
 
    case "${1}" in
       [Uu]pload)
-         PasswordExists "${name}"
-         rsync -a "${passLocation}/${name}.gpg" "${username}"@"${localIP}":~/.local/share/bashpass/
+         if [[ ${name} == "all" ]]; then
+               rsync -a "${passLocation}" "${username}"@"${localIP}":~/.local/share/
+         else
+            PasswordExists "${name}"
+            rsync -a "${passLocation}/${name}.gpg" "${username}"@"${localIP}":~/.local/share/bashpass/
+         fi
          ;;
       [Dd]ownload)
-         rsync -a "${username}"@"${localIP}":"~/.local/share/bashpass/${name}.gpg" "${passLocation}/"
+         if [[ ${name} == "all" ]]; then
+            rsync -a "${username}"@"${localIP}":"~/.local/share/bashpass/" "$HOME/.local/share/"
+         else
+            rsync -a "${username}"@"${localIP}":"~/.local/share/bashpass/${name}.gpg" "${passLocation}/"
+         fi
          ;;
       *)
          Kill "unknown option '${1}" "22"
