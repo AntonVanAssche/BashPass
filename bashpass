@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # '-e' Abort the script when an error occures.
 # '-f' To ensure that globbing is globally disabled.
@@ -148,7 +148,7 @@ RandomPassword() {
 
          # Generate a password using '/dev/urandom'.
          # Call the 'tr' command to translate the password to a character set.
-         password=$(</dev/urandom tr -dc '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%*()?.,/+-abcdefghijklmnopqrstuvwxyz' | head -c "${length}"; printf '')
+         password=$(LC_ALL=C </dev/urandom tr -dc 'A-Za-z0-9_!@#$%^&*()\-+=' | head -c "${length}"; printf '')
          ;;
    esac
 
