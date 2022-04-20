@@ -40,16 +40,16 @@ BashPass is a password manager written in Bash. It uses GPG to encrypt/decrypt t
 
 ```
 bashpass [option] [name]                    - Basic command structure.
-
+ 
 Options:
 --help     or -h                            - Show this help message.
 --version  or -v                            - Show the version number
+--list     or -l                            - List all password.
 --add      or -a                     [name] - Add a password.
 --update   or -u                     [name] - Update a password.
 --delete   or -d                     [name] - Delete a password.
 --show     or -s                     [name] - Show a password.
 --copy     or -c                     [name] - Copy a password to the clipboard.
---list     or -l                            - List all password.
 --sync     or -S  [upload|download]  [name] - Synchronize a password with a other device on your local network.
 ```
 
