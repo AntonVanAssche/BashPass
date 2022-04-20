@@ -26,6 +26,7 @@ cd ../
 
 mkdir -p "${HOME}/.config/bashpass"
 mkdir -p "${HOME}/.local/share/bashpass"
+mkdir -p "${HOME}/.local/bin"
 
 cp -r "${currentDir}/BashPass/config/bashpass.conf" "${HOME}/.config/bashpass/bashpass.conf"
 cp -r "${currentDir}/BashPass/bashpass" "${HOME}/.local/bin/bashpass"
