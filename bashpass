@@ -148,14 +148,16 @@ RandomPassword() {
 
          # Generate a password using '/dev/urandom'.
          # Call the 'tr' command to translate the password to a character set.
-         password=$(LC_ALL=C </dev/urandom tr -dc 'A-Za-z0-9_!@#$%^&*()\-+=' | head -c "${length}"; printf '')
+         password=$(LC_ALL=C tr -dc 'A-Za-z0-9!"#$%&'\''()*+,-./:;<=>?@[\]^_`{|}~' < /dev/urandom | dd ibs=1 obs=1 count=${length} 2> /dev/null) || :
          ;;
    esac
 
    # Write password to the 'password' file.
-   if ! printf '%s' "${password}" > "${passLocation}/${name}"; then
+   if [[ -z ${password} ]]; then
       Kill "failed to save the password ${name}" "1"
    fi
+
+   printf '%s' "${password}" > "${passLocation}/${name}"
 }
 
 # Upload your GPG key to another device on your local network.
