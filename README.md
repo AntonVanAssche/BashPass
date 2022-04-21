@@ -21,6 +21,8 @@ BashPass is a password manager written in Bash. It uses GPG to encrypt/decrypt t
 
 ## Dependencies
 
+-  `bash >= 3.0`
+
 **Password encryption**:
 
 -  `gpg` or `gpg2`
