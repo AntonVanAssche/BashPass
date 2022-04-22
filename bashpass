@@ -175,7 +175,7 @@ Add() {
    RandomPassword
 
    # Encrypte the password file using gpg.
-   gpg --encrypt --quiet --output "${passLocation}/${name}.gpg" --recipient "${email}" --local-user "${keyID}" "${passLocation}/${name}"
+   gpg --encrypt --quiet --output "${passLocation}/${name}.gpg" --recipient "${keyID}" "${passLocation}/${name}"
 
    printf 'Password %s has been successfully saved' "'${name}'"
    printf '\n'
@@ -202,7 +202,7 @@ Update() {
    rm -rf "${passLocation:?}/${name}.gpg"
 
    # Encrypte the password file using gpg.
-   gpg --encrypt --quiet --output "${passLocation}/${name}.gpg" --recipient "${email}" --local-user "${keyID}" "${passLocation}/${name}"
+   gpg --encrypt --quiet --output "${passLocation}/${name}.gpg" --recipient "${keyID}" "${passLocation}/${name}"
 
    printf 'Password %s has successfully been updated' "'${name}'"
    printf '\n'
@@ -336,10 +336,10 @@ Main() {
    # Detect 'gpg'
    command -v gpg &> /dev/null || Kill "gpg is required" "127"
 
-   # Ask the GPG key name to use for encrypting the password.
+   # Ask the GPG key ID to use for encrypting the password.
    # It will only ask when the keyID isn't found in the config file.
    if [[ -z ${keyID} ]]; then
-      printf 'Enter the name of the GPG key you want to use: '
+      printf 'Enter the key ID of the GPG key you want to use: '
       read -r keyID
       printf 'keyID: %s\n' "${keyID}" >> "${config}"
    fi

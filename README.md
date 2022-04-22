@@ -110,23 +110,34 @@ Key does not expire at all
 Is this correct? (y/N) y
 ```
 
-Now it's time to set a name for the key. This can be anything (example: BashPass) but it's important to remember, you'll need this later to configure BashPass.
+Now it's time to set a name for the key. This can be anything (example: BashPass).
 
 ```
 Real name: Bashpass
 ```
 
-Once you've set a name for the key, it's time to set the email address. Again this is important to remember, you'll need this later to configure BashPass.
+Once you've set a name for the key, it's time to set the email address, this is important to remember, you'll need this later to configure BashPass.
 
 ```
 Email address: example@gmail.com
 ```
 
-The final step to generate your GPG key is to set a comment, this isn't needed but can be useful in case you have more than one GPG key on your computer. After this just confirm the setting and you're done.
+The final step to generate your GPG key is to set a comment, this isn't needed but can be useful in case you have more than one GPG key on your computer. After this just confirm the settings and you're done.
 
 ```
 Comment: BashPass encryption key
 ```
+
+Now your key will be generated. Once this is done you'll see something like this:
+
+```
+pub   rsa3072 2022-04-22 [SC]
+      86F27E3CAA49BB273653B39763BBB2BD91082EE1
+uid           [ultimate] Bashpass (Key to use BashPass) <example@gmail.com>
+sub   rsa3072 2022-04-22 [E]
+```
+
+Note you can see the key fingerprint (`86F27E3CAA49BB273653B39763BBB2BD91082EE1`), this string contains the key ID. This are the last 8 characters (`91082EE1`) of the fingerprint. This part is important to remember, you'll need this later to configure BashPass.
 
 ### Running the installer
 
@@ -145,7 +156,7 @@ export PATH="$HOME/.local/bin:$PATH"
 When you start BashPass for the first time you'll be prompted with the question to enter the name of the GPG key you want to use. After entering the name a you'll be asked to enter the e-mail address you've used to generate the key.
 
 ```
-Enter the name of the GPG key you want to use: Bashpass
+Enter the key ID of the GPG key you want to use: 91082EE1
 Enter the email address you created the gpg key with: example@gmail.com
 ```
 
