@@ -35,6 +35,7 @@ GetSetting() {
 # Get the necessary configurations from the configuration file.
 # '|| :' To prevent the script from exiting if the variable is not found (especially needed for the '${email} variable').
 email="$(GetSetting 'email')" || :
+keyID="$(GetSetting 'keyID')" || :
 passLocation="$HOME/$(GetSetting 'location')" || :
 version="$(GetSetting 'version')" || :
 timer="$(GetSetting 'timer')" || :
@@ -174,7 +175,7 @@ Add() {
    RandomPassword
 
    # Encrypte the password file using gpg.
-   gpg --encrypt --quiet --output "${passLocation}/${name}.gpg" --recipient "${email}" "${passLocation}/${name}"
+   gpg --encrypt --quiet --output "${passLocation}/${name}.gpg" --recipient "${email}" --local-user "${keyID}" "${passLocation}/${name}"
 
    printf 'Password %s has been successfully saved' "'${name}'"
    printf '\n'
@@ -201,7 +202,7 @@ Update() {
    rm -rf "${passLocation:?}/${name}.gpg"
 
    # Encrypte the password file using gpg.
-   gpg --encrypt --quiet --output "${passLocation}/${name}.gpg" --recipient "${email}" "${passLocation}/${name}"
+   gpg --encrypt --quiet --output "${passLocation}/${name}.gpg" --recipient "${email}" --local-user "${keyID}" "${passLocation}/${name}"
 
    printf 'Password %s has successfully been updated' "'${name}'"
    printf '\n'
@@ -334,6 +335,14 @@ Main() {
 
    # Detect 'gpg'
    command -v gpg &> /dev/null || Kill "gpg is required" "127"
+
+   # Ask the GPG key name to use for encrypting the password.
+   # It will only ask when the keyID isn't found in the config file.
+   if [[ -z ${keyID} ]]; then
+      printf 'Enter the name of the GPG key you want to use: '
+      read -r keyID
+      printf 'keyID: %s\n' "${keyID}" >> "${config}"
+   fi
 
    # Ask the e-email address to encrypt when it can't be found in the config file.
    if [[ -z ${email} ]]; then

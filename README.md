@@ -7,6 +7,8 @@ BashPass is a password manager written in Bash. It uses GPG to encrypt/decrypt t
 -  [Dependencies](#dependencies)
 -  [Usage](#usage)
 -  [Installing BashPass](#installing-bashpass)
+   -  [Generating your GPG key](#generating-your-gpg-key)
+   -  [Running the installer](#running-the-installer)
 -  [Updating BashPass](#updating-bashpass)
 -  [Uninstalling BashPass](#uninstalling-bashpass)
 -  [Synchronize passwords between devices](#synchronize-passwords-between-devices)
@@ -42,7 +44,7 @@ BashPass is a password manager written in Bash. It uses GPG to encrypt/decrypt t
 
 ```
 bashpass [option] [name]                    - Basic command structure.
- 
+
 Options:
 --help     or -h                            - Show this help message.
 --version  or -v                            - Show the version number
@@ -64,19 +66,71 @@ Examples:
 
 ## Installing BashPass
 
-First you'll have to generate a GPG key. Run the following command to do so, and your key will be generated (you can use the defaults for most questions).
+### Generating your GPG key
+
+Before you install BashPass, you'll have to generate a GPG key. Run the following command in your terminal to start key generation process.
 
 ```bash
 $ gpg --full-generate-key
 ```
 
-Now it's time to install BashPass. Just run the `setup.sh` script and you'll be good to go.
+Once you run this command, you'll be asked to select a encryption protocol. Select the first option (`RSA`).
 
-```bash
-$ ./scripts/install.sh
+```
+Please select what kind of key you want:
+   (1) RSA and RSA
+   (2) DSA and Elgamal
+   (3) DSA (sign only)
+   (4) RSA (sign only)
+   (9) ECC (sign and encrypt) *default*
+  (10) ECC (sign only)
+  (14) Existing key from card
+Your selection? 1
 ```
 
-In case you don't want to clone the whole repository, here is a simple one-liner to install BashPass 😉. Be aware you'll still have generate your GPG key first.
+Now you'll be prompted to choose a keysize. The default option (`3072`) is fine.
+
+```
+RSA keys may be between 1024 and 4096 bits long.
+What keysize do you want? (3072)
+Requested keysize is 3072 bits
+```
+
+After selecting the keysize, you'll be asked how long you want the key to be valid. The default option 1 (`key does not expire`) is fine.
+
+```
+Please specify how long the key should be valid.
+         0 = key does not expire
+      <n>  = key expires in n days
+      <n>w = key expires in n weeks
+      <n>m = key expires in n months
+      <n>y = key expires in n years
+Key is valid for? (0)
+Key does not expire at all
+Is this correct? (y/N) y
+```
+
+Now it's time to set a name for the key. This can be anything (example: BashPass) but it's important to remember, you'll need this later to configure BashPass.
+
+```
+Real name: Bashpass
+```
+
+Once you've set a name for the key, it's time to set the email address. Again this is important to remember, you'll need this later to configure BashPass.
+
+```
+Email address: example@gmail.com
+```
+
+The final step to generate your GPG key is to set a comment, this isn't needed but can be useful in case you have more than one GPG key on your computer. After this just confirm the setting and you're done.
+
+```
+Comment: BashPass encryption key
+```
+
+### Running the installer
+
+Once you have generated your GPG key, it's time to install BashPass. For this you can clone the repo and run the `install.sh` script or the simple one-liner below. This command will download the latest version of BashPass and install it for you.
 
 ```bash
 $ bash -c "$(wget -qO - https://raw.githubusercontent.com/AntonVanAssche/BashPass/master/scripts/install.sh)"
@@ -88,21 +142,16 @@ After installation, you'll have to add `.local/bin` to your PATH to use BashPass
 export PATH="$HOME/.local/bin:$PATH"
 ```
 
-When you start BashPass for the first time you'll be prompted with the question to enter an e-mail address. You must enter the same e-mail address that you've used to generate the GPG key.
+When you start BashPass for the first time you'll be prompted with the question to enter the name of the GPG key you want to use. After entering the name a you'll be asked to enter the e-mail address you've used to generate the key.
 
 ```
-Enter the email address you created the gpg key with:
+Enter the name of the GPG key you want to use: Bashpass
+Enter the email address you created the gpg key with: example@gmail.com
 ```
 
 ## Updating BashPass
 
-To update BashPass to the latest version, just run the `setup.sh` script and you'll be good to go.
-
-```bash
-$ ./scripts/update.sh
-```
-
-In case you don't want to clone the whole repository, here is a simple one-liner to update BashPass 😉.
+To update BashPass to the latest version, you can clone the repo and run the `update.sh` script or the simple one-liner below.
 
 ```bash
 $ bash -c "$(wget -qO - https://raw.githubusercontent.com/AntonVanAssche/BashPass/master/scripts/update.sh)"
@@ -110,13 +159,7 @@ $ bash -c "$(wget -qO - https://raw.githubusercontent.com/AntonVanAssche/BashPas
 
 ## Uninstalling BashPass
 
-To uninstall BashPass, just run the `setup.sh` script.
-
-```bash
-$ ./scripts/uninstall.sh
-```
-
-In case you don't want to clone the whole repository, here is a simple one-liner to uninstall BashPass 😉.
+To uninstall BashPass, you can clone the repo and run the `uninstall.sh` script or the simple one-liner below.
 
 ```bash
 $ bash -c "$(wget -qO - https://raw.githubusercontent.com/AntonVanAssche/BashPass/master/scripts/uninstall.sh)"
@@ -138,22 +181,10 @@ To upload a password to another device on your local network, run the following 
 $ bashpass --sync upload password
 ```
 
-or:
-
-```bash
-$ bashpass -S upload password
-```
-
 In case you want to upload all your passwords to another device, you can run the following command.
 
 ```bash
 $ bashpass --sync upload all
-```
-
-or:
-
-```bash
-$ bashpass -S upload all
 ```
 
 ### Download
@@ -166,22 +197,10 @@ To download a password from another device on your local network, run the follow
 $ bashpass --sync download password
 ```
 
-or
-
-```bash
-$ bashpass -S download password
-```
-
 In case you want to upload all your passwords to another device, you can run the following command.
 
 ```bash
 $ bashpass --sync download all
-```
-
-or:
-
-```bash
-$ bashpass -S download all
 ```
 
 ## Configuring BashPass
