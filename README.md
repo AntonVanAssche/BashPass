@@ -126,7 +126,7 @@ $ bash -c "$(wget -qO - https://raw.githubusercontent.com/AntonVanAssche/BashPas
 
 The `sync` option of BashPass allows you to upload or download a password from your device to another device on your local network using `ssh` and `rsync`. This option can used like shown below.
 
-**Note**: you'll have to import your private key to view the password and the public key in case you want to add a new password **(BashPass can do this for you)**.
+**Note**: you'll have to import/export your GPG keys to/from the other device. You can follow [this guide](https://www.debuntu.org/how-to-importexport-gpg-key-pair/) for importing and exporting your GPG keys,
 
 ### Upload
 
