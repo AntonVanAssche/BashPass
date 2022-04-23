@@ -48,7 +48,7 @@ BashPass is a command-line based password manager written in Bash. It uses GPG t
 
 ## Documentation
 
--  **[Installation](https://github.com/AntonVanAssche/BashPass/wiki/Getting-Started)**
+-  **[Getting started](https://github.com/AntonVanAssche/BashPass/wiki/Getting-Started)**
 -  **[Usage](https://github.com/AntonVanAssche/BashPass/wiki/Usage)**
 -  **[Configuring](https://github.com/AntonVanAssche/BashPass/wiki/Configuring)**
 
