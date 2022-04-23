@@ -1,128 +1,79 @@
-# BashPass
-BashPass is a simple password manager written in Bash. It uses GPG to encrypt/decrypt the files where the passwords are stored (default: `~/.local/share/bashpass/`). This means the password are 100% stored locally, so you don't have to trust a third party to store your passwords.
+<div align="center">
+   <h1>
+      BashPass
+   </h1>
+   <p align="center">
+      A command-line based password manager written in Bash.
+      <br/>
+      <a href="https://github.com/AntonVanAssche/BashPass/wiki"><strong>Explore the docs »</strong></a>
+      <br/>
+      <br/>
+      <strong>·</strong>
+      <a href="https://github.com/AntonVanAssche/BashPass/issues">Report Bug</a>
+      <strong>·</strong>
+      <a href="https://github.com/AntonVanAssche/BashPass/issues">Request Feature</a>
+   </p>
+   <p align="center">
+      <a href="https://github.com/AntonVanAssche/BashPass/graphs/contributors">
+         <img src="https://img.shields.io/github/contributors/AntonVanAssche/BashPass.svg?style=for-the-badge">
+      </a>
+      <a href="https://github.com/AntonVanAssche/BashPass/releases/latest/">
+         <img src="https://img.shields.io/github/release/AntonVanAssche/BashPass.svg?style=for-the-badge">
+      </a>
+      <a href="https://github.com/AntonVanAssche/BashPass/network/members">
+         <img src="https://img.shields.io/github/forks/AntonVanAssche/BashPass.svg?style=for-the-badge">
+      </a>
+      <a href="https://github.com/github_username/AntonVanAssche/BashPass">
+         <img src="https://img.shields.io/github/stars/AntonVanAssche/BashPass.svg?style=for-the-badge">
+      </a>
+      <a href="https://github.com/github_username/AntonVanAssche/BashPass">
+         <img src="https://img.shields.io/github/issues/AntonVanAssche/BashPass.svg?style=for-the-badge">
+      </a>
+      <a href="https://github.com/AntonVanAssche/BashPass/blob/master/LICENSE">
+         <img src="https://img.shields.io/github/license/AntonVanAssche/BashPass.svg?style=for-the-badge">
+      </a>
+</div>
 
-## Table of contents
+<img src="./assets/bashpass.gif" alt="Preview GIF" width="500px" align="right">
 
-- [Dependencies](#dependencies)
-- [Usage](#usage)
-- [Installing BashPass](#installing-bashpass)
-- [Updating BashPass](#updating-bashpass)
-- [Uninstalling BashPass](#uninstalling-bashpass)
-- [Updating the config](#updating-the-config)
-    - [Updating the location where passwords are stored](#updating-the-location-where-passwords-are-stored)
-    - [Updating the email address](#updating-the-e-mail-address)
-    - [Updating the clipboard timer](#updating-the-clipboard-timer)
-- [Feedback](#feedback)
+## About BashPass
 
-## Dependencies
-- gpg (Encrypt the password files)
-- xclip (Copy the password to the clipboard)
+BashPass is a command-line based password manager written in Bash. It uses GPG to encrypt/decrypt the files where the passwords are stored . This means the passwords are 100% stored locally, so you don't have to trust a third party to store your passwords.
 
-## Usage
-Note: the `[name]` is optional.
+## Features
 
-```
-bashpass [option] [name]                      - Basic command structure.
+-  Generating passwords
+-  Saving passwords
+-  Encrypting/decrypting the password files
+-  Copying the password to the clipboard
+-  Syncing the passwords with another computer
+-  And much more!
 
-Options:
---help       or -h                            - Show this help message.
---version    or -v                            - Show the version number
---add        or -a                     [name] - Add a password.
---update     or -u                     [name] - Update a password.
---delete     or -d                     [name] - Delete a password.
---show       or -s                     [name] - Show a password.
---copy       or -c                     [name] - Copy a password to the clipboard.
---list       or -l                            - List all password.
-```
+## Documentation
 
-Examples: 
-- `bashpass --add gmail`
-- `bashpass --delete gmail`
-- `bashpass --show gmail`
-- `bashpass --list`
+-  **[Getting started](https://github.com/AntonVanAssche/BashPass/wiki/Getting-Started)**
+-  **[Usage](https://github.com/AntonVanAssche/BashPass/wiki/Usage)**
+-  **[Configuring](https://github.com/AntonVanAssche/BashPass/wiki/Configuring)**
 
-## Installing BashPass
-First you'll have to generate a GPG key. Run the following command to do so, and your key will be generated (you can use the defaults for most questions).
+## Contributing
 
-```bash
-$ gpg --full-generate-key
-```
+Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
 
-Now it's time to install BashPass. Just run the `setup.sh` script and you'll be good to go.
+If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag `enhancement`.
+Don't forget to give the project a star! Thanks again!
 
-```bash
-$ ./setup.sh --install
-```
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
-After installation, you'll have to add `.local/bin` to your PATH to use BashPass. Add the following line in your `.bashrc` file.
-
-```bash
-export PATH="$HOME/.local/bin:$PATH"
-```
-
-When you start BashPass for the first time you'll be prompted with the question to enter an e-mail address. You must enter the same e-mail address that you've used to generate the GPG key.
-
-```
-Enter the email address you created the gpg key with:
-```
-
-## Updating BashPass
-To update BashPass to the latest version, just run the `setup.sh` script and you'll be good to go.
-
-```bash
-$ ./setup.sh --update
-```
-
-## Uninstalling BashPass
-To uninstall BashPass, just run the `setup.sh` script.
-
-```bash
-$ ./setup.sh --uninstall
-```
-
-## Updating the config
-### Updating the location where passwords are stored
-By default BashPass stores the passwords the following directory `~/.local/share/bashpass/`. In case you want to change the location you'll have to change the following line in the config file located at `~/.config/bashpass/bashpass.conf`.
-
-```
-location:.local/share/bashpass
-```
-
-**Example**: if you want to store the passwords in `.bashpass/passwords/`. You'll have to update the line to:
-
-**Note**: The new location has to be located inside **your home** (`~`) directory.
-
-```
-location:.bashpass/passwords/
-```
-
-### Updating the e-mail address
-Changing the e-mail address isn't recommended but in case you need to do this here you go. To update the e-mail address you'll have to update the following line in the config file located at `~/.config/bashpass/bashpass.conf`.
-
-```
-email:email@gmail.com
-```
-
-**Example**: if you want to update the e-mail address to `newemail@gmail.com`. You'll have to update the line to:
-
-**Note**: when you update the e-mail address you'll have to generate a new GPG key. You will also be unable to read your passwords you have stored with the old e-mail address.
-
-```
-email:newemail@gmail.com
-```
-
-### Updating the clipboard timer
-By default BashPass has a timer of `10` seconds. This can be changed in the config file located at `~/.config/bashpass/bashpass.conf`. To change this edit the following line.
-
-```
-timer:10
-```
-
-**Example**: if you want to update the timer to `15` seconds. You'll have to update the line to:
-
-```
-timer:15
-```
+See [`CONTRIBUTING.md`](./CONTRIBUTING.md) for more information.
 
 ## Feedback
-This project isn't perfect, therefore suggestions/improvements are always [welcome](https://github.com/TuX-sudo/BashPass/issues)!
+
+This project isn't perfect, therefore suggestions/improvements are always [welcome](https://github.com/AntonVanAssche/BashPass/issues)!
+
+## License
+
+Distributed under the MIT License. See [`LICENSE.md`](./LICENSE.md) for more information.

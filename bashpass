@@ -1,115 +1,107 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # '-e' Abort the script when an error occures.
 # '-f' To ensure that globbing is globally disabled.
 # '+x' To ensure debug mode is never enabled (prevents the password from leaking).
-set -ef +x
+# '-o pipefail' To ensure that the return code of a pipeline is the value of the last command to exit with a non-zero status.
+#     Needed for the `Copy` function.
+set -e -f +x -o pipefail
 
-# Detect the user.
-# When the user is root exit out.
-if [[ "$UID" == 0 ]]; then
-   prinf "You must run this as a normal user"
-   exit 1
-fi
-
-# Get the necessary configurations from the configuration file.
+# Assign the path to the config file to the variable '${config}'.
 configLocation="$HOME/.config/bashpass"
 config="$configLocation/bashpass.conf"
-email="$(grep "email" "$config" | cut -d: -f2)"
-passLocation="$HOME/$(grep "location" "$config" | cut -d: -f2)"
-version="$(grep "version" "$config" | cut -d: -f2)"
-timer="$(grep "timer" "$config" | cut -d: -f2)"
 
-# Create the necessary directories/files if they doesn't exists
-mkdir -p "${passLocation}" "${configLocation}"
-touch "${config}"
+# Detect the config file.
+if [[ ! -f ${config} ]]; then  
+   printf '\n'
+   printf 'An error occurred: config file not found.'
+   printf '\n'
+   exit 2
+fi
 
-function Help() {
-   cat << EOF
-BashPass version: $version
-A simple password manager written in Bash.
+# Simple function to get the setting '${1}' from the config file.
+# This basically replaces the '$(grep "setting" "$config" | cut -d" " -f2)'.
+# It's also pure bash, which means that no sub shells are used.
+GetSetting() {
+   while read;
+   do
+      if [[ "${REPLY}" =~ ^${1} ]]; then
+         printf '%s' "${REPLY#*: }"
+         break
+      fi
+   done < "${config}"
+}
 
-bashpass [option] [name]                      - Basic command structure.
+# Get the necessary configurations from the configuration file.
+# '|| :' To prevent the script from exiting if the variable is not found (especially needed for the '${email} variable').
+email="$(GetSetting 'email')" || :
+keyID="$(GetSetting 'keyID')" || :
+passLocation="$HOME/$(GetSetting 'location')" || :
+version="$(GetSetting 'version')" || :
+timer="$(GetSetting 'timer')" || :
+passLength="$(GetSetting 'length')" || :
 
+# Print out the error that occurred and exit (with the correct exit code) afterwards.
+Kill() {
+   printf '\n'
+   printf 'An error occurred: %s' "${1}"
+   printf '\n'
+   exit "${2}"
+}
+
+# Return all possible options/usages of BashPass. 
+Help() {
+   printf '%s' "\
+BashPass version: ${version}
+A password manager written in Bash.
+
+bashpass [option] [name]                    - Basic command structure.
+ 
 Options:
---help       or -h                            - Show this help message.
---version    or -v                            - Show the version number
---add        or -a                     [name] - Add a password.
---update     or -u                     [name] - Update a password.
---delete     or -d                     [name] - Delete a password.
---show       or -s                     [name] - Show a password.
---copy       or -c                     [name] - Copy a password to the clipboard.
---list       or -l                            - List all password.
-EOF
+--help     or -h                            - Show this help message.
+--version  or -v                            - Show the version number
+--list     or -l                            - List all password.
+--add      or -a                     [name] - Add a password.
+--update   or -u                     [name] - Update a password.
+--delete   or -d                     [name] - Delete a password.
+--show     or -s                     [name] - Show a password.
+--copy     or -c                     [name] - Copy a password to the clipboard.
+--sync     or -S  [upload|download]  [name] - Synchronize a password with a other device on your local network.
+"
 }
 
-function Version() {
-   printf "BashPass version: %s" "${version}"
-}
-
-function RandomPassword() {
-   printf "Do you want to generate a password [Y/n]: "
-   read -r random
-
-   case "${random}" in
-      [Nn])
-         printf "Enter a password: "
-         read -rs password1
-         printf "\n"
-
-         printf "Enter the password again: "
-         read -rs password2
-         printf "\n"
-         
-         while [[ "${password1}" != "${password2}" ]]; do
-            printf "Passwords ditn't match, please try again: "
-            read -rs password2
-            printf "\n"
-         done
-
-         password=${password1}
-         ;;
-      *)
-         printf "Give the lenght of the password: "
-         read -r lenght
-
-         # Generate a password using '/dev/urandom'.
-         # Call the 'tr' command to translate the password to a character set.
-         password=$(</dev/urandom tr -dc '12345!@#$%qwertQWERTasdfgASDFGzxcvbZXCVB' | head -c "${lenght}"; echo "")
-         ;;
-   esac
-
-   [[ -z "$password" ]] && Kill "Failed to set a password"
-
-   # Write password to the 'password' file.
-   printf "%s" "${password}" > "${passLocation}/${name}"
+# Return the current verion of BashPass.
+Version() {
+   printf 'BashPass version: %s' "${version}"
+   printf '\n'
 }
 
 # Function to ask for a name.
-function Name() {
+Name() {
    name="${1}"
    function=${2}
 
    if [[ -z "${name}" ]]; then
-      printf "Enter the name of the password you want to %s: " "${function}"
+      printf 'Enter the name of the password you want to %s: ' "${function}"
       read -r name
    fi
 }
 
-# Function to print out errors and exit afterwards.
-function Kill() {
-   printf "A error occured: %s" "${1}"
-   printf "\n"
-   Help
-   printf "\n"
-   exit 1
+# Check whether the given password exists.
+PasswordExists() {
+   name="${1}"
+
+   if [[ ! -f "${passLocation}/${name}.gpg" ]]; then
+      Kill "password '${name}' doesn't exist." "1"
+   fi
 }
 
-function PasswordExists() {
+# Ask the user whether to overwrite an existing password or not.
+PasswordAlreadyExists() {
    while [[ -f ${passLocation}/${name}.gpg ]]; do
-      printf "A password with the name %s already exists." "'${name}'"
-      printf "\n"
-      printf "Do you want to overwrite the existing password [y/N]: "
+      printf 'A password with the name %s already exists.' "'${name}'"
+      printf '\n'
+      printf 'Do you want to overwrite the existing password [y/N]: '
       read -r overwrite
       
       case "${overwrite}" in
@@ -117,30 +109,76 @@ function PasswordExists() {
             rm -rf "${passLocation}/${name}.gpg"
             ;;
          *)
-            printf "Enter a new name: "
+            printf 'Enter a new name: '
             read -r name
             ;;
       esac
    done
 }
 
-function Add() {
+# Ask the user whether he would like to generate a password or to enter one himself.
+RandomPassword() {
+   printf 'Do you want to generate a password [Y/n]: '
+   read -r random
+
+   case "${random}" in
+      [Nn])
+         printf 'Enter a password: '
+         read -rs password1
+         printf '\n'
+
+         [[ -z "${password1}" ]] && Kill "the password cannot be empty." "1"
+
+         printf 'Enter the password again: '
+         read -rs password2
+         printf '\n'
+         
+         while [[ "${password1}" != "${password2}" ]]; do
+            printf 'Passwords didn'\''t match, please try again: '
+            read -rs password2
+            printf '\n'
+         done
+
+         password=${password1}
+         ;;
+      *)
+         printf 'Give the length of the password (Default: %s): ' "${passLength}"
+         read -r length
+
+         [[ -z ${length} ]] && length=${passLength}
+
+         # Generate a password using '/dev/urandom'.
+         # Call the 'tr' command to translate the password to a character set.
+         password=$(LC_ALL=C tr -dc 'A-Za-z0-9!"#$%&'\''()*+,-./:;<=>?@[\]^_`{|}~' < /dev/urandom | dd ibs=1 obs=1 count=${length} 2> /dev/null) || :
+         ;;
+   esac
+
+   # Write password to the 'password' file.
+   if [[ -z ${password} ]]; then
+      Kill "failed to save the password ${name}" "1"
+   fi
+
+   printf '%s' "${password}" > "${passLocation}/${name}"
+}
+
+# Add a new password.
+Add() {
    # Ask for a name when no name was given using ${2}.
    Name "${1}" "add"
 
-   [[ -z "${name}" ]] && Kill "Failed to set a name"
+   [[ -z "${name}" ]] && Kill "failed to set a name" "1"
 
    # Check if a password with the chosen name already exists.
-   PasswordExists
+   PasswordAlreadyExists
 
    # Ask if the user want to generate a random password.
    RandomPassword
 
    # Encrypte the password file using gpg.
-   gpg --encrypt --output "${passLocation}/${name}.gpg" --recipient "${email}" "${passLocation}/${name}"  &> /dev/null
+   gpg --encrypt --quiet --output "${passLocation}/${name}.gpg" --recipient "${keyID}" "${passLocation}/${name}"
 
-   printf "Password %s has been successfully saved" "'${name}'"
-   printf "\n"
+   printf 'Password %s has been successfully saved' "'${name}'"
+   printf '\n'
 
    # Remove the Decrypted password file after reading
    # to prevent the password from being leaked afterwards.
@@ -148,12 +186,14 @@ function Add() {
    rm -rf "${passLocation:?}/${name}"
 }
 
-function Update() {
+# Update an existing password.
+Update() {
    # Ask for a name when no name was given using ${2}.
    Name "${1}" "update"
+   PasswordExists "${name}"
 
    # Decrypte the password file.
-   gpg --decrypt --output "${passLocation}/${name}" "${passLocation}/${name}.gpg" &> /dev/null
+   gpg --decrypt --quiet --output "${passLocation}/${name}" "${passLocation}/${name}.gpg"
 
    # Ask if the user want to generate a random password.
    RandomPassword
@@ -162,10 +202,10 @@ function Update() {
    rm -rf "${passLocation:?}/${name}.gpg"
 
    # Encrypte the password file using gpg.
-   gpg --encrypt --output "${passLocation}/${name}.gpg" --recipient "${email}" "${passLocation}/${name}"  &> /dev/null
+   gpg --encrypt --quiet --output "${passLocation}/${name}.gpg" --recipient "${keyID}" "${passLocation}/${name}"
 
-   printf "Password %s has successfully been updated" "'${name}'"
-   printf "\n"
+   printf 'Password %s has successfully been updated' "'${name}'"
+   printf '\n'
 
    # Remove the Decrypted password file after reading
    # to prevent the password from being leaked afterwards.
@@ -173,55 +213,144 @@ function Update() {
    rm -rf "${passLocation:?}/${name}"
 }
 
-function Delete() {
+# Delete an existing password.
+Delete() {
    # Ask for a name when no name was given using ${2}.
    Name "${1}" "delete"
+   PasswordExists "${name}"
 
    rm -rf "${passLocation}/${name}.gpg"
-   printf "Password %s has successfully been deleted" "'${name}'"
-   printf "\n"
+   printf 'Password %s has successfully been deleted' "'${name}'"
+   printf '\n'
 }
 
-function Show() {
+# Print the password that was given. 
+Show() {
    # Ask for a name when no name was given using ${2}.
    Name "${1}" "show"
+   PasswordExists "${name}"
 
    # Decrypte the password file and show the password
-   printf "Password: %s" "$(gpg -dq "${passLocation}/${name}.gpg")"
-   printf "\n"
+   printf 'Password: %s' "$(gpg --decrypt --quiet "${passLocation}/${name}.gpg")"
+   printf '\n'
 }
 
-function Copy() {
+# Copy the password that was given to the clipboard.
+# Clear the clipboard afterwards.
+Copy() {
+   # Detect 'xclip'
+   command -v xclip &> /dev/null || Kill "xclip is required" "127"
+
    # Ask for a name when no name was given using ${2}.
    Name "${1}" "copy"
+   PasswordExists "${name}"
 
    # Decrypte the password file and copy it to the clipboard using xclip.
    # This WON'T show the password inside the terminal output.
-   printf "%s" "$(gpg -dq "${passLocation}/${name}.gpg")" | xclip -selection clipboard
+   if ! printf '%s' "$(gpg --decrypt --quiet "${passLocation}/${name}.gpg")" | xclip -selection clipboard; then
+      xclip -selection clipboard < /dev/null
+      Kill "failed to copy password '${name}' to the clipboard." "1"
+   fi
+
+   printf 'Password %s has been copied to the clipboard' "'${name}'"
+   printf '\n'
    
    # Wait for the timer to end clear the clipboard.
    # 'timer' can be changed in the config file.
    sleep "${timer}" || kill 0
    xclip -selection clipboard < /dev/null
+   
+   printf 'Clipboard has been cleared to ensure it cannot be leaked.'
+   printf '\n'
 }
 
-function List() {
-   ls -1 "$passLocation"
-   printf "\n"
+# Return a list of all the passwords that are stored on your machine.
+List() {
+   # Enable globbing for only this function.
+   set +f
+   
+   # Print the list of all the passwords (without using the `ls` command).
+   for p in "${passLocation}"/*.gpg; do
+      # Remove the path to the file.
+      p="${p##*/}"
+
+      # Remove the file extension.
+      p="${p%%.gpg}"
+
+      printf 'Name: %s' "${p}"
+      printf '\n'
+   done
+
+   # Disable globbing.
+   set -f
 }
 
-# Detect 'gpg'
-command -v gpg &> /dev/null || Kill "gpg is required"
+# Copy a password to/from another device using 'rsync'.
+# Export the 'gpg' keys to that device.
+Sync() {
+   # Detect 'rsync'
+   command -v rsync &> /dev/null || Kill "rsync is required" "127"
 
-# Ask the e-meil address to encrypt when it can't be found in the config file.
-if [[ -z ${email} ]]; then
-   printf "Enter the email address you created the gpg key with: "
-   read -r email
-   printf "email:%s" "${email}" >> "${config}"
-fi
+   Name "${2}" "synchronize"
 
-function Main() {
-   case "$1" in
+   printf 'Enter the username of the user on the other device: '
+   read -r username
+   printf 'Enter the IP address of the other device: '
+   read -r localIP
+
+   case "${1}" in
+      [Uu]pload)
+         if [[ ${name} == "all" ]]; then
+            rsync -a "${passLocation}" "${username}"@"${localIP}":~/.local/share/
+         else
+            PasswordExists "${name}"
+            rsync -a "${passLocation}/${name}.gpg" "${username}"@"${localIP}":~/.local/share/bashpass/
+         fi
+         ;;
+      [Dd]ownload)
+         if [[ ${name} == "all" ]]; then
+            rsync -a "${username}"@"${localIP}":"~/.local/share/bashpass/" "$HOME/.local/share/"
+         else
+            rsync -a "${username}"@"${localIP}":"~/.local/share/bashpass/${name}.gpg" "${passLocation}/"
+         fi
+         ;;
+      *)
+         Kill "unknown option '${1}" "22"
+         ;;
+   esac
+
+   printf '\n'
+   printf 'Be aware you'\''ll need to import/export your GPG key.'
+   printf '\n'
+}
+
+Main() {
+   # Detect the user.
+   # When the user is root exit out.
+   [[ "$UID" == 0 ]] && Kill "permission denied" "13"
+
+   # Create the necessary directories if they doesn't exists.
+   mkdir -p "${passLocation}"
+
+   # Detect 'gpg'
+   command -v gpg &> /dev/null || Kill "gpg is required" "127"
+
+   # Ask the GPG key ID to use for encrypting the password.
+   # It will only ask when the keyID isn't found in the config file.
+   if [[ -z ${keyID} ]]; then
+      printf 'Enter the key ID of the GPG key you want to use: '
+      read -r keyID
+      printf 'keyID: %s\n' "${keyID}" >> "${config}"
+   fi
+
+   # Ask the e-email address to encrypt when it can't be found in the config file.
+   if [[ -z ${email} ]]; then
+      printf 'Enter the email address you created the gpg key with: '
+      read -r email
+      printf 'email: %s\n' "${email}" >> "${config}"
+   fi
+
+   case "${1}" in
       "--help"| "-h") Help;;
       "--version"| "-v") Version;;
       "--add"| "-a") Add "${2}";;
@@ -230,13 +359,14 @@ function Main() {
       "--show"| "-s") Show "${2}";;
       "--copy"| "-c") Copy "${2}";;
       "--list"| "-l") List;;
-      *) Kill "option '${1}' not found";;
+      "--sync"| "-S") Sync "${2}" "${3}";;
+      *) Kill "option '${1}' not found" "22";;
    esac
 }
 
-# Check if an argument '$1' is given.
-if [[ "$1" ]]; then
-   Main "$@"
+# Check if an argument '${1}' is given.
+if [[ "${1}" ]]; then
+   Main "${@}"
 else
    Help
 fi
