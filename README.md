@@ -17,6 +17,9 @@
       <a href="https://github.com/AntonVanAssche/BashPass/graphs/contributors">
          <img src="https://img.shields.io/github/contributors/AntonVanAssche/BashPass.svg?style=for-the-badge">
       </a>
+      <a href="https://github.com/AntonVanAssche/BashPass/graphs/release">
+         <img src="https://img.shields.io/github/release/AntonVanAssche/BashPass.svg?style=for-the-badge">
+      </a>
       <a href="https://github.com/AntonVanAssche/BashPass/network/members">
          <img src="https://img.shields.io/github/forks/AntonVanAssche/BashPass.svg?style=for-the-badge">
       </a>
