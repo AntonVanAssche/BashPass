@@ -285,7 +285,7 @@ List() {
    set -f
 }
 
-# Copy a password to/from another device  on your local network using 'rsync'.
+# Copy a password to/from another device using 'rsync'.
 # Export the 'gpg' keys to that device.
 Sync() {
    # Detect 'rsync'
@@ -295,13 +295,13 @@ Sync() {
 
    printf 'Enter the username of the user on the other device: '
    read -r username
-   printf 'Enter the local IP address of the other device: '
+   printf 'Enter the IP address of the other device: '
    read -r localIP
 
    case "${1}" in
       [Uu]pload)
          if [[ ${name} == "all" ]]; then
-               rsync -a "${passLocation}" "${username}"@"${localIP}":~/.local/share/
+            rsync -a "${passLocation}" "${username}"@"${localIP}":~/.local/share/
          else
             PasswordExists "${name}"
             rsync -a "${passLocation}/${name}.gpg" "${username}"@"${localIP}":~/.local/share/bashpass/
