@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Abort the script when an error occures.
 set -e
@@ -81,15 +81,9 @@ ReplaceVersion() {
    printf '%s\n' "${setting[@]}" > "${config}"
 }
 
-CloneLatestVersion() {
-   #git clone -b -q "$(basename "$(curl -Ls -o /dev/null -w "%{url_effective}" https://github.com/AntonVanAssche/BashPass/releases/latest)")" \
-      # https://github.com/AntonVanAssche/BashPass.git
-
-   # Current replacement for cloning the latest version.
-   git clone https://github.com/AntonVanAssche/BashPass.git
-   cd BashPass/
-   git checkout develop
-   cd ../
+# Get latest release from GitHub api
+GetLatestRelease() {
+  curl --silent "https://api.github.com/repos/AntonVanAssche/BashPass/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/'
 }
 
 Main() {
@@ -102,7 +96,7 @@ Main() {
    printf 'Updating BashPass to version: '\''%s'\''...\n' "${latestVersion}"
    printf '\n'
 
-   CloneLatestVersion
+   git clone https://www.github.com/AntonVanAssche/BashPass.git --branch "$(GetLatestRelease)"
 
    case $(GetOldSetting 'version') in
       "1.0"| "1.1")
@@ -123,4 +117,4 @@ Main() {
    rm -rf "${oldConfig}" BashPass/
 }
 
-Main "$@"
+Main "${@}"
