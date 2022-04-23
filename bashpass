@@ -285,11 +285,10 @@ List() {
    set -f
 }
 
-# Copy a password to/from another device  on your local network using 'ssh' and 'rsync'.
+# Copy a password to/from another device  on your local network using 'rsync'.
 # Export the 'gpg' keys to that device.
 Sync() {
-   # Detect 'ssh' and 'scp'
-   command -v ssh &> /dev/null || Kill "ssh is required" "127"
+   # Detect 'rsync'
    command -v rsync &> /dev/null || Kill "rsync is required" "127"
 
    Name "${2}" "synchronize"
