@@ -100,6 +100,9 @@ Main() {
 
    case $(GetOldSetting 'version') in
       "1.0"| "1.1")
+         # This fixes a bug where the e-mail address was not copied over to the new config format.
+         printf '\n' >> "${oldConfig}"
+
          currentEmail="$(GetOldSetting 'email')" || :
          currentLocation="$(GetOldSetting 'location')" || :
          currentTimer="$(GetOldSetting 'timer')" || :
