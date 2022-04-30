@@ -10,7 +10,7 @@ config="${configLocation}/bashpass.conf"
 # This basically replaces the '$(grep "version" "$config" | cut -d" " -f2)'.
 # It's also pure bash, which means that no sub shells are used.
 GetVersion() {
-   while read;
+   while read -r;
    do
       if [[ "${REPLY}" =~ ^version ]]; then
          printf '%s' "${REPLY#*: }"

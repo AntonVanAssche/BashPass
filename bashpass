@@ -23,7 +23,7 @@ fi
 # This basically replaces the '$(grep "setting" "$config" | cut -d" " -f2)'.
 # It's also pure bash, which means that no sub shells are used.
 GetSetting() {
-   while read;
+   while read -r;
    do
       if [[ "${REPLY}" =~ ^${1} ]]; then
          printf '%s' "${REPLY#*: }"
