@@ -11,5 +11,5 @@ jobs:
          - name: Run shellcheck.
            run: |
               shopt -s nullglob
-              shellcheck bashpass
-              shellcheck scripts/*
+              shellcheck bashpass -e SC2140
+              shellcheck scripts/* -e SC2016
