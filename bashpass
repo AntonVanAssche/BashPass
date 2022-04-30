@@ -149,7 +149,7 @@ RandomPassword() {
 
          # Generate a password using '/dev/urandom'.
          # Call the 'tr' command to translate the password to a character set.
-         password=$(LC_ALL=C tr -dc 'A-Za-z0-9!"#$%&'\''()*+,-./:;<=>?@[\]^_`{|}~' < /dev/urandom | dd ibs=1 obs=1 count=${length} 2> /dev/null) || :
+         password=$(LC_ALL=C tr -dc 'A-Za-z0-9!"#$%&'\''()*+,-./:;<=>?@[\]^_`{|}~' < /dev/urandom | dd ibs=1 obs=1 count="${length}" 2> /dev/null) || :
          ;;
    esac
 
