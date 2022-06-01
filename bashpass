@@ -49,6 +49,13 @@ Kill() {
    exit "${2}"
 }
 
+# Surprisingly, `sleep` is an external program and not a Bash built-in.
+# So it is possible that it is not installed on a system, although it is very unlikely.
+# We can use `read` to replace the `sleep` command.
+Sleep() {
+   read -rt "${1}" <> <(:) || :
+}
+
 # Return all possible options/usages of BashPass. 
 Help() {
    printf '%s' "\
@@ -257,7 +264,7 @@ Copy() {
    
    # Wait for the timer to end clear the clipboard.
    # 'timer' can be changed in the config file.
-   sleep "${timer}" || kill 0
+   Sleep "${timer}" || kill 0
    xclip -selection clipboard < /dev/null
    
    printf 'Clipboard has been cleared to ensure it cannot be leaked.'
