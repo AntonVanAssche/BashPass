@@ -252,6 +252,9 @@ Copy() {
    Name "${1}" "copy"
    PasswordExists "${name}"
 
+   # Ignore terminal interrupts (CTRL+C).
+   trap '' INT
+
    # Decrypte the password file and copy it to the clipboard using xclip.
    # This WON'T show the password inside the terminal output.
    if ! printf '%s' "$(gpg --decrypt --quiet "${passLocation}/${name}.gpg")" | xclip -selection clipboard; then
