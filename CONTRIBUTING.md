@@ -30,7 +30,7 @@ When you decide to open an issue, please use the appropriate template provided.
 -  A quick summary and/or background
 -  Steps to reproduce
    -  Be specific!
-   -  Give sample code if you can. Includes sample code that _anyone_ with a base R setup can run to reproduce what I was seeing
+   -  Give sample code if you can. Includes sample code that _anyone_ with a base Bash knowledge can understand and run. 
 -  What you expected would happen
 -  What actually happens
 -  The version of the software
