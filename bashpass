@@ -23,7 +23,7 @@ fi
 # This basically replaces the '$(grep "setting" "$config" | cut -d" " -f2)'.
 # It's also pure bash, which means that no sub shells are used.
 GetSetting() {
-   while read;
+   while read -r;
    do
       if [[ "${REPLY}" =~ ^${1} ]]; then
          printf '%s' "${REPLY#*: }"
@@ -47,6 +47,13 @@ Kill() {
    printf 'An error occurred: %s' "${1}"
    printf '\n'
    exit "${2}"
+}
+
+# Surprisingly, `sleep` is an external program and not a Bash built-in.
+# So it is possible that it is not installed on a system, although it is very unlikely.
+# We can use `read` to replace the `sleep` command.
+Sleep() {
+   read -rt "${1}" <> <(:) || :
 }
 
 # Return all possible options/usages of BashPass. 
@@ -149,7 +156,7 @@ RandomPassword() {
 
          # Generate a password using '/dev/urandom'.
          # Call the 'tr' command to translate the password to a character set.
-         password=$(LC_ALL=C tr -dc 'A-Za-z0-9!"#$%&'\''()*+,-./:;<=>?@[\]^_`{|}~' < /dev/urandom | dd ibs=1 obs=1 count=${length} 2> /dev/null) || :
+         password=$(LC_ALL=C tr -dc 'A-Za-z0-9!"#$%&'\''()*+,-./:;<=>?@[\]^_`{|}~' < /dev/urandom | dd ibs=1 obs=1 count="${length}" 2> /dev/null) || :
          ;;
    esac
 
@@ -245,6 +252,9 @@ Copy() {
    Name "${1}" "copy"
    PasswordExists "${name}"
 
+   # Ignore terminal interrupts (CTRL+C).
+   trap '' INT
+
    # Decrypte the password file and copy it to the clipboard using xclip.
    # This WON'T show the password inside the terminal output.
    if ! printf '%s' "$(gpg --decrypt --quiet "${passLocation}/${name}.gpg")" | xclip -selection clipboard; then
@@ -257,7 +267,7 @@ Copy() {
    
    # Wait for the timer to end clear the clipboard.
    # 'timer' can be changed in the config file.
-   sleep "${timer}" || kill 0
+   Sleep "${timer}" || kill 0
    xclip -selection clipboard < /dev/null
    
    printf 'Clipboard has been cleared to ensure it cannot be leaked.'

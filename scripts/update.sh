@@ -17,7 +17,7 @@ cp "${config}" "${oldConfig}"
 # This basically replaces the '$(grep "setting" "$oldConfig" | cut -d: -f2)'.
 # It's also pure bash, which means that no sub shells are used.
 GetOldSetting() {
-   while read;
+   while read -r;
    do
       if [[ "${REPLY}" =~ ^${1} ]]; then
          printf '%s' "${REPLY#*:}"
@@ -30,7 +30,7 @@ GetOldSetting() {
 # This basically replaces the '$(grep "setting" "$config" | cut -d" " -f2)'.
 # It's also pure bash, which means that no sub shells are used.
 GetNewSetting() {
-   while read;
+   while read -r;
    do
       if [[ "${REPLY}" =~ ^${1} ]]; then
          printf '%s' "${REPLY#*: }"
@@ -43,7 +43,7 @@ GetNewSetting() {
 # This basically replaces the 'sed -i "2s|setting|${newSetting}|g" "${config}"'.
 # It's also pure bash, which means that no sub shells are used.
 ReplaceOldSettings() {
-   while read;
+   while read -r;
    do
       case ${REPLY} in
          "location: "*)
@@ -66,7 +66,7 @@ ReplaceOldSettings() {
 # This basically replaces the 'sed -i "1s|${currentVersion}|${latestVersion}|g" "${config}"'.
 # It's also pure bash, which means that no sub shells are used.
 ReplaceVersion() {
-   while read;
+   while read -r;
    do
       case ${REPLY} in
          "version: "*)
@@ -100,6 +100,9 @@ Main() {
 
    case $(GetOldSetting 'version') in
       "1.0"| "1.1")
+         # This fixes a bug where the e-mail address was not copied over to the new config format.
+         printf '\n' >> "${oldConfig}"
+
          currentEmail="$(GetOldSetting 'email')" || :
          currentLocation="$(GetOldSetting 'location')" || :
          currentTimer="$(GetOldSetting 'timer')" || :
