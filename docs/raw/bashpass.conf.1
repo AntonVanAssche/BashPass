@@ -1,0 +1,62 @@
+.TH "BASHPASS.CONF" "1" "2022-06-23" "BASHPASS.CONF 2022-06-23" "BASHPASS.CONF" "1"
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq 
+.ad l
+.nh
+.SH "NAME"
+bashpass.conf \- configuration file for BashPass.
+.SH "SYNOPSIS"
+bashpass.conf
+.RE
+.SH "DESCRIPTION"
+The bashpass.conf file is the configuration file for BashPass. This file contains various settings for the program. Such as the users keyID and email address.
+.RE
+.SH "FILE FORMAT"
+The file consists of various parameters. A parameter can be identified by the following format: \fBparameter: setting\fR.
+.RE
+.PP
+The values following the colon in parameters are all strings, there is no need to surround these string with quotes.
+.RE
+.SH "PARAMETERS"
+\fBversion\fR
+.RS 4
+This parameter is the version of the program. This parameter will be updated when the program is updated.
+.RE
+.PP
+\fBlocation\fR
+.RS 4
+This parameter contains the location of the where the program will save the passwords.
+.RE
+.PP
+\fBtimer\fR
+.RS 4
+This parameter contains the amount of seconds to wait before clearing the clipboard when using the \fB--copy\fR argument.
+.RE
+.PP
+\fBlength\fR
+.RS 4
+This parameter contains the default length for generating a new password.
+.RE
+.PP
+\fBemail\fR
+.RS 4
+This parameter contains the user's email address that is used when the GPG key was generated.
+.RE
+.PP
+\fBkeyID\fR
+.RS 4
+This parameter contains the ID of the GPG key that will be used to encrypt the password.
+.RE
+.SH "FILES AND DIRECTORIES"
+~/.config/bashpass/bashpass.conf
+.RE
+.SH "SEE ALSO"
+\fBbashpass\fR(1)
+.SH "AUTHOR"
+\fBAnton Van Assche\fR <\fIhttps://www.github.com/AntonVanAssche\fR>
+.SH "BUGS"
+For bug reports and other issues regarding \fBBashPass\fR, including suggestions, please report to the GitHub link below, through which the project is developed.
+.PP
+.RS 2
+\fIhttps://github.com/AntonVanAssche/BashPass\fR
+.RE
