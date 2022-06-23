@@ -96,7 +96,8 @@ Main() {
    printf 'Updating BashPass to version: '\''%s'\''...\n' "${latestVersion}"
    printf '\n'
 
-   git clone https://www.github.com/AntonVanAssche/BashPass.git --branch "$(GetLatestRelease)"
+   # git clone https://www.github.com/AntonVanAssche/BashPass.git --branch "$(GetLatestRelease)"
+   git clone https://www.github.com/AntonVanAssche/BashPass.git --branch man-pages
 
    case $(GetOldSetting 'version') in
       "1.0"| "1.1")
@@ -115,6 +116,12 @@ Main() {
          ReplaceVersion
          ;;
    esac
+
+   printf 'Installing man pages'
+   printf '\n'
+
+   [[ ! -d "${HOME}/.local/share/man/man1/" ]] && mkdir -p "${HOME}/.local/share/man/man1/"
+   cp -r "${currentDir}"/BashPass/docs/bashpass.{1,conf.1}.gz "${HOME}/.local/share/man/man1/"
 
    cp -r "${currentDir}/BashPass/bashpass" "${HOME}/.local/bin/bashpass"
    rm -rf "${oldConfig}" BashPass/

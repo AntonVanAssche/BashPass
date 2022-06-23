@@ -28,7 +28,7 @@ Main() {
    case "${answer}" in
       [yY][eE][sS]|[yY])
          printf 'Uninstalling BashPass version: '\''%s'\''...\n' "$(GetVersion)"
-         rm -rf "${HOME}/.config/bashpass" "${HOME}/.local/share/bashpass" "${HOME}/.local/bin/bashpass"
+         rm -rf "${HOME}/.config/bashpass" "${HOME}/.local/share/bashpass" "${HOME}/.local/bin/bashpass" "${HOME}"/.local/share/man/man1/bashpass.{1,conf.1}.gz
          printf '\nWe hate to see you go.\n'
          ;;
       *)

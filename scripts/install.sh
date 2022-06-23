@@ -30,6 +30,12 @@ Main() {
    cp -r "${currentDir}/BashPass/config/bashpass.conf" "${HOME}/.config/bashpass/bashpass.conf"
    cp -r "${currentDir}/BashPass/bashpass" "${HOME}/.local/bin/bashpass"
 
+   printf 'Installing man pages'
+   printf '\n'
+
+   [[ ! -d "${HOME}/.local/share/man/man1/" ]] && mkdir -p "${HOME}/.local/share/man/man1/"
+   cp -r "${currentDir}"/BashPass/docs/bashpass.{1,conf.1}.gz "${HOME}/.local/share/man/man1/"
+
    printf 'Make sure to add '\''\${HOME}/.local/bin/'\'' to your \$PATH.'
    printf '\n'
 
