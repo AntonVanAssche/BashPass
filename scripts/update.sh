@@ -96,8 +96,7 @@ Main() {
    printf 'Updating BashPass to version: '\''%s'\''...\n' "${latestVersion}"
    printf '\n'
 
-   # git clone https://www.github.com/AntonVanAssche/BashPass.git --branch "$(GetLatestRelease)"
-   git clone https://www.github.com/AntonVanAssche/BashPass.git --branch man-pages
+   git clone https://www.github.com/AntonVanAssche/BashPass.git --branch "$(GetLatestRelease)"
 
    case $(GetOldSetting 'version') in
       "1.0"| "1.1")
