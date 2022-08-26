@@ -57,8 +57,8 @@ BashPass is a command-line based password manager written in Bash. It uses GPG t
 
 Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
 
-If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag `enhancement`.
-Don't forget to give the project a star! Thanks again!
+If you have a suggestion/improvement that would make this project better, please [fork](https://github.com/AntonVanAssche/BashPass/fork) the repo and create a [pull request](https://github.com/AntonVanAssche/BashPass/pulls). You can also simply open an [issue](https://github.com/AntonVanAssche/BashPass/issues) with the tag `enhancement`.
+A star to the repo would be greatly appreciated (only if you want to, you don't have to if you don't want to)!
 
 1. Fork the Project
 2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
@@ -67,10 +67,6 @@ Don't forget to give the project a star! Thanks again!
 5. Open a Pull Request
 
 See [`CONTRIBUTING.md`](./CONTRIBUTING.md) for more information.
-
-## Feedback
-
-This project isn't perfect, therefore suggestions/improvements are always [welcome](https://github.com/AntonVanAssche/BashPass/issues)!
 
 ## License
 
