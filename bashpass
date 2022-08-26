@@ -130,13 +130,13 @@ RandomPassword() {
 
    case "${random}" in
       [Nn])
-         printf 'Enter a password: '
+         printf 'Enter a password for %s: ' "${name}"
          read -rs password1
          printf '\n'
 
          [[ -z "${password1}" ]] && Kill "the password cannot be empty." "1"
 
-         printf 'Enter the password again: '
+         printf 'Retype the password for %s: ' "${name}"
          read -rs password2
          printf '\n'
          
