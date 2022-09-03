@@ -56,6 +56,13 @@ Sleep() {
    read -rt "${1}" <> <(:) || :
 }
 
+# Wrapper for `command -v` to avoid spamming '> /dev/null'.
+# It also protects against user aliasses and functions.
+Has() {
+   command=$(command -v "${1}") 2> /dev/null || Kill "${1} is required" "127"
+   [[ -x ${command} ]] || Kill "${1} is not an executable" "1"
+}
+
 # Return all possible options/usages of BashPass. 
 Help() {
    printf '%s' "\
@@ -246,9 +253,7 @@ Show() {
 # Clear the clipboard afterwards.
 Copy() {
    # Detect 'xclip' or 'xsel'
-   command -v xclip &> /dev/null ||
-      command -v xsel &> /dev/null ||
-      Kill "xclip or xsel is required" "127"
+   Has "xclip" || Has "xsel"
 
    # Ask for a name when no name was given using ${2}.
    Name "${1}" "copy"
@@ -264,8 +269,8 @@ Copy() {
    elif gpg --decrypt --quiet "${passLocation}/${name}.gpg" | xsel --clipboard 2> /dev/null; then
       :
    else
-      command -v xclip &> /dev/null && xclip -selection clipboard < /dev/null 
-      command -v xsel &> /dev/null && xsel --clipboard < /dev/null
+      Has "xclip" && xclip -selection clipboard < /dev/null 
+      Has "xsel" && xsel --clipboard < /dev/null
       Kill "failed to copy password '${name}' to the clipboard." "1"
    fi
 
@@ -275,8 +280,8 @@ Copy() {
    # Wait for the timer to end clear the clipboard.
    # 'timer' can be changed in the config file.
    Sleep "${timer}" || kill 0
-   command -v xclip &> /dev/null && xclip -selection clipboard < /dev/null
-   command -v xsel &> /dev/null && xsel --clipboard < /dev/null
+   Has "xclip" && xclip -selection clipboard < /dev/null 
+   Has "xsel" && xsel --clipboard < /dev/null
 
    printf 'Clipboard has been cleared to ensure it cannot be leaked.'
    printf '\n'
@@ -307,7 +312,7 @@ List() {
 # Export the 'gpg' keys to that device.
 Sync() {
    # Detect 'rsync'
-   command -v rsync &> /dev/null || Kill "rsync is required" "127"
+   Has "rsync"
 
    Name "${2}" "synchronize"
 
@@ -351,7 +356,7 @@ Main() {
    mkdir -p "${passLocation}"
 
    # Detect 'gpg'
-   command -v gpg &> /dev/null || Kill "gpg is required" "127"
+   Has "gpg"
 
    # Ask the GPG key ID to use for encrypting the password.
    # It will only ask when the keyID isn't found in the config file.
