@@ -253,7 +253,9 @@ Show() {
 # Clear the clipboard afterwards.
 Copy() {
    # Detect 'xclip' or 'xsel'
-   Has "xclip" || Has "xsel"
+   commmand -v xclip &> /dev/null || 
+      command -v xsel &> /dev/null ||
+      Kill "xclip or xsel is required" "127"
 
    # Ask for a name when no name was given using ${2}.
    Name "${1}" "copy"
@@ -269,8 +271,8 @@ Copy() {
    elif gpg --decrypt --quiet "${passLocation}/${name}.gpg" | xsel --clipboard 2> /dev/null; then
       :
    else
-      Has "xclip" && xclip -selection clipboard < /dev/null 
-      Has "xsel" && xsel --clipboard < /dev/null
+      command -v "xclip" &> /dev/null && xclip -selection clipboard < /dev/null 
+      command -v "xsel" &> /dev/null && xsel --clipboard < /dev/null
       Kill "failed to copy password '${name}' to the clipboard." "1"
    fi
 
