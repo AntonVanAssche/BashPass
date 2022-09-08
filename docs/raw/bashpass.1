@@ -51,7 +51,7 @@ Output a password with a given name. This option will not clear the terminal so 
 .PP
 \fB-c\fR, \fB--copy\fR [\fINAME\fR]
 .RS 4
-Copy a password with a given name to the clipboard. After a certain amount of seconds the clipboard will be cleared. The amount of seconds can be specified by changing the \fItimer\fR option in the configuration file (~/.config/bashpass/bashpass.conf). This is to insure security.
+Copy a password with a given name to the clipboard. After a certain amount of seconds the clipboard will be cleared to ensure security. The amount of seconds can be specified by changing the \fItimer\fR option in the configuration file (~/.config/bashpass/bashpass.conf). This is to insure security. This option requires either \fIxclip\fR(1) or \fIxsel\fR(1) to be installed on your system.
 .RE
 .PP
 \fB-S\fR, \fB--sync\fR [\fIupload/download\fR] [\fINAME\fR]
