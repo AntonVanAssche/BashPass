@@ -12,7 +12,7 @@ configLocation="$HOME/.config/bashpass"
 config="$configLocation/bashpass.conf"
 
 # Detect the config file.
-if [[ ! -f ${config} ]]; then  
+if [[ ! -f ${config} ]]; then
    printf '\n'
    printf 'An error occurred: config file not found.'
    printf '\n'
@@ -63,14 +63,14 @@ Has() {
    [[ -x ${command} ]] || Kill "${1} is not an executable" "1"
 }
 
-# Return all possible options/usages of BashPass. 
+# Return all possible options/usages of BashPass.
 Help() {
    printf '%s' "\
 BashPass version: ${version}
 A password manager written in Bash.
 
 bashpass [option] [name]                    - Basic command structure.
- 
+
 Options:
 --help     or -h                            - Show this help message.
 --version  or -v                            - Show the version number
@@ -238,7 +238,7 @@ Delete() {
    printf '\n'
 }
 
-# Print the password that was given. 
+# Print the password that was given.
 Show() {
    # Ask for a name when no name was given using ${2}.
    Name "${1}" "show"
@@ -253,7 +253,7 @@ Show() {
 # Clear the clipboard afterwards.
 Copy() {
    # Detect 'xclip' or 'xsel'
-   commmand -v xclip &> /dev/null || 
+   commmand -v xclip &> /dev/null ||
       command -v xsel &> /dev/null ||
       Kill "xclip or xsel is required" "127"
 
@@ -271,7 +271,7 @@ Copy() {
    elif gpg --decrypt --quiet "${passLocation}/${name}.gpg" | xsel --clipboard 2> /dev/null; then
       :
    else
-      command -v "xclip" &> /dev/null && xclip -selection clipboard < /dev/null 
+      command -v "xclip" &> /dev/null && xclip -selection clipboard < /dev/null
       command -v "xsel" &> /dev/null && xsel --clipboard < /dev/null
       Kill "failed to copy password '${name}' to the clipboard." "1"
    fi
@@ -282,7 +282,7 @@ Copy() {
    # Wait for the timer to end clear the clipboard.
    # 'timer' can be changed in the config file.
    Sleep "${timer}" || kill 0
-   Has "xclip" && xclip -selection clipboard < /dev/null 
+   Has "xclip" && xclip -selection clipboard < /dev/null
    Has "xsel" && xsel --clipboard < /dev/null
 
    printf 'Clipboard has been cleared to ensure it cannot be leaked.'
