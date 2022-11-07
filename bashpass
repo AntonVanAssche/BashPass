@@ -44,7 +44,7 @@ passLength="$(GetSetting 'length')" || :
 # Print out the error that occurred and exit (with the correct exit code) afterwards.
 Kill() {
    printf '\n'
-   printf 'An error occurred: %s' "${1}"
+   printf 'An error occurred: %s' "${1}" >&2
    printf '\n'
    exit "${2}"
 }
