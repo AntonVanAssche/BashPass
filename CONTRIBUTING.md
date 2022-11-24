@@ -38,7 +38,7 @@ When you decide to open an issue, please use the appropriate template provided.
 
 ## Use a Consistent Coding Style
 
--  Tabs are 3 spaces long.
+-  Tabs are 4 spaces long.
 -  Use CamelCasing for variables.
 -  Use PascalCasing for function name.
 
