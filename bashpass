@@ -40,6 +40,8 @@ passLocation="$HOME/$(GetSetting 'location')" || :
 version="$(GetSetting 'version')" || :
 timer="$(GetSetting 'timer')" || :
 passLength="$(GetSetting 'length')" || :
+gitRepo="$(GetSetting 'gitRepo')" || :
+gitBranch="$(GetSetting 'gitBranch')" || :
 
 # Print out the error that occurred and exit (with the correct exit code) afterwards.
 Kill() {
@@ -310,37 +312,32 @@ List() {
     set -f
 }
 
-# Copy a password to/from another device using 'rsync'.
-# Export the 'gpg' keys to that device.
+# Upload or download encrypted password(s) to/from a git repository.
+# The user can chose whether he wants to locally host his git server or trust a
+# third party like GitHub, eather way BashPass should work with both options.
+# It's recommended to configure 'SSH' between the devices and the git server for optimal user experience.
 Sync() {
-    # Detect 'rsync'
-    Has "rsync"
+    # Detect 'git'
+    Has "git"
 
-    Name "${2}" "synchronize"
+    [[ -z ${gitRepo} ]] && Kill "URL to git repository not specified in config" "1"
+    [[ -z ${gitBranch} ]] && Kill "No branchname pecified in config" "1"
+    [[ -d "${passLocation}/.git/" ]] || Kill "${passLocation} isn't a git repository" "1"
 
-    printf 'Enter the username of the user on the other device: '
-    read -r username
-    printf 'Enter the IP address of the other device: '
-    read -r localIP
-
+    # The '--git-dir' and '--work-tree' options allow the user to synchronize
+    # their password(s) regardless of their current working directory (pwd).
+    # See: https://stackoverflow.com/questions/7622616/executing-a-git-pull-from-a-different-directory
     case "${1}" in
         [Uu]pload)
-            if [[ ${name} == "all" ]]; then
-                rsync -a "${passLocation}" "${username}"@"${localIP}":~/.local/share/
-            else
-                PasswordExists "${name}"
-                rsync -a "${passLocation}/${name}.gpg" "${username}"@"${localIP}":~/.local/share/bashpass/
-            fi
+            git --git-dir="${passLocation}/.git/" --work-tree="${passLocation}" add .
+            git --git-dir="${passLocation}/.git/" --work-tree="${passLocation}" commit -m "Synchronize passwords ($(printf '%(%d/%m/%Y)T at %(%T)T)')"
+            git --git-dir="${passLocation}/.git/" --work-tree="${passLocation}" push origin "${gitBranch}";
             ;;
         [Dd]ownload)
-            if [[ ${name} == "all" ]]; then
-                rsync -a "${username}"@"${localIP}":"~/.local/share/bashpass/" "$HOME/.local/share/"
-            else
-                rsync -a "${username}"@"${localIP}":"~/.local/share/bashpass/${name}.gpg" "${passLocation}/"
-            fi
+            git --git-dir="${passLocation}/.git/" --work-tree="${passLocation}" pull origin "${gitBranch}"
             ;;
         *)
-            Kill "unknown option '${1}" "22"
+            Kill "unknown option '${1}'" "22"
             ;;
     esac
 
