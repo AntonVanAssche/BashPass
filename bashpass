@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-
 # '-e' Abort the script when an error occures.
 # '-f' To ensure that globbing is globally disabled.
 # '+x' To ensure debug mode is never enabled (prevents the password from leaking).
@@ -81,7 +80,11 @@ Options:
 --delete    or -d                            [name] - Delete a password.
 --show      or -s                            [name] - Show a password.
 --copy      or -c                            [name] - Copy a password to the clipboard.
---sync      or -S     [upload|download]      [name] - Synchronize password(s) with a git repository.
+--sync      or -S    [synchronize option]    [name] - Synchronize password(s) with a git repository.
+
+Synchronize options:
+    upload       - Synchronize remote password(s) with locally stored ones.
+    download     - Synchronize local password(s) with remotely stored ones.
 "
 }
 
