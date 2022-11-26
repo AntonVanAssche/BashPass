@@ -41,7 +41,6 @@ version="$(GetSetting 'version')" || :
 timer="$(GetSetting 'timer')" || :
 passLength="$(GetSetting 'length')" || :
 gitRepo="$(GetSetting 'gitRepo')" || :
-gitBranch="$(GetSetting 'gitBranch')" || :
 
 # Print out the error that occurred and exit (with the correct exit code) afterwards.
 Kill() {
@@ -82,7 +81,7 @@ Options:
 --delete    or -d                            [name] - Delete a password.
 --show      or -s                            [name] - Show a password.
 --copy      or -c                            [name] - Copy a password to the clipboard.
---sync      or -S     [upload|download]      [name] - Synchronize a password with a other device on your local network.
+--sync      or -S     [upload|download]      [name] - Synchronize password(s) with a git repository.
 "
 }
 
@@ -321,7 +320,6 @@ Sync() {
     Has "git"
 
     [[ -z ${gitRepo} ]] && Kill "URL to git repository not specified in config" "1"
-    [[ -z ${gitBranch} ]] && Kill "No branchname pecified in config" "1"
     [[ -d "${passLocation}/.git/" ]] || Kill "${passLocation} isn't a git repository" "1"
 
     # The '--git-dir' and '--work-tree' options allow the user to synchronize
@@ -331,10 +329,10 @@ Sync() {
         [Uu]pload)
             git --git-dir="${passLocation}/.git/" --work-tree="${passLocation}" add .
             git --git-dir="${passLocation}/.git/" --work-tree="${passLocation}" commit -m "Synchronize passwords ($(printf '%(%d/%m/%Y)T at %(%T)T)')"
-            git --git-dir="${passLocation}/.git/" --work-tree="${passLocation}" push origin "${gitBranch}";
+            git --git-dir="${passLocation}/.git/" --work-tree="${passLocation}" push
             ;;
         [Dd]ownload)
-            git --git-dir="${passLocation}/.git/" --work-tree="${passLocation}" pull origin "${gitBranch}"
+            git --git-dir="${passLocation}/.git/" --work-tree="${passLocation}" pull
             ;;
         *)
             Kill "unknown option '${1}'" "22"
