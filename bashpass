@@ -329,10 +329,20 @@ Sync() {
         [Uu]pload)
             git --git-dir="${passLocation}/.git/" --work-tree="${passLocation}" add .
             git --git-dir="${passLocation}/.git/" --work-tree="${passLocation}" commit -m "Synchronize passwords ($(printf '%(%d/%m/%Y)T at %(%T)T)')"
-            git --git-dir="${passLocation}/.git/" --work-tree="${passLocation}" push
+            if git --git-dir="${passLocation}/.git/" --work-tree="${passLocation}" push; then
+                printf '\n'
+                printf 'Remote password(s) successfully synchronized with local.'
+            else
+                Kill "failed to upload password(s) to ${gitRepo}" "1"
+            fi
             ;;
         [Dd]ownload)
-            git --git-dir="${passLocation}/.git/" --work-tree="${passLocation}" pull
+            if git --git-dir="${passLocation}/.git/" --work-tree="${passLocation}" pull; then
+                printf '\n'
+                printf 'Local password(s) successfully synchronized with remote.'
+            else
+                Kill "failed to download password(s) to ${gitRepo}" "1"
+            fi
             ;;
         *)
             Kill "unknown option '${1}'" "22"
