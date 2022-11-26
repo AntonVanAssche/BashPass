@@ -80,7 +80,7 @@ Options:
 --delete    or -d                            [name] - Delete a password.
 --show      or -s                            [name] - Show a password.
 --copy      or -c                            [name] - Copy a password to the clipboard.
---sync      or -S    [synchronize option]    [name] - Synchronize password(s) with a git repository.
+--sync      or -S    [synchronize option]           - Synchronize password(s) with a git repository.
 
 Synchronize options:
     upload       - Synchronize remote password(s) with locally stored ones.
