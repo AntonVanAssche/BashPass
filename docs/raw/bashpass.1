@@ -1,6 +1,6 @@
-.TH "BASHPASS" "1" "2022-06-23" "BASHPASS 2022-06-23" "BASHPASS" "1"
+.TH "BASHPASS" "1" "2022-12-10" "BASHPASS 2022-12-23" "BASHPASS" "1"
 .ie \n(.g .ds Aq \(aq
-.el       .ds Aq 
+.el       .ds Aq
 .ad l
 .nh
 .SH "NAME"
@@ -54,11 +54,11 @@ Output a password with a given name. This option will not clear the terminal so 
 Copy a password with a given name to the clipboard. After a certain amount of seconds the clipboard will be cleared to ensure security. The amount of seconds can be specified by changing the \fItimer\fR option in the configuration file (~/.config/bashpass/bashpass.conf). This is to insure security. This option requires either \fIxclip\fR(1) or \fIxsel\fR(1) to be installed on your system.
 .RE
 .PP
-\fB-S\fR, \fB--sync\fR [\fIupload/download\fR] [\fINAME\fR]
+\fB-S\fR, \fB--sync\fR [\fIupload/download\fR]
 .RS 4
-Copy/Download a password to/from another device. This option requires \fIrsync\fR(1) to be installed on your system and being able to connect using a Secure Shell connection to the other device.
+Synchronize passwords between a git repository and your local device (in both directions). The repository can either be a self hosted or via a third-party such as GitHub or GitLab. This option requires \fIGIT\fR(1) to be installed on your system and a working internet connection to be available.
 .PP
-To copy/download all passwords you can use the keyword \fIall\fR as the name.
+\fBNOTE\fR: you'll have to import your GPG key on every device you want to use the synchronization functionality. You can follow this guide <https://www.debuntu.org/how-to-importexport-gpg-key-pair/> for importing and exporting your GPG keys.
 .RE
 .SH "FILES AND DIRECTORIES"
 ~/.local/bin/bashpass
