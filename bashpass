@@ -256,10 +256,11 @@ Show() {
 # Copy the password that was given to the clipboard.
 # Clear the clipboard afterwards.
 Copy() {
-    # Detect 'xclip' or 'xsel'
+    # Detect 'xclip' (X11), 'xsel' (X11) or 'wl-clipboard' (Wayland).
     commmand -v xclip &> /dev/null ||
         command -v xsel &> /dev/null ||
-        Kill "xclip or xsel is required" "127"
+        command -v wl-copy &> /dev/null ||
+        Kill "xclip, xsel or wl-clipboard (Wayland) is required" "127"
 
     # Ask for a name when no name was given using ${2}.
     Name "${1}" "copy"
@@ -274,9 +275,12 @@ Copy() {
         :
     elif gpg --decrypt --quiet "${passLocation}/${name}.gpg" | xsel --clipboard 2> /dev/null; then
         :
+    elif gpg --decrypt --quiet "${passLocation}/${name}.gpg" | wl-copy 2> /dev/null; then
+        :
     else
         command -v "xclip" &> /dev/null && xclip -selection clipboard < /dev/null
         command -v "xsel" &> /dev/null && xsel --clipboard < /dev/null
+        command -v "wl-copy" &> /dev/null && wl-copy < /dev/null
         Kill "failed to copy password '${name}' to the clipboard." "1"
     fi
 
