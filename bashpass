@@ -280,7 +280,7 @@ Copy() {
     else
         command -v "xclip" &> /dev/null && xclip -selection clipboard < /dev/null
         command -v "xsel" &> /dev/null && xsel --clipboard < /dev/null
-        command -v "wl-copy" &> /dev/null && wl-copy < /dev/null
+        command -v "wl-copy" &> /dev/null && wl-copy --clear
         Kill "failed to copy password '${name}' to the clipboard." "1"
     fi
 
@@ -290,8 +290,9 @@ Copy() {
     # Wait for the timer to end clear the clipboard.
     # 'timer' can be changed in the config file.
     Sleep "${timer}" || kill 0
-    Has "xclip" && xclip -selection clipboard < /dev/null
-    Has "xsel" && xsel --clipboard < /dev/null
+    command -v "xclip" &> /dev/null && xclip -selection clipboard < /dev/null
+    command -v "xsel" &> /dev/null && xsel --clipboard < /dev/null
+    command -v "wl-copy" &> /dev/null && wl-copy --clear
 
     printf 'Clipboard has been cleared to ensure it cannot be leaked.'
     printf '\n'
