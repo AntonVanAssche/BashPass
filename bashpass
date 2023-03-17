@@ -350,7 +350,7 @@ Sync() {
                 printf '\n'
                 printf 'Local password(s) successfully synchronized with remote.'
             else
-                Kill "failed to download password(s) to ${gitRepo}" "1"
+                Kill "failed to download password(s) from ${gitRepo}" "1"
             fi
             ;;
         *)
