@@ -256,10 +256,16 @@ Show() {
 # Copy the password that was given to the clipboard.
 # Clear the clipboard afterwards.
 Copy() {
-    # Detect 'xclip' or 'xsel'
-    commmand -v xclip &> /dev/null ||
-        command -v xsel &> /dev/null ||
-        Kill "xclip or xsel is required" "127"
+    # Detect 'xclip' (X11), 'xsel' (X11) or 'wl-copy' (Wayland).
+    if command -v xclip &> /dev/null; then
+        clipboardCommand="xclip -selection clipboard"
+    elif command -v xsel &> /dev/null; then
+        clipboardCommand="xsel --clipboard"
+    elif command -v wl-copy &> /dev/null; then
+        clipboardCommand="wl-copy"
+    else
+        kill "xclip, xsel, or wl-copy is required" 127
+    fi
 
     # Ask for a name when no name was given using ${2}.
     Name "${1}" "copy"
@@ -268,26 +274,26 @@ Copy() {
     # Ignore terminal interrupts (CTRL+C).
     trap '' INT
 
-    # Decrypte the password file and copy it to the clipboard using xclip or xsel.
+    # Decrypte the password file and copy it to the clipboard using xclip, xsel or wl-copy.
     # This WON'T show the password inside the terminal output.
-    if gpg --decrypt --quiet "${passLocation}/${name}.gpg" | xclip -selection clipboard 2> /dev/null; then
-        :
-    elif gpg --decrypt --quiet "${passLocation}/${name}.gpg" | xsel --clipboard 2> /dev/null; then
-        :
+    if gpg --decrypt --quiet "${passLocation}/${name}.gpg" | ${clipboardCommand}; then
+        printf 'Password %s has been copied to the clipboard' "'${name}'"
+        printf '\n'
     else
-        command -v "xclip" &> /dev/null && xclip -selection clipboard < /dev/null
-        command -v "xsel" &> /dev/null && xsel --clipboard < /dev/null
-        Kill "failed to copy password '${name}' to the clipboard." "1"
+        kill "failed to copy password '${name}' to the clipboard." 1
     fi
-
-    printf 'Password %s has been copied to the clipboard' "'${name}'"
-    printf '\n'
 
     # Wait for the timer to end clear the clipboard.
     # 'timer' can be changed in the config file.
     Sleep "${timer}" || kill 0
-    Has "xclip" && xclip -selection clipboard < /dev/null
-    Has "xsel" && xsel --clipboard < /dev/null
+
+    if command -v xclip &> /dev/null; then
+        xclip -selection clipboard < /dev/null
+    elif command -v xsel &> /dev/null; then
+        xsel --clipboard < /dev/null
+    elif command -v wl-copy &> /dev/null; then
+        wl-copy --clear
+    fi
 
     printf 'Clipboard has been cleared to ensure it cannot be leaked.'
     printf '\n'
