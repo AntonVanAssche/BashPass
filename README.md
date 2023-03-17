@@ -45,7 +45,7 @@ BashPass is a command-line based password manager written in Bash. It uses GPG t
 -   Add/edit/delete passwords
 -   Generate passwords
 -   Clipboard support
--   Safely copy passwords between different devices
+-   Sync passwords securely using a Git repository
 
 ## Documentation
 
