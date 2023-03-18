@@ -2,7 +2,7 @@
 name: 🎆 Feature request
 about: Request a feature in this project
 title: '[FEATURE]'
-labels: 'enhancement, untriaged'
+labels: 'Type: feature request, Status: untriaged'
 assignees: ''
 ---
 
