@@ -5,7 +5,7 @@ on:
     branches:
       - master
     paths:
-      - ".github/WIKI/"
+      - ".github/WIKI/**"
 
 jobs:
   build:
