@@ -1,4 +1,4 @@
-# Welcome to the BashPass Wiki
+## Welcome to the BashPass Wiki
 
 BashPass is a simple command-line tool that helps you manage your passwords securely in a local password store.
 With BashPass, you don't have to worry about remembering all your different passwords, or writing them down in an insecure manner.
