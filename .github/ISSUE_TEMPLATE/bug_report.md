@@ -1,34 +1,27 @@
 ---
-name: Bug report
+name: 🐛 Bug report
 about: Create a report to help us improve
-title: ''
-labels: ''
+title: '[BUG]'
+labels: 'bug, untriaged'
 assignees: ''
-
 ---
 
----
-name: Bug report
-about: Create a report to help us improve
-title: ''
-labels: ''
-assignees: ''
+### What is the bug?
+_A clear and concise description of the bug._
 
----
+### How can one reproduce the bug?
+_Steps to reproduce the behavior._
 
-**(1) Issue/Bug Description:**
+### What is the expected behavior?
+_A clear and concise description of what you expected to happen._
 
+### What is your host/environment?
+-   _Operation system:_
+-   _BashPass version:_
+-   _GnuPG version:_
 
-**(2) Steps to reproduce (if you know):**
+### Do you have any screenshots?
+_If applicable, add screenshots to help explain your problem._
 
-
-**(3) Expected behavior:**
-
-
-**(4) Actual behavior:**
-
-**(5) BashPass version:**
-
-**(6) GPG version:**
-
-**(7) Notes:**
+### Do you have any additional context?
+_Add any other context about the problem._
