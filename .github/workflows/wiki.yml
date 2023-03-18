@@ -2,8 +2,10 @@ name: Wiki
 
 on:
   push:
-    tags:
-      - '*'
+    branches:
+      - master
+    paths:
+      - ".github/WIKI/"
 
 jobs:
   build:
