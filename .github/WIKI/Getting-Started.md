@@ -135,6 +135,17 @@ $ wget -O BashPass-X.X.tar.gz https://github.com/AntonVanAssche/BashPass/archive
 $ wget -O BashPass-X.X.tar.gz.asc https://github.com/AntonVanAssche/BashPass/releases/download/X.X/BashPass-X.X.tar.gz.asc
 ```
 
+If the above commands fail, you can try using `curl` instead of `wget` by running the following commands:
+
+```console
+$ curl -o BashPass-X.X.tar.gz -L https://github.com/AntonVanAssche/BashPass/archive/refs/tags/X.X.tar.gz
+$ curl -o BashPass-X.X.tar.gz.asc -L https://github.com/AntonVanAssche/BashPass/releases/download/X.X/BashPass-X.X.tar.gz.asc
+```
+
+If neither of these options work, it may be because you do not have either `wget` or `curl` installed on your system.
+You can check if you have either of them installed by running `command -v wget` or `command -v curl`, which should return the path where the binary is located.
+If you don't have either of them installed, you can install them using your system's package manager.
+
 The provided tarballs are signed with the following PGP key: [AB592CC1A4D17E654ED55FE83FF8016D27683E3E](https://keyserver.ubuntu.com/pks/lookup?search=0x3ff8016d27683e3e&op=vindex).
 A copy of this public key can be found on the [release](https://github.com/AntonVanAssche/BashPass/releases/download/2.0/BashPass-2.0.pub) page.
 This key allows you to verify the tarball.
