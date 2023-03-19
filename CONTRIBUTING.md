@@ -51,46 +51,43 @@ To submit a code change, follow these steps:
 
 To ensure consistency and readability of the codebase, please follow these guidelines when contributing to BashPass:
 
-##### Indentation
-
--   Tabs are 4 spaces long.
-
-##### Naming Conventions
-
--   Use descriptive variable names that convey the purpose of the variable.
--   Use CamelCase for variable names, starting with a lowercase letter.
-
-```bash
-thisIsAVariable="random variable"
-```
-
--   Use PascalCase for function and class names, starting with an uppercase letter.
-
-```bash
-ThisIsAFunction() {}
-```
-
+-   Use Bash built-ins wherever possible.
+-   Try not to pipe (`|`) for everything.
+-   Limit usage of external commands `$(cmd)`.
+-   Indent 4 spaces.
+-   Use [snake_case](https://en.wikipedia.org/wiki/Snake_case) for function
+    and variable names.
+-   Variables must be surrounded by `{}`.
 -   Loops and conditionals should use the `(( ))` and `[[ ]]` syntax (where possible).
+-   Quote **EVERYTHING**.
+
+If the test only has one command inside of it; use the compact test
+syntax. Otherwise the normal `if`/`fi` is just fine.
 
 ```bash
-if [[ -z "${var}" ]]; then
-    prinf 'Empty variable'
+# Bad
+if [[ "${var}" ]]; then
+    printf '%s\n' "${var}"
 fi
 
-for ((i=0; i -lt 5; i++)); do
-    printf '%s' "${i}"
-done
+# Good
+[[ "${var}" ]] && printf '%s\n' "${var}"
+
+# Also good (Use this for longer lines).
+[[ "${var}" ]] && \
+    printf '%s\n' "${var}"
 ```
 
-##### Comments
+For your contribution to be accepted, your changes need to pass
+ShellCheck.
 
--   Write comments to explain the purpose and functionality of the code, particularly for complex or non-obvious sections.
--   Use inline comments sparingly, and only when necessary to clarify the code.
 
-##### Formatting
+```console
+$ shellcheck bashpass -e SC2140
+```
 
--   Use consistent formatting throughout the codebase.
--   Use a linter, such as `shellcheck`, to automatically detect and fix formatting issues.
+**Note**: If you have trouble installing ShellCheck. You can open a pull
+request on the repo and our GitHub actions will run ShellCheck for you.
 
 ### Documentation Changes
 

@@ -3,13 +3,13 @@
 # Abort the script when an error occures.
 set -e
 
-configLocation="$HOME/.config/bashpass"
-config="${configLocation}/bashpass.conf"
+config_location="$HOME/.config/bashpass"
+config="${config_location}/bashpass.conf"
 
 # Simple function to get the setting 'version' from the config file.
 # This basically replaces the '$(grep "version" "$config" | cut -d" " -f2)'.
 # It's also pure bash, which means that no sub shells are used.
-GetVersion() {
+get_version() {
     while read -r;
     do
         if [[ "${REPLY}" =~ ^version ]]; then
@@ -27,7 +27,7 @@ Main() {
 
     case "${answer}" in
         [yY][eE][sS]|[yY])
-            printf 'Uninstalling BashPass version: '\''%s'\''...\n' "$(GetVersion)"
+            printf 'Uninstalling BashPass version: '\''%s'\''...\n' "$(get_version)"
             rm -rf "${HOME}/.config/bashpass" "${HOME}/.local/share/bashpass" "${HOME}/.local/bin/bashpass" "${HOME}"/.local/share/man/man1/bashpass.{1,conf.1}.gz
             printf '\nWe hate to see you go.\n'
             ;;
