@@ -37,7 +37,7 @@ Examples:
 
 To add a password, use the `--add` or `-a` option.
 
-```bash
+```console
 $ bashpass --add [password]
 ```
 
@@ -61,7 +61,7 @@ Give the length of the password (Default: 14):
 
 This feature allows you to update an existing password. To use this option, run BashPass with the `--update` or `-u` flag.
 
-```bash
+```console
 $ bashpass --update [password]
 ```
 
@@ -73,7 +73,7 @@ To delete a password from your system, run BashPass with the `--delete` or `-d` 
 
 **Note**: Be careful with this option, once you delete a password there is no way to recover it.
 
-```bash
+```console
 $ bashpass -d [password]
 ```
 
@@ -83,7 +83,7 @@ This feature will display the password in your terminal.
 
 **NOTE**: this will return the password in plain text.
 
-```bash
+```console
 $ bashpass --show [password]
 ```
 
@@ -92,7 +92,7 @@ $ bashpass --show [password]
 This feature is more secure than the `--show` option because the clipboard will be cleared after a certain amount of time (default is 10 seconds), and the password will never be shown in the terminal.
 You can use this feature by using the `--copy` or `-c` flag.
 
-```bash
+```console
 $ bashpass --copy [password]
 ```
 
@@ -115,7 +115,7 @@ You can follow this guide https://www.debuntu.org/how-to-importexport-gpg-key-pa
 
 The `upload` option will upload all local changes to the remote git repository.
 
-```bash
+```console
 $ bashpass --sync upload
 ```
 
@@ -123,6 +123,6 @@ $ bashpass --sync upload
 
 The `download` option will download all changes from the remote git repository to the user's local machine.
 
-```bash
+```console
 $ bashpass --sync download
 ```

@@ -24,7 +24,7 @@
 Before you install BashPass, you'll have to generate a GPG key.
 Run the following command in your terminal to start key generation process:
 
-```bash
+```console
 $ gpg --full-generate-key
 ```
 
@@ -107,18 +107,18 @@ Once you have generated your GPG key, you can proceed to install BashPass.
 The recommended way to install BashPass is to use the installer script.
 You can clone the repository and run the install.sh script, or you can run the following one-liner command in your terminal:
 
-```bash
+```console
 $ bash -c "$(wget -qO - https://raw.githubusercontent.com/AntonVanAssche/BashPass/master/scripts/install.sh)"
 ```
 
 If the above command fails, you can try using `curl` instead of `wget` by running the following command:
 
-```bash
+```console
 $ bash -c "$(curl -so - https://raw.githubusercontent.com/AntonVanAssche/BashPass/master/scripts/install.sh)"
 ```
 
 If neither of these options work, it may be because you do not have either `wget` or `curl` installed on your system.
-You can check if you have either of them installed by running `command -v` wget or `command -v curl`, which should return the path where the binary is located.
+You can check if you have either of them installed by running `command -v wget` or `command -v curl`, which should return the path where the binary is located.
 If you don't have either of them installed, you can install them using your system's package manager.
 
 ### Installation using the tarball/zip
@@ -130,7 +130,7 @@ Download the tarball corresponding to the version you want to install from the [
 
 **Note**: Replace `X.X` in the commands below with the version number you want to install.
 
-```bash
+```console
 $ wget -O BashPass-X.X.tar.gz https://github.com/AntonVanAssche/BashPass/archive/refs/tags/X.X.tar.gz
 $ wget -O BashPass-X.X.tar.gz.asc https://github.com/AntonVanAssche/BashPass/releases/download/X.X/BashPass-X.X.tar.gz.asc
 ```
@@ -141,13 +141,13 @@ This key allows you to verify the tarball.
 Although this step isn't required, it is recommended.
 If you do decide to verify the authenticity of the tarball you can import the PGP key by using this command:
 
-```bash
+```console
 $ gpg --keyserver keyserver.ubuntu.com --recv-keys 0x3ff8016d27683e3e
 ```
 
 Once the PGP key is imported, you can verify the authenticity of the tarball.
 
-```bash
+```console
 $ gpg --verify BashPass-X.X.tar.gz.asc
 ```
 
@@ -162,13 +162,13 @@ gpg: Good signature of "Anton Van Assche (git) <vanasscheanton@gmail.com>" [unkn
 
 Now it's time to extract the tarball, you can do this with the following command:
 
-```bash
+```console
 $ tar -xvzf BashPass-X.X.tar.gz
 ```
 
 Once the tarball is extracted, it is time to create the necessary folders and copy all the files to the their corresponding directory.
 
-```bash
+```console
 $ mkdir -p ~/.config/bashpass/
 $ mkdir -p ~/.local/share/bashpass/
 $ mkdir -p ~/.local/bin/
@@ -198,13 +198,13 @@ That's it, you can now start using BashPass!
 
 To update BashPass to the latest version, you can clone the repository and run the `update.sh` script, or you can use the one-liner below to download and install the latest version:
 
-```bash
+```console
 $ bash -c "$(wget -qO - https://raw.githubusercontent.com/AntonVanAssche/BashPass/master/scripts/update.sh)"
 ```
 
 If you don't have `wget`, you can use `curl` instead:
 
-```bash
+```console
 $ bash -c "$(curl -so - https://raw.githubusercontent.com/AntonVanAssche/BashPass/master/scripts/update.sh)"
 ```
 
@@ -216,13 +216,13 @@ This should return the path to the binary.
 
 To uninstall BashPass, you can clone the repository and run the `uninstall.sh` script, or you can use the one-liner below to remove your current installation:
 
-```bash
+```console
 $ bash -c "$(wget -qO - https://raw.githubusercontent.com/AntonVanAssche/BashPass/master/scripts/uninstall.sh)"
 ```
 
 If you don't have `wget`, you can use `curl` instead:
 
-```bash
+```console
 $ bash -c "$(curl -so - https://raw.githubusercontent.com/AntonVanAssche/BashPass/master/scripts/uninstall.sh)"
 ```
 
