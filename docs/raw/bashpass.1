@@ -1,4 +1,4 @@
-.TH "BASHPASS" "1" "2022-12-10" "BASHPASS 2022-12-23" "BASHPASS" "1"
+.TH "BASHPASS" "1" "2023-03-19" "BASHPASS 2023-03-19" "BASHPASS" "1"
 .ie \n(.g .ds Aq \(aq
 .el       .ds Aq
 .ad l
@@ -16,27 +16,27 @@ Together with \fBGnuPG\fR, this command-line based password manager allows the u
 .SH "OPTIONS"
 \fB-h\fR, \fB--help\fR
 .RS 4
-Display some helpful information.
+Display a brief help message.
 .RE
 .PP
 \fB-v\fR, \fB--version\fR
 .RS 4
-Output the version.
+Display the version number of your BashPass installation.
 .RE
 .PP
 \fB-l\fR, \fB--list\fR
 .RS 4
-Output a list of all the passwords (names).
+List all saved passwords by name.
 .RE
 .PP
 \fB-a\fR, \fB--add\fR [\fINAME\fR]
 .RS 4
-Save a password, either auto generated or self chosen.
+Add a new password to the system. The password can be either self-chosen or auto-generated.
 .RE
 .PP
 \fB-u\fR, \fB--update\fR [\fINAME\fR]
 .RS 4
-Change a saved password, either auto generated or self chosen.
+Update a saved password with a new value. The password can be either self-chosen or auto-generated.
 .RE
 .PP
 \fB-d\fR, \fB--delete\fR [\fINAME\fR]
@@ -46,19 +46,19 @@ Delete a saved password from the system.
 .PP
 \fB-s\fR, \fB--show\fR [\fINAME\fR]
 .RS 4
-Output a password with a given name. This option will not clear the terminal so it is not recommended to use in crowded environments.
+Display a saved password with a given name. Note that this option will not clear the terminal, so it is not recommended for use in crowded environments.
 .RE
 .PP
 \fB-c\fR, \fB--copy\fR [\fINAME\fR]
 .RS 4
-Copy a password with a given name to the clipboard. After a certain amount of seconds the clipboard will be cleared to ensure security. The amount of seconds can be specified by changing the \fItimer\fR option in the configuration file (~/.config/bashpass/bashpass.conf). This is to insure security. This option requires either \fIxclip\fR(1) (X11), \fIxsel\fR(1) (X11) or \fIwl-clipboard\fR(1) (Wayland) to be installed on your system.
+This option allows users to copy a password with a specific name to the clipboard. To enhance security, the clipboard is cleared after a certain amount of time. The duration for clearing the clipboard can be modified by adjusting the \fItimer\fR parameter in the (~/.config/bashpass/bashpass.conf) configuration file. Note that this option requires either \fIxclip\fR (for X11), \fIxsel\fR (for X11), or \fIwl-clipboard\fR (for Wayland) to be installed on the system.
 .RE
 .PP
 \fB-S\fR, \fB--sync\fR [\fIupload/download\fR]
 .RS 4
-Synchronize passwords between a git repository and your local device (in both directions). The repository can either be a self hosted or via a third-party such as GitHub or GitLab. This option requires \fIGIT\fR(1) to be installed on your system and a working internet connection to be available.
+This option allows the user to synchronize passwords between a git repository and their local device in both directions. The git repository can be self-hosted or hosted via a third-party service such as GitHub or GitLab. To use this option, the \fIGIT(1)\fR utility must be installed on the user's system, and a working internet connection must be available.
 .PP
-\fBNOTE\fR: you'll have to import your GPG key on every device you want to use the synchronization functionality. You can follow this guide <https://www.debuntu.org/how-to-importexport-gpg-key-pair/> for importing and exporting your GPG keys.
+\fBNOTE\fR that the user will need to import their GPG key on every device they want to use for synchronization. A guide on importing and exporting GPG keys can be found at <https://www.debuntu.org/how-to-importexport-gpg-key-pair/>.
 .RE
 .SH "FILES AND DIRECTORIES"
 ~/.local/bin/bashpass

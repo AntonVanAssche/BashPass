@@ -1,36 +1,28 @@
-.TH "BASHPASS.CONF" "1" "2022-12-10" "BASHPASS.CONF 2022-12-10" "BASHPASS.CONF" "1"
+.TH "BASHPASS.CONF" "1" "2023-03-19" "BASHPASS.CONF 2023-03-19" "BASHPASS.CONF" "1"
 .ie \n(.g .ds Aq \(aq
-.el       .ds Aq 
+.el       .ds Aq
 .ad l
 .nh
 .SH "NAME"
-bashpass.conf \- configuration file for BashPass.
+bashpass.conf \- BashPass configuration file
 .SH "SYNOPSIS"
 bashpass.conf
 .RE
 .SH "DESCRIPTION"
-The bashpass.conf file is the configuration file for BashPass. This file contains various settings for the program. Such as the users keyID and email address.
+The \fBbashpass.conf\fR file is used to configure BashPass. It contains various settings such as the user's email address and GPG key ID.
 .RE
 .SH "FILE FORMAT"
-The file consists of various parameters. A parameter can be identified by the following format: \fBparameter: setting\fR.
-.RE
-.PP
-The values following the colon in parameters are all strings, there is no need to surround these string with quotes.
+The file consists of several parameters, each in the format \fBparameter: setting\fR. Values following the colon are strings and do not need to be quoted.
 .RE
 .SH "PARAMETERS"
-\fBversion\fR
-.RS 4
-This parameter is the version of the program. This parameter will be updated when the program is updated.
-.RE
-.PP
 \fBlocation\fR
 .RS 4
-This parameter contains the location of the where the program will save the passwords.
+This parameter contains the location where the program will save passwords.
 .RE
 .PP
 \fBtimer\fR
 .RS 4
-This parameter contains the amount of seconds to wait before clearing the clipboard when using the \fB--copy\fR argument.
+This parameter contains the amount of time, in seconds, to wait before clearing the clipboard after copying a password with the \fB--copy\fR (\fB-c\fR) option.
 .RE
 .PP
 \fBlength\fR
@@ -40,17 +32,17 @@ This parameter contains the default length for generating a new password.
 .PP
 \fBemail\fR
 .RS 4
-This parameter contains the user's email address that is used when the GPG key was generated.
+This parameter contains the user's email address used during GPG key generation.
 .RE
 .PP
 \fBkeyID\fR
 .RS 4
-This parameter contains the ID of the GPG key that will be used to encrypt the password.
+This parameter contains the ID of the GPG key used to encrypt/decrypt passwords.
 .RE
 .PP
 \fBgitRepo\fR
 .RS 4
-This parameter contains the URL used to synchronize passwords between the local device and the remote git repository.
+This parameter contains the URL for synchronizing passwords between the local device and a remote git repository.
 .RE
 .SH "FILES AND DIRECTORIES"
 ~/.config/bashpass/bashpass.conf
