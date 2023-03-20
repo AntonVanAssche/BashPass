@@ -33,10 +33,10 @@ get_setting() {
 
 # Get the necessary configurations from the configuration file.
 # '|| :' To prevent the script from exiting if the variable is not found (especially needed for the '${email} variable').
+version="3.0" || :
 email="$(get_setting 'email')" || :
 key_id="$(get_setting 'keyID')" || :
 pass_location="$HOME/$(get_setting 'location')" || :
-version="$(get_setting 'version')" || :
 timer="$(get_setting 'timer')" || :
 pass_length="$(get_setting 'length')" || :
 git_repo="$(get_setting 'gitRepo')" || :
