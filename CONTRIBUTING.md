@@ -51,12 +51,13 @@ To submit a code change, follow these steps:
 
 To ensure consistency and readability of the codebase, please follow these guidelines when contributing to BashPass:
 
--   Use Bash built-ins wherever possible.
--   Try not to pipe (`|`) for everything.
--   Limit usage of external commands `$(cmd)`.
 -   Indent 4 spaces.
+-   Try to keep lines below `100` characters long.
 -   Use [snake_case](https://en.wikipedia.org/wiki/Snake_case) for function
     and variable names.
+-   Use Bash built-ins wherever possible.
+-   Limit usage of external commands `$(cmd)`.
+-   Try not to pipe (`\`) for everything.
 -   Variables must be surrounded by `{}`.
 -   Loops and conditionals should use the `(( ))` and `[[ ]]` syntax (where possible).
 -   Quote **EVERYTHING**.
@@ -80,7 +81,6 @@ fi
 
 For your contribution to be accepted, your changes need to pass
 ShellCheck.
-
 
 ```console
 $ shellcheck bashpass -e SC2140
