@@ -97,7 +97,7 @@ uid           [ultimate] Bashpass (Key to use BashPass) <example@gmail.com>
 sub   rsa3072 2022-04-22 [E]
 ```
 
-Note you can see the key fingerprint (`86F27E3CAA49BB273653B39763BBB2BD91082EE1``), this string contains the key ID.
+Note you can see the key fingerprint (`86F27E3CAA49BB273653B39763BBB2BD91082EE1`), this string contains the key ID.
 This are the last 8 characters (`91082EE1`) of the fingerprint.
 This part is **IMPORTANT** to remember, you'll need this later to configure BashPass (see: [Post installation](#post-installation)).
 
