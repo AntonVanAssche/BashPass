@@ -397,6 +397,10 @@ main() {
         printf 'email: %s\n' "${email}" >> "${config}"
     fi
 
+    # Restrict new password file permissions to only the
+    # current user.
+    umask 077
+
     case "${1}" in
         "--help"| "-h") help;;
         "--version"| "-v") version;;
