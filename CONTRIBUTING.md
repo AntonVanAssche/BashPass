@@ -79,6 +79,8 @@ fi
     printf '%s\n' "${var}"
 ```
 
+#### ShellCheck
+
 For your contribution to be accepted, your changes need to pass
 ShellCheck.
 
@@ -88,6 +90,12 @@ $ shellcheck bashpass -e SC2140
 
 **Note**: If you have trouble installing ShellCheck. You can open a pull
 request on the repo and our GitHub actions will run ShellCheck for you.
+
+#### Comments
+
+-   Write comments to explain the purpose and functionality of the code,
+    particularly for complex or non-obvious sections.
+-   Use inline comments sparingly, and only when necessary to clarify the code.
 
 ### Documentation Changes
 
