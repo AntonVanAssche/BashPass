@@ -57,7 +57,7 @@ To ensure consistency and readability of the codebase, please follow these guide
     and variable names.
 -   Use Bash built-ins wherever possible.
 -   Limit usage of external commands `$(cmd)`.
--   Try not to pipe (`\`) for everything.
+-   Try not to pipe (`|`) for everything.
 -   Variables must be surrounded by `{}`.
 -   Loops and conditionals should use the `(( ))` and `[[ ]]` syntax (where possible).
 -   Quote **EVERYTHING**.
