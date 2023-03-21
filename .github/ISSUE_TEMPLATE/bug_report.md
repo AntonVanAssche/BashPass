@@ -18,6 +18,7 @@ _A clear and concise description of what you expected to happen._
 ### What is your host/environment?
 -   _Operation system:_
 -   _BashPass version:_
+-   _Bash version:_
 -   _GnuPG version:_
 
 ### Do you have any screenshots?
