@@ -259,11 +259,11 @@ show() {
 copy() {
     # Detect 'xclip' (X11), 'xsel' (X11) or 'wl-copy' (Wayland).
     if command -v xclip &> /dev/null; then
-        clipboardCommand="xclip -selection clipboard"
+        clipboard_command="xclip -selection clipboard"
     elif command -v xsel &> /dev/null; then
-        clipboardCommand="xsel --clipboard"
+        clipboard_command="xsel --clipboard"
     elif command -v wl-copy &> /dev/null; then
-        clipboardCommand="wl-copy"
+        clipboard_command="wl-copy"
     else
         error_out "xclip, xsel, or wl-copy is required" 127
     fi
@@ -277,7 +277,7 @@ copy() {
 
     # Decrypte the password file and copy it to the clipboard using xclip, xsel or wl-copy.
     # This WON'T show the password inside the terminal output.
-    if gpg --decrypt --quiet "${configured_pass_location}/${pass_name}.gpg" | ${clipboardCommand}; then
+    if gpg --decrypt --quiet "${configured_pass_location}/${pass_name}.gpg" | ${clipboard_command}; then
         printf 'Password %s has been copied to the clipboard' "'${pass_name}'"
         printf '\n'
     else
