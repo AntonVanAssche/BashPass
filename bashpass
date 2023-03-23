@@ -61,8 +61,8 @@ sleep() {
 # Wrapper for `command -v` to avoid spamming '> /dev/null'.
 # It also protects against user aliasses and functions.
 has() {
-    command=$(command -v "${1}") 2> /dev/null || error_out "${1} is required" "127"
-    [[ -x ${command} ]] || error_out "${1} is not an executable" "1"
+    command=$(command -v "${1}") 2> /dev/null || error_out "${1} is required" 127
+    [[ -x ${command} ]] || error_out "${1} is not an executable" 1
 }
 
 # Return all possible options/usages of BashPass.
@@ -112,7 +112,7 @@ check_password_exists() {
     pass_name="${1}"
 
     [[ -f "${configured_pass_location}/${pass_name}.gpg" ]] || \
-        error_out "password '${pass_name}' doesn't exist." "1"
+        error_out "password '${pass_name}' doesn't exist." 1
 }
 
 # Ask the user whether he would like to generate a password or to enter one himself.
@@ -126,7 +126,7 @@ set_password() {
             read -rs password1
             printf '\n'
 
-            [[ -z "${password1}" ]] && error_out "the password cannot be empty." "1"
+            [[ -z "${password1}" ]] && error_out "the password cannot be empty." 1
 
             printf 'Retype the password for %s: ' "${pass_name}"
             read -rs password2
@@ -153,9 +153,8 @@ set_password() {
     esac
 
     # Write password to the 'password' file.
-    if [[ -z ${password} ]]; then
-        error_out "failed to save the password ${pass_name}" "1"
-    fi
+    [[ -z ${password} ]] && \
+        error_out "failed to save the password ${pass_name}" 1
 
     printf '%s' "${password}" > "${configured_pass_location}/${pass_name}"
 }
@@ -165,7 +164,7 @@ add() {
     # Ask for a name when no name was given using ${2}.
     set_name "${1}" "add"
 
-    [[ -z "${pass_name}" ]] && error_out "failed to set a name" "1"
+    [[ -z "${pass_name}" ]] && error_out "failed to set a name" 1
 
     # Check if a password with the chosen name already exists.
     # If it does, ask the user whether he wants to overwrite it,
@@ -191,7 +190,7 @@ add() {
     set_password
 
     # Encrypte the password file using gpg.
-    gpg --encrypt --quiet --output "${configured_pass_location}/${pass_name}.gpg" \
+   "${gpg_command}" --encrypt --quiet --output "${configured_pass_location}/${pass_name}.gpg" \
         --recipient "${configured_key_id}" "${configured_pass_location}/${pass_name}"
 
     printf 'Password %s has been successfully saved' "'${pass_name}'"
@@ -210,7 +209,7 @@ update() {
     check_password_exists "${pass_name}"
 
     # Decrypte the password file.
-    gpg --decrypt --quiet --output "${configured_pass_location}/${pass_name}" \
+    "${gpg_command}" --decrypt --quiet --output "${configured_pass_location}/${pass_name}" \
         "${configured_pass_location}/${pass_name}.gpg"
 
     # Ask if the user want to generate a random password.
@@ -220,7 +219,7 @@ update() {
     rm -rf "${configured_pass_location:?}/${pass_name}.gpg"
 
     # Encrypte the password file using gpg.
-    gpg --encrypt --quiet --output "${configured_pass_location}/${pass_name}.gpg" \
+    "${gpg_command}" --encrypt --quiet --output "${configured_pass_location}/${pass_name}.gpg" \
         --recipient "${configured_key_id}" "${configured_pass_location}/${pass_name}"
 
     printf 'Password %s has successfully been updated' "'${pass_name}'"
@@ -250,7 +249,7 @@ show() {
     check_password_exists "${pass_name}"
 
     # Decrypte the password file and show the password
-    printf 'Password: %s' "$(gpg --decrypt --quiet "${configured_pass_location}/${pass_name}.gpg")"
+    printf 'Password: %s' "$(${gpg_command} --decrypt --quiet "${configured_pass_location}/${pass_name}.gpg")"
     printf '\n'
 }
 
@@ -277,7 +276,7 @@ copy() {
 
     # Decrypte the password file and copy it to the clipboard using xclip, xsel or wl-copy.
     # This WON'T show the password inside the terminal output.
-    if gpg --decrypt --quiet "${configured_pass_location}/${pass_name}.gpg" | ${clipboard_command}; then
+    if "${gpg_command}" --decrypt --quiet "${configured_pass_location}/${pass_name}.gpg" | ${clipboard_command}; then
         printf 'Password %s has been copied to the clipboard' "'${pass_name}'"
         printf '\n'
     else
@@ -331,9 +330,9 @@ sync() {
     has "git"
 
     [[ -z ${configured_git_repo} ]] && \
-        error_out "URL to git repository not specified in config" "1"
+        error_out "URL to git repository not specified in config" 1
     [[ -d "${configured_pass_location}/.git/" ]] || \
-        error_out "${configured_pass_location} isn't a git repository" "1"
+        error_out "${configured_pass_location} isn't a git repository" 1
 
     # The '--git-dir' and '--work-tree' options allow the user to synchronize
     # their password(s) regardless of their current working directory (pwd).
@@ -350,7 +349,7 @@ sync() {
                 printf '\n'
                 printf 'Remote password(s) successfully synchronized with local.'
             else
-                error_out "failed to upload password(s) to ${configured_git_repo}" "1"
+                error_out "failed to upload password(s) to ${configured_git_repo}" 1
             fi
             ;;
         [Dd]ownload)
@@ -358,11 +357,11 @@ sync() {
                 printf '\n'
                 printf 'Local password(s) successfully synchronized with remote.'
             else
-                error_out "failed to download password(s) from ${configured_git_repo}" "1"
+                error_out "failed to download password(s) from ${configured_git_repo}" 1
             fi
             ;;
         *)
-            error_out "unknown option '${1}'" "22"
+            error_out "unknown option '${1}'" 22
             ;;
     esac
 
@@ -374,13 +373,19 @@ sync() {
 main() {
     # Detect the user.
     # When the user is root exit out.
-    [[ "${UID}" == 0 ]] && error_out "permission denied" "13"
+    [[ "${UID}" == 0 ]] && error_out "permission denied" 13
 
     # Create the necessary directories if they doesn't exists.
     mkdir -p "${configured_pass_location}"
 
-    # Detect 'gpg'
-    has "gpg"
+    # Detect both 'gpg' and 'gpg2', when both are installed
+    # 'gpg2' will be used, since it's more secure.
+    # But since some operating systems package 'gpg2',
+    # but the command is still 'gpg' we need to check for both.
+    command -v gpg &> /dev/null && gpg_command="gpg"
+    command -v gpg2 &> /dev/null && gpg_command="gpg2"
+
+    has "${gpg_command}"
 
     # Ask the GPG key ID to use for encrypting the password.
     # It will only ask when the configured_key_id isn't found in the config file.
@@ -411,7 +416,7 @@ main() {
         "--copy"| "-c") copy "${2}";;
         "--list"| "-l") list;;
         "--sync"| "-S") sync "${2}" "${3}";;
-        *) error_out "option '${1}' not found" "22";;
+        *) error_out "option '${1}' not found" 22;;
     esac
 }
 
