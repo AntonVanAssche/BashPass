@@ -76,7 +76,7 @@ bashpass [option] [name]                            - Basic command structure.
 
 Options:
 --help      or -h                                   - show this help message.
---VERSION   or -v                                   - show the VERSION number
+--version   or -v                                   - show the VERSION number
 --list      or -l                                   - list all password.
 --add       or -a                            [name] - add a password.
 --update    or -u                            [name] - update a password.
