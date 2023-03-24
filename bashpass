@@ -130,13 +130,13 @@ set_password() {
 
     case "${random}" in
         [Nn])
-            printf 'Enter a password for %s: ' "${pass_name}"
+            printf 'Enter a password for %s: ' "'${pass_name}'"
             read -rs password1
             printf '\n'
 
             [[ -z "${password1}" ]] && error_out "the password cannot be empty." 1
 
-            printf 'Retype the password for %s: ' "${pass_name}"
+            printf 'Retype the password for %s: ' "'${pass_name}'"
             read -rs password2
             printf '\n'
 
@@ -149,7 +149,7 @@ set_password() {
             password=${password1}
             ;;
         *)
-            printf 'Give the length of the password (Default: %s): ' "${configured_pass_length}"
+            printf 'Enter a password length (Default: %s): ' "'${configured_pass_length}'"
             read -r pass_length
 
             [[ -z ${pass_length} ]] && pass_length=${configured_pass_length}
@@ -165,7 +165,7 @@ set_password() {
 
     # Write password to the 'password' file.
     [[ -z ${password} ]] && \
-        error_out "failed to save the password ${pass_name}" 1
+        error_out "failed to save the password '${pass_name}'" 1
 
     printf '%s' "${password}" > "${configured_pass_location}/${pass_name}"
 }
@@ -245,7 +245,7 @@ update() {
     "${gpg_command}" --encrypt --quiet --output "${configured_pass_location}/${pass_name}.gpg" \
         --recipient "${configured_key_id}" "${configured_pass_location}/${pass_name}"
 
-    printf 'Password %s has successfully been updated' "'${pass_name}'"
+    printf 'Password %s has been successfully updated' "'${pass_name}'"
     printf '\n'
 
     # Remove the plain text password file after encrypting it,
@@ -264,7 +264,7 @@ delete() {
     check_password_exists "${pass_name}"
 
     rm -rf "${configured_pass_location}/${pass_name}.gpg"
-    printf 'Password %s has successfully been deleted' "'${pass_name}'"
+    printf 'Password %s has been successfully deleted' "'${pass_name}'"
     printf '\n'
 }
 
