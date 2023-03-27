@@ -1,4 +1,4 @@
-.TH "BASHPASS" "1" "2023-03-19" "BASHPASS 2023-03-19" "BASHPASS" "1"
+.TH "BASHPASS" "1" "2023-03-27" "BASHPASS 2023-03-27" "BASHPASS" "1"
 .ie \n(.g .ds Aq \(aq
 .el       .ds Aq
 .ad l
@@ -61,7 +61,9 @@ This option allows the user to synchronize passwords between a git repository an
 \fBNOTE\fR that the user will need to import their GPG key on every device they want to use for synchronization. A guide on importing and exporting GPG keys can be found at <https://www.debuntu.org/how-to-importexport-gpg-key-pair/>.
 .RE
 .SH "FILES AND DIRECTORIES"
-~/.local/bin/bashpass
+/usr/bin/bashpass (\fBFor Linux and BSD systems\fR)
+.RE
+/usr/share/bin/bashpass (\fBFor Mac OS systems\fR)
 .RE
 ~/.config/bashpass/bashpass.conf
 .RE
