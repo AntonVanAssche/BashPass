@@ -1,0 +1,44 @@
+name: Test Makefile
+
+on:
+  push:
+    paths:
+      - "BSDmakefile"
+      - "GNUmakefile"
+  pull_request:
+    paths:
+      - "BSDmakefile"
+      - "GNUmakefile"
+
+jobs:
+  test-ubuntu:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Test installation
+        run: |
+          make install
+      - name: Test updating
+        run: |
+          make update
+      - name: Test uninstall
+        run: |
+          make install
+          make uninstall
+
+  test-macos:
+    runs-on: macos-12
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Test installation
+        run: |
+          make install
+      - name: Test updating
+        run: |
+          make update
+      - name: Test uninstall
+        run: |
+          make install
+          make uninstall
