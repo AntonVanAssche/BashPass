@@ -85,7 +85,7 @@ For your contribution to be accepted, your changes need to pass
 ShellCheck.
 
 ```console
-$ shellcheck bashpass -e SC2140
+$ shellcheck bashpass
 ```
 
 **Note**: If you have trouble installing ShellCheck. You can open a pull
