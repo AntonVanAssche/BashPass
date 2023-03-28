@@ -158,7 +158,7 @@ set_password() {
             # Using 'tr' we can then translate the random bytes to a character set we want.
             # After that we can use 'dd' to only take the first ${pass_length} characters.
             password=$(LC_ALL=C \
-                tr -dc 'A-Za-z0-9!"#$%&'\''()*+,-./:;<=>?@[\]^_`{|}~' < /dev/urandom | \
+                tr -dc 'A-Za-z0-9!"#$%&'\''()*+,-./:;<=>?@[\]^_`{|}~ ' < /dev/urandom | \
                 dd ibs=1 obs=1 count="${pass_length}" 2> /dev/null) || :
             ;;
     esac
