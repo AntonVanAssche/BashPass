@@ -72,7 +72,7 @@ help() {
 BashPass version: ${VERSION}
 A password manager written in Bash.
 
-bashpass [option] [name]                            - Basic command structure.
+${0##*/} [option] [name]                            - Basic command structure.
 
 Options:
 --help      or -h                                   - show this help message.
