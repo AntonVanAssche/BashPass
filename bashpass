@@ -154,6 +154,11 @@ set_password() {
 
             [[ -z ${pass_length} ]] && pass_length=${configured_pass_length}
 
+            # Since we don't want the user to enter a non-numeric value,
+            # we can use a regular expression to check if the input is a number.
+            # If it isn't, we will error out.
+            [[ ${pass_length} =~ ^[1-9]+$ ]] || error_out "the password length must be a number." 1
+
             # To generate a random password, we need read random bytes from '/dev/urandom'.
             # Using 'tr' we can then translate the random bytes to a character set we want.
             # After that we can use 'dd' to only take the first ${pass_length} characters.
