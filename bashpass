@@ -11,7 +11,14 @@ readonly VERSION="3.0"
 # Whenever an error occurs, we want to notify the user about it.
 # This is a basic function that wil print the corresponding error
 # message to stderr, and will exit with the given exit status.
+# To ensure security, we will also remove the raw password file
+# if it exists, to prevent the user from accidentally leaking
+# the password. Although 'rm' isn't a built-in, there is no
+# other way to achieve this without it.
 error_out() {
+    [[ -z "${pass_name}" ]] || \
+        [[ -f "${configured_pass_location}/${pass_name}" ]] && \
+            rm -rf "${configured_pass_location:?}/${pass_name}"
     printf '\n'
     printf 'An error occurred: %s' "${1}" >&2
     printf '\n'
