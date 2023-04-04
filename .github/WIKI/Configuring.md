@@ -3,7 +3,6 @@ In this file, you can make several changes such as the email address, default lo
 The default configuration file is shown below.
 
 ```
-version: 3.0
 location: .local/share/bashpass
 timer: 10
 length: 14

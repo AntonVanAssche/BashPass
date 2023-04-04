@@ -6,7 +6,7 @@ set +o xtrace   # Disable debug mode.
 set -o pipefail # Don't hide errors within pipes.
 
 # Current version.
-readonly VERSION="3.0"
+readonly VERSION="3.1"
 
 # Whenever an error occurs, we want to notify the user about it.
 # This is a basic function that wil print the corresponding error
