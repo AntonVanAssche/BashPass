@@ -1,21 +1,21 @@
 ## Dependencies
 
--  `bash >= 3.0`
+-   `bash >= 3.0`
 
 **Password encryption**:
 
--  `gpg` or `gpg2`
+-   `gpg` or `gpg2`
 
 **Clipboard support**:
 
 -   X11
-    -  `xclip` or `xsel`
+    -   `xclip` or `xsel`
 -   Wayland
-    -   _Comming soon_
+    -   `wl-clipboard`
 
 **Synchronization support**:
 
--  `git`
+-   `git`
 
 ## Installation
 
@@ -98,32 +98,27 @@ sub   rsa3072 2022-04-22 [E]
 ```
 
 Note you can see the key fingerprint (`86F27E3CAA49BB273653B39763BBB2BD91082EE1`), this string contains the key ID.
-This are the last 8 characters (`91082EE1`) of the fingerprint.
+This are the last 8 characters ( `91082EE1`) of the fingerprint.
 This part is **IMPORTANT** to remember, you'll need this later to configure BashPass (see: [Post installation](#post-installation)).
 
-### Installation using the installer (recommended)
+### Installation by using the one-liners
 
-Once you have generated your GPG key, you can proceed to install BashPass.
-The recommended way to install BashPass is to use the installer script.
-You can clone the repository and run the install.sh script, or you can run the following one-liner command in your terminal:
+As of BashPass 3.1, the one-liners provided in the `scripts/` directory can no longer be used to install BashPass, due to the removal of the `install.sh`, `update.sh`, and `uninstall.sh` scripts.
+Instead, BashPass now uses two Makefiles (`GNUmakefile` and `BSDmakefile`) for installation, updating, and uninstalling, reducing the codebase and making BashPass more maintainable.
+This change makes it easier to maintain the code and reduces unnecessary scripts.
 
-```console
-$ bash -c "$(wget -qO - https://raw.githubusercontent.com/AntonVanAssche/BashPass/master/scripts/install.sh)"
-```
+The `GNUmakefile` and `BSDmakefile` are two different makefiles used by different operating systems.
+The `GNUmakefile` is used by most Linux distributions, including Debian and Fedora, as well as macOS, while the `BSDmakefile` is used by BSD-based operating systems like FreeBSD and OpenBSD.
 
-If the above command fails, you can try using `curl` instead of `wget` by running the following command:
+The reason for having two makefiles is that the syntax and features of the `make` command can vary between these operating systems.
+By providing two different makefiles, BashPass can be installed on a wide variety of systems without requiring the user to modify the makefile for their specific platform.
 
-```console
-$ bash -c "$(curl -so - https://raw.githubusercontent.com/AntonVanAssche/BashPass/master/scripts/install.sh)"
-```
+Therefore, if you want to install BashPass, please see the [Installation by downloading the tarball/zip (recommended)](#install-by-the-tarballzip-recommended) section.
 
-If neither of these options work, it may be because you do not have either `wget` or `curl` installed on your system.
-You can check if you have either of them installed by running `command -v wget` or `command -v curl`, which should return the path where the binary is located.
-If you don't have either of them installed, you can install them using your system's package manager.
+### Installation By downloading the tarball/zip (recommended)
 
-### Installation using the tarball/zip
-
-If you prefer to manually install BashPass, you can do so using the tarballs (or zip) available on the [release page](https://github.com/AntonVanAssche/BashPass/releases/latest/) of the BashPass GitHub repository.
+If you prefer to download the provided tarball or zip, you can download them from the [release page](https://github.com/AntonVanAssche/BashPass/releases/latest/) of the GitHub repository.
+This is the recommended way to install BashPass, since it allows you to verify the authenticity of the tarball.
 Follow the steps below to manually install BashPass:
 
 Download the tarball corresponding to the version you want to install from the [release page](https://github.com/AntonVanAssche/BashPass/releases/latest/).
@@ -147,7 +142,7 @@ You can check if you have either of them installed by running `command -v wget` 
 If you don't have either of them installed, you can install them using your system's package manager.
 
 The provided tarballs are signed with the following PGP key: [AB592CC1A4D17E654ED55FE83FF8016D27683E3E](https://keyserver.ubuntu.com/pks/lookup?search=0x3ff8016d27683e3e&op=vindex).
-A copy of this public key can be found on the [release](https://github.com/AntonVanAssche/BashPass/releases/download/2.0/BashPass-2.0.pub) page.
+A copy of this public key can be found on the [release](https://github.com/AntonVanAssche/BashPass/releases/download/3.0/BashPass-3.0.pub) page.
 This key allows you to verify the tarball.
 Although this step isn't required, it is recommended.
 If you do decide to verify the authenticity of the tarball you can import the PGP key by using this command:
@@ -165,7 +160,7 @@ $ gpg --verify BashPass-X.X.tar.gz.asc
 This command verifies the tarball's signature using GPG. If the signature is valid, you should see a message indicating that the signature is good, as shown below.
 
 ```
-gpg: assuming signed data in 'BashPass-2.0.tar.gz'
+gpg: assuming signed data in 'BashPass-X.X.tar.gz'
 gpg: Signature created Sat April 23 18:37:51 2022 CEST
 gpg: Use RSA key AB592CC1A4D17E654ED55FE83FF8016D27683E3E
 gpg: Good signature of "Anton Van Assche (git) <vanasscheanton@gmail.com>" [unknown]
@@ -177,24 +172,51 @@ Now it's time to extract the tarball, you can do this with the following command
 $ tar -xvzf BashPass-X.X.tar.gz
 ```
 
-Once the tarball is extracted, it is time to create the necessary folders and copy all the files to the their corresponding directory.
+Once the tarball is extracted, it is time to install BashPass, by using the `make install` command.
+
+```console
+$ cd BashPass-X.X
+$ make install
+```
+
+Alternatively, you can install BashPass by running the following commands:
+
+**Note**: Lines beginning with `#` must be executed as root, use `sudo` or `doas` depending on your operating system.
+
+-   For Linux and BSD:
 
 ```console
 $ mkdir -p ~/.config/bashpass/
 $ mkdir -p ~/.local/share/bashpass/
-$ mkdir -p ~/.local/bin/
-$ cp -r BashPass-X.X/bashpass ~/.local/bin/
+# cp -r BashPass-X.X/bashpass /usr/bin/bashpass
+# cp -r BashPass-X.X/docs/* /usr/share/man/man1/
 $ cp -r BashPass-X.X/config/ ~/.config/bashpass/
 ```
 
-### Post installation
+-   For Mac OS:
 
-After installing BashPass, you need to add `.local/bi`n to your `PATH` variable in order to use it.
-To do so, add the following line to your .bashrc file:
-
-```bash
-export PATH="${HOME}/.local/bin:${PATH}"
+```console
+$ mkdir -p ~/.config/bashpass/
+$ mkdir -p ~/.local/share/bashpass/
+# cp -r BashPass-X.X/bashpass /usr/local/bin/bashpass
+# cp -r BashPass-X.X/docs/* /usr/local/share/man/man1/
+$ cp -r BashPass-X.X/config/ ~/.config/bashpass/
 ```
+
+### Installation by cloning the repository
+
+Once you have generated your GPG key, you can proceed to install BashPass.
+BashPass can be installed by cloning the repository and running the `make install` command.
+
+**Note**: Replace `X.X` in the commands below with the version number you want to install.
+
+```console
+$ git clone https://www.github.com/AntonVanAssche/BashPass.git --branch X.X
+$ cd BashPass-X.X
+$ make install
+```
+
+### Post installation
 
 When you launch BashPass for the first time, you will be asked to enter the key ID and email address associated with the GPG key that you generated (see: [Generating your gpg key](#generating-your-gpg-key)).
 
@@ -207,36 +229,64 @@ That's it, you can now start using BashPass!
 
 ## Updating
 
-To update BashPass to the latest version, you can clone the repository and run the `update.sh` script, or you can use the one-liner below to download and install the latest version:
+Updating BashPass to it's latest version is fairly straightforward, this can be achieved by cloning the repository and running the `make update` command.
+Alternatively, you can also download the latest release, extract it and run the `make update` command from the extracted directory.
+
+**Note**: Replace `X.X` in the commands below with the version number you want to install.
 
 ```console
-$ bash -c "$(wget -qO - https://raw.githubusercontent.com/AntonVanAssche/BashPass/master/scripts/update.sh)"
+$ git clone https://www.github.com/AntonVanAssche/BashPass.git --branch X.X
+$ cd BashPass-X.X
+$ make update
 ```
 
-If you don't have `wget`, you can use `curl` instead:
+Alternatively, you can update BashPass by running the following commands:
+
+**Note**: Lines beginning with `#` must be executed as root, use `sudo` or `doas` depending on your operating system.
+
+-   For Linux and BSD:
 
 ```console
-$ bash -c "$(curl -so - https://raw.githubusercontent.com/AntonVanAssche/BashPass/master/scripts/update.sh)"
+# cp -r BashPass-X.X/bashpass /usr/bin/bashpass
+# cp -r BashPass-X.X/docs/* /usr/share/man/man1/
 ```
 
-If both options fail, you may need to install one of these tools first.
-To check whether `wget` or `curl` is installed, run `command -v wget` or `command -v curl` respectively.
-This should return the path to the binary.
+-   For Mac OS:
+
+```console
+# cp -r BashPass-X.X/bashpass /usr/local/bin/bashpass
+# cp -r BashPass-X.X/docs/* /usr/local/share/man/man1/
+```
 
 ## Uninstalling
 
-To uninstall BashPass, you can clone the repository and run the `uninstall.sh` script, or you can use the one-liner below to remove your current installation:
+Uninstalling BashPass is also fairly straightforward, this can be achieved by cloning the repository and running the `make uninstall` command.
+Alternatively, you can also download the latest release, extract it and run the `make uninstall` command from the extracted directory.
+
+Keep in mind that this will remove all configuration files and data associated with BashPass, with the exception of the password store location.
+
+**Note**: Replace `X.X` in the commands below with the version number you want to install.
 
 ```console
-$ bash -c "$(wget -qO - https://raw.githubusercontent.com/AntonVanAssche/BashPass/master/scripts/uninstall.sh)"
+$ git clone https://www.github.com/AntonVanAssche/BashPass.git --branch X.X
+$ cd BashPass-X.X
+$ make uninstall
 ```
 
-If you don't have `wget`, you can use `curl` instead:
+Alternatively, you can uninstall BashPass by running the following commands:
+
+**Note**: Lines beginning with `#` must be executed as root, use `sudo` or `doas` depending on your operating system.
+
+-   For Linux and BSD:
 
 ```console
-$ bash -c "$(curl -so - https://raw.githubusercontent.com/AntonVanAssche/BashPass/master/scripts/uninstall.sh)"
+# rm -rf /usr/bin/bashpass
+# rm -rf /usr/share/man/man1/bashpass.{1,conf.1}.gz
 ```
 
-If both options fail, you may need to install one of these tools first.
-To check whether `wget` or `curl` is installed, run `command -v wget` or `command -v curl` respectively.
-This should return the path to the binary.
+-   For Mac OS:
+
+```console
+# rm -rf /usr/local/bin/bashpass
+# rm -rf /usr/local/share/man/man1/bashpass.{1,conf.1}.gz
+```
