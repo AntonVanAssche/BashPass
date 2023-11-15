@@ -12,6 +12,8 @@
     -   `xclip` or `xsel`
 -   Wayland
     -   `wl-clipboard`
+-   macOS
+    -   `pbcopy`
 
 **Synchronization support**:
 
