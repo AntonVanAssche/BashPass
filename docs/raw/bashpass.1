@@ -1,4 +1,4 @@
-.TH "BASHPASS" "1" "2023-03-27" "BASHPASS 2023-03-27" "BASHPASS" "1"
+.TH "BASHPASS" "1" "2023-11-16" "BASHPASS 2023-11-16" "BASHPASS" "1"
 .ie \n(.g .ds Aq \(aq
 .el       .ds Aq
 .ad l
@@ -51,7 +51,7 @@ Display a saved password with a given name. Note that this option will not clear
 .PP
 \fB-c\fR, \fB--copy\fR [\fINAME\fR]
 .RS 4
-This option allows users to copy a password with a specific name to the clipboard. To enhance security, the clipboard is cleared after a certain amount of time. The duration for clearing the clipboard can be modified by adjusting the \fItimer\fR parameter in the (~/.config/bashpass/bashpass.conf) configuration file. Note that this option requires either \fIxclip\fR (for X11), \fIxsel\fR (for X11), or \fIwl-clipboard\fR (for Wayland) to be installed on the system.
+This option allows users to copy a password with a specific name to the clipboard. To enhance security, the clipboard is cleared after a certain amount of time. The duration for clearing the clipboard can be modified by adjusting the \fItimer\fR parameter in the (~/.config/bashpass/bashpass.conf) configuration file. Note that this option requires either \fIxclip\fR (for X11), \fIxsel\fR (for X11), \fIwl-clipboard\fR (for Wayland), or \fIpbcopy\fR (on macOS) to be installed on the system.
 .RE
 .PP
 \fB-S\fR, \fB--sync\fR [\fIupload/download\fR]
