@@ -303,9 +303,12 @@ show() {
 # This is a security measure to prevent the password from being leaked, it also makes
 # this feature more secure than the 'show' function.
 copy() {
-    # Detect 'xclip' (X11), 'xsel' (X11), 'wl-copy' (Wayland) or 'pbcopy' (macOS).
+    # Detect 'pbcopy' (macOS), 'xclip' (X11), 'xsel' (X11) or'wl-copy' (Wayland).
     # Determine which clipboard command to use.
-    if command -v xclip &> /dev/null; then
+    if command -v pbcopy &> /dev/null; then
+        copy_clipboard_command="pbcopy"
+        clear_clipboard_command="pbcopy < /dev/null"
+    elif command -v xclip &> /dev/null; then
         copy_clipboard_command="xclip -selection clipboard"
         clear_clipboard_command="xclip -selection clipboard < /dev/null"
     elif command -v xsel &> /dev/null; then
@@ -314,12 +317,9 @@ copy() {
     elif command -v wl-copy &> /dev/null; then
         copy_clipboard_command="wl-copy"
         clear_clipboard_command="wl-copy --clear"
-    elif command -v pbcopy &> /dev/null; then
-        copy_clipboard_command="pbcopy"
-        clear_clipboard_command="pbcopy < /dev/null"
     else
         error_out \
-            "'xclip' (X11), 'xsel' (X11), 'wl-copy' (Wayland) or 'pbcopy' (macOS) is required" 127
+            "'pbcopy' (macOS) 'xclip' (X11), 'xsel' (X11) or'wl-copy' (Wayland) is required" 127
     fi
 
     # If a name argument was not provided, prompt the user to enter one.
