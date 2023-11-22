@@ -345,7 +345,7 @@ copy() {
     # Wait for the timer to end, and then clear the clipboard.
     # The duration ('timer') can be changed in the config file.
     sleep "${configured_timer}" || kill 0
-    "${clear_clipboard_command}"
+    ${clear_clipboard_command}
 
     printf 'Clipboard has been cleared to ensure it cannot be leaked.'
     printf '\n'
