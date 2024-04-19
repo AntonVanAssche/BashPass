@@ -8,8 +8,13 @@ jobs:
 
     steps:
       - uses: actions/checkout@v1
-      - name: Run shellcheck.
+
+      - name: ShellCheck on bashpass.
         run: |
           shopt -s nullglob
           shellcheck bashpass
-          shellcheck scripts/* -e SC2016
+
+      - name: ShellCheck on scripts
+        run: |
+          shopt -s nullglob
+          shellcheck scripts/*
