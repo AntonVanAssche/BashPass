@@ -97,6 +97,19 @@ request on the repo and our GitHub actions will run ShellCheck for you.
     particularly for complex or non-obvious sections.
 -   Use inline comments sparingly, and only when necessary to clarify the code.
 
+#### Compatibility
+
+Each change should be compatible with all Bash versions from `3.0` and above.
+Therefor, it's recommended to compile Bash `3.0` on you local machine to test your changes.
+
+Source: [Bash 3.0](https://ftp.gnu.org/gnu/bash/bash-3.0.tar.gz)
+
+```console
+$ tar -xvf bash-3.0.tar.gz
+$ ./configure
+$ make -j 4
+```
+
 ### Documentation Changes
 
 We welcome all types of documentation changes, including updates to the Wiki and Man Pages.
