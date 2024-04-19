@@ -1,75 +1,57 @@
-# Contributing to BashPass
+# 1. Reporting Bugs
 
-Your contributions are always welcome, whether it's:
+If you come across a bug, feel free to report it by opening a new [issue](https://github.com/AntonVanAssche/BashPass/issues), and selecting the `Bug report` template.
 
--   Reporting a bug
--   Discussing the current state of the code
--   Submitting a fix
--   Proposing new features
--   Documentation
+# 2. Feature Requests
 
-## Bug reports using Github's [issues](https://github.com/TuX-sudo/BashPass/issues)
+If you'd like a new feature to be added, feel free to open a new [issue](https://github.com/AntonVanAssche/BashPass/issues), and select the `Feature request` template.
 
-If you come across a bug, feel free to report it by opening a new [issue](https://github.com/TuX-sudo/BashPass/issues), and selecting the `Bug report` template.
+# 3. Questions
 
-### Write bug reports with detail, background, and sample code
+If you have any questions, feel free to open a new [issue](https://github.com/AntonVanAssche/BashPass/issues), and select the `Question or Support Request` template.
 
-When you decide to open an issue, please use the appropriate template provided.
+# 4. Security Vulnerabilities
 
-**Great Bug Reports** tend to have:
+If you discover a security vulnerability within BashPass, please open a new [issue](https://github.com/AntonVanAssche/BashPass/issues) and select the ` Report a security vulnerability ` template.
 
--   A quick summary and/or background
--   Steps to reproduce
--   Be specific!
--   Give sample code if you can. Includes sample code that _anyone_ with a base Bash knowledge can understand and run.
--   What you expected would happen
--   What actually happens
--   The version of the software
--   Notes (possibly including why you think this might be happening, or stuff you tried that didn't work)
+# 5. Guide for Code Contributions
 
-## Feature requests using Github's [issues](https://github.com/TuX-sudo/BashPass/issues)
+## 5.1 Branch Model
 
-We are always open for new feature that could be added, feel free to suggest them by opening a new [issue](https://github.com/TuX-sudo/BashPass/issues), and selecting the `Feature request` template.
+BashPass is developed mainly through the master branch, and pull requests should be [fork based](https://help.github.com/articles/using-pull-requests/).
 
-## Code and Documentation Changes
-
-If you're interested in contributing to BashPass, we welcome both code and documentation changes.
-Here is what you need to know:
-
-### Code Changes
-
-Pull requests are the best way to propose changes to the codebase.
-To submit a code change, follow these steps:
-
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request.
-
-#### Use a Consistent Coding Style
+## 5.2 Code Style
 
 To ensure consistency and readability of the codebase, please follow these guidelines when contributing to BashPass:
 
--   Indent 4 spaces.
--   Try to keep lines below `100` characters long.
--   Use [snake_case](https://en.wikipedia.org/wiki/Snake_case) for function
-    and variable names.
--   Use Bash built-ins wherever possible.
--   Limit usage of external commands `$(cmd)`.
--   Try not to pipe (`|`) for everything.
--   Variables must be surrounded by `{}`.
--   Loops and conditionals should use the `(( ))` and `[[ ]]` syntax (where possible).
--   Quote **EVERYTHING**.
+- Bash Built-ins: Utilize Bash built-in commands whenever possible.
+- Indentation: Please use **4** spaces for indentation.
+- Line Length: Aim to keep lines below **100** characters long.
+- Minimize External Commands: Limit the usage of external commands like `$(cmd)`.
+- Naming Convention: Follow the `snake_case` convention for function and variable names.
+- Output: Prefer `printf` over `echo`.
+- Piping: Avoid excessive piping (`|`).
+- Return Codes: Ensure return codes are meaningful and consistent.
+- Symtax: Use single quotes for strings without variables, and double quotes for those with variables.
+- Syntax: It's important to quote **EVERYTHING**.
+- Syntax: Utilize `(( ))` and `[[ ]]` syntax for loops and conditionals where applicable.
+- Syntax: Utilize compact test syntax for single-command tests, otherwise `if`/`fi` is suitable.
+- Syntax: Variables should be enclosed in `{}`.
+- Variables: Global variables should be in uppercase.
+- Variables: Local variables should be in lowercase.
+- Variables: Use `local` variables whenever feasible.
+- Variables: Use `readonly` for variables that should not be changed, otherwise use `declare` or `local`.
 
-If the test only has one command inside of it; use the compact test
-syntax. Otherwise the normal `if`/`fi` is just fine.
+Here are examples for clarity:
 
 ```bash
 # Bad
 if [[ "${var}" ]]; then
     printf '%s\n' "${var}"
 fi
+
+# Acceptable, but not preferred
+test "${var}" && printf '%s\n' "${var}"
 
 # Good
 [[ "${var}" ]] && printf '%s\n' "${var}"
@@ -79,63 +61,74 @@ fi
     printf '%s\n' "${var}"
 ```
 
-#### ShellCheck
+```bash
+# Bad
+str="This string doesn't contain any variables"
 
-For your contribution to be accepted, your changes need to pass
-ShellCheck.
+# Good
+str='This string does not contain any variables'
+str="This string contains a variable: ${var}"
+```
+
+```bash
+# Bad
+readonly var="This variable should not be changed"
+
+# Good
+readonly VAR="This variable should not be changed"
+
+# Bad
+func() {
+    var="${1}"
+}
+
+# Good
+func() {
+    local var="${1}"
+}
+```
+
+## 5.3 Acceptance Criteria
+
+For your contribution to be accepted, your changes must meet the 2 main criteria:
+
+- **ShellCheck**: Ensure your code passes ShellCheck.
+- **Bash 3.0 Compatibility**: Make sure your code is compatible with Bash 3.0 and above.
 
 ```console
 $ shellcheck bashpass
 ```
 
-**Note**: If you have trouble installing ShellCheck. You can open a pull
-request on the repo and our GitHub actions will run ShellCheck for you.
-
-#### Comments
-
--   Write comments to explain the purpose and functionality of the code,
-    particularly for complex or non-obvious sections.
--   Use inline comments sparingly, and only when necessary to clarify the code.
-
-#### Compatibility
-
-Each change should be compatible with all Bash versions from `3.0` and above.
-Therefor, it's recommended to compile Bash `3.0` on you local machine to test your changes.
-
 Source: [Bash 3.0](https://ftp.gnu.org/gnu/bash/bash-3.0.tar.gz)
 
 ```console
 $ tar -xvf bash-3.0.tar.gz
+$ cd bash-3.0/
 $ ./configure
 $ make -j 4
 ```
 
-### Documentation Changes
+# 6. Guide for Documentation Contributions
 
-We welcome all types of documentation changes, including updates to the Wiki and Man Pages.
-Our wiki are located under the `.github/WIKI/` directory, for man pages checkout `docs/raw/`.
-To submit a documentation change, follow these steps:
+## 6.1 Branch model
 
-1. Fork the Project
-2. Create your Documentation Branch (`git checkout -b documentation/AmazingChange`)
-3. Commit your Changes (`git commit -m 'Add some AmazingChange'`)
-4. Push to the Branch (`git push origin documentation/AmazingChange`)
-5. Open a Pull Request.
+All documentation regarding BashPass is maintained in the master branch, and pull requests should be [fork based](https://help.github.com/articles/using-pull-requests/).
 
-#### Writing clear and consistent documentation
+## 6.2 Documentation Location
+
+BashPass has 2 types of documentation:
+- **man pages**: `docs/raw/`
+- **GitHub wiki**: `.github/WIKI/`
+
+## 6.3 Documentation Style
 
 To make sure that the documentation is useful and consistent, please follow these guidelines when writing and updating documentation:
 
--   Use clear and concise language.
--   Write in a style that is easy for non-technical users to understand.
--   Use proper grammar and spelling.
--   Provide examples wherever possible.
+- Use clear and concise language.
+- Write in a style that is easy for non-technical users to understand.
+- Use proper grammar and spelling.
+- Provide examples wherever possible.
 
-### Creating a Pull Request
-
-When creating a pull request, please ensure that your changes are well-documented and that they are thoroughly tested.
-We've provided a template you can fill out, and you'll be good to go.
-
-## License
+# 7. License
 
 By contributing, you agree that your contributions will be licensed under the [MIT License](./LICENSE.md).
