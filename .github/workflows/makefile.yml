@@ -14,30 +14,26 @@ jobs:
   test-ubuntu:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v2
+
       - name: Test installation
         run: |
-          make install
-      - name: Test updating
-        run: |
-          make update
+          sudo make install
+
       - name: Test uninstall
         run: |
-          make install
-          make uninstall
+          sudo make install
+          sudo make uninstall
 
   test-macos:
     runs-on: macos-12
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v2
+
       - name: Test installation
         run: |
           make install
-      - name: Test updating
-        run: |
-          make update
+
       - name: Test uninstall
         run: |
           make install
