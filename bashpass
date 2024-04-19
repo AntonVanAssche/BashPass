@@ -8,7 +8,7 @@ set -o pipefail # Don't hide errors within pipes.
 # Restrict new password file permissions to only the current user.
 umask 077
 
-readonly VERSION="3.2"
+readonly VERSION="3.3"
 readonly NAME="BashPass"
 readonly SCRIPT_NAME="${0##*/}"
 
