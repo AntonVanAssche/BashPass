@@ -90,12 +90,15 @@ ask_for_git_repo() {
     printf '%s' "${git_repo}"
 }
 
+# The following variables will be used to store the user's settings. When no value is
+# found in the configuration file, the user will either be prompted to enter the value,
+# or a default value will be used.
 CONFIGURED_EMAIL="$(get_setting 'email' || ask_for_email)"
 CONFIGURED_GIT_REPO="$(get_setting 'gitRepo')"
 CONFIGURED_KEY_ID="$(get_setting 'keyID' || ask_for_key_id)"
-CONFIGURED_PASSWD_LENGTH="$(get_setting 'length')"
-CONFIGURED_PASSWD_STORE="${HOME}/$(get_setting 'location')"
-CONFIGURED_TIMER="$(get_setting 'timer')"
+CONFIGURED_PASSWD_LENGTH="$(get_setting 'length' || printf '14')"
+CONFIGURED_PASSWD_STORE="${HOME}/$(get_setting 'location' || printf '.local/share/bashpass')"
+CONFIGURED_TIMER="$(get_setting 'timer' || printf '10')"
 
 readonly CONFIGURED_EMAIL
 readonly CONFIGURED_GIT_REPO
