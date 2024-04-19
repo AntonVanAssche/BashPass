@@ -1,81 +1,102 @@
-.TH "BASHPASS" "1" "2023-11-16" "BASHPASS 2023-11-16" "BASHPASS" "1"
+.TH "BASHPASS" "1" "2024-04-19" "BASHPASS 2024-04-19" "BASHPASS" "1"
 .ie \n(.g .ds Aq \(aq
 .el       .ds Aq
 .ad l
 .nh
+
 .SH "NAME"
-bashpass \- command-line based password manager written in Bash.
+BashPass \- command-line based password manager written in Bash.
+
 .SH "SYNOPSIS"
-bashpass [\fIOPTIONS\fR] [\fINAME\fR]
-.RS 4
-A \fINAME\fR does not need to be specified, the program will ask for it if none is given as an argument.
+bashpass [\fIOPTION\fR] [\fINAME\fR | \fISYNC_COMMAND\fR]
 .RE
+
 .SH "DESCRIPTION"
-Together with \fBGnuPG\fR, this command-line based password manager allows the user to safely save passwords on his devices. All passwords are 100% stored locally and encrypted with the users own GPG key, so you don't have to trust a third party to store your passwords.
+Together with \fBGnuPG\fR, this command-line based password manager allows the user to safely save passwords on his devices.
+All passwords are 100% stored locally and encrypted with the users own GPG key, so you don't have to trust a third party to store your passwords.
 .RE
+
 .SH "OPTIONS"
-\fB-h\fR, \fB--help\fR
-.RS 4
-Display a brief help message.
+
 .RE
+\fB--help\fR | \fB-h\fR
+.RS 4
+Show a brief help message.
 .PP
-\fB-v\fR, \fB--version\fR
+
+.RE
+\fB--version\fR | \fB-v\fR
 .RS 4
 Display the version number of your BashPass installation.
-.RE
 .PP
-\fB-l\fR, \fB--list\fR
-.RS 4
-List all saved passwords by name.
+
 .RE
-.PP
-\fB-a\fR, \fB--add\fR [\fINAME\fR]
+\fB--add\fR | \fB-a\fR [\fINAME\fR]
 .RS 4
 Add a new password to the system. The password can be either self-chosen or auto-generated.
-.RE
+If no \fINAME\fR is specified, BashPass will ask for it.
 .PP
-\fB-u\fR, \fB--update\fR [\fINAME\fR]
+
+.RE
+\fB--copy\fR | \fB-c\fR [\fINAME\fR]
 .RS 4
-Update a saved password with a new value. The password can be either self-chosen or auto-generated.
-.RE
+Copy the password of the specified \fINAME\fR to the clipboard.
+The clipboard will be cleared after a certain amount of time, specified in the configuration file.
 .PP
-\fB-d\fR, \fB--delete\fR [\fINAME\fR]
+
+.RE
+\fB--delete\fR | \fB-d\fR [\fINAME\fR]
 .RS 4
-Delete a saved password from the system.
-.RE
+Delete the password of the specified \fINAME\fR from the system.
 .PP
-\fB-s\fR, \fB--show\fR [\fINAME\fR]
+
+.RE
+\fB--show\fR | \fB-s\fR [\fINAME\fR]
 .RS 4
-Display a saved password with a given name. Note that this option will not clear the terminal, so it is not recommended for use in crowded environments.
-.RE
+Print the password of the specified \fINAME\fR to stdout.
 .PP
-\fB-c\fR, \fB--copy\fR [\fINAME\fR]
+
+.RE
+\fB--update\fR | \fB-u\fR [\fINAME\fR]
 .RS 4
-This option allows users to copy a password with a specific name to the clipboard. To enhance security, the clipboard is cleared after a certain amount of time. The duration for clearing the clipboard can be modified by adjusting the \fItimer\fR parameter in the (~/.config/bashpass/bashpass.conf) configuration file. Note that this option requires either \fIxclip\fR (for X11), \fIxsel\fR (for X11), \fIwl-clipboard\fR (for Wayland), or \fIpbcopy\fR (on macOS) to be installed on the system.
-.RE
+Update the password of the specified \fINAME\fR.
+The password can be either self-chosen or auto-generated.
 .PP
-\fB-S\fR, \fB--sync\fR [\fIupload/download\fR]
-.RS 4
-This option allows the user to synchronize passwords between a git repository and their local device in both directions. The git repository can be self-hosted or hosted via a third-party service such as GitHub or GitLab. To use this option, the \fIGIT(1)\fR utility must be installed on the user's system, and a working internet connection must be available.
-.PP
-\fBNOTE\fR that the user will need to import their GPG key on every device they want to use for synchronization. A guide on importing and exporting GPG keys can be found at <https://www.debuntu.org/how-to-importexport-gpg-key-pair/>.
+
 .RE
+\fB--list\fR | \fB-l\fR
+.RE 4
+List all the names of the passwords stored in the password store.
+.PP
+
+.RE
+\fB--sync\fR | \fB-S\fR [\fISYNC_COMMAND\fR]
+.RE 4
+Sync the password store with a remote Git repository.
+The \fISYNC_COMMAND\fR can be either \fBupload\fR or \fBdownload\fR.
+.PP
+
 .SH "FILES AND DIRECTORIES"
-/usr/bin/bashpass (\fBFor Linux and BSD systems\fR)
+/usr/bin/bashpass (\fBLinux and BSD\fR)
 .RE
-/usr/share/bin/bashpass (\fBFor Mac OS systems\fR)
+/usr/share/bin/bashpass (\fBmacOS\fR)
 .RE
 ~/.config/bashpass/bashpass.conf
 .RE
 ~/.local/share/bashpass/
-.RE
+.PP
+
 .SH "SEE ALSO"
 \fBbashpass.conf\fR(1)
+.PP
+
 .SH "AUTHOR"
 \fBAnton Van Assche\fR <\fIhttps://www.github.com/AntonVanAssche\fR>
+.PP
+
 .SH "BUGS"
 For bug reports and other issues regarding \fBBashPass\fR, including suggestions, please report to the GitHub link below, through which the project is developed.
 .PP
 .RS 2
-\fIhttps://github.com/AntonVanAssche/BashPass\fR
+<\fIhttps://github.com/AntonVanAssche/BashPass\fR>
 .RE
