@@ -1,6 +1,9 @@
-The BashPass configuration file can be found at `~/.config/bashpass/bashpass.conf`.
-In this file, you can make several changes such as the email address, default location where passwords are stored, and other settings.
-The default configuration file is shown below.
+This page provides instructions on how to configure BashPass using its configuration file.
+
+# 1. Configuration File
+
+By default, BashPass will look for a configuration file in `~/.config/bashpass/bashpass.conf`.
+If the file is not found, BashPass will use the default settings.
 
 ```
 location: .local/share/bashpass
@@ -8,90 +11,59 @@ timer: 10
 length: 14
 ```
 
-## Configuring the Location where Passwords are Stored
+# 2. Configuring BashPass
 
-By default, BashPass stores passwords in the directory `~/.local/share/bashpass/`.
-If you want to change the location, you need to modify the following line in the config file:
+You can configure BashPass by editing the configuration file.
+The configuration file is a simple text file that contains the following settings:
 
-```
-location: .local/share/bashpass
-```
+## 2.1. GnuPG Key ID
 
-**Example**: To store passwords in `.bashpass/passwords/`, update the line to:
+Upon first use, BashPass will ask you to provide your GnuPG key ID and will store it in the configuration file.
+In order to make BashPass work, you need to provide your GnuPG key ID.
+This can be done by adding an entry to the configuration, using `keyID` as the key and your GnuPG key ID as the value.
+The key ID of a GnuPG key is the last 8 characters of the key fingerprint.
 
-**Note**: The new location must be within **your home** (`~`) directory.
-
-```
-location: .bashpass/passwords/
-```
-
-## Configuring the Email Address
-
-It is not recommended to change the email address.
-However, if you need to, update the following line in the config file:
+For example, using `12345678` as the ID will look like this:
 
 ```
-email: email@gmail.com
+keyID: 12345678
 ```
 
-**Example**: To update the email address to `newemail@gmail.com`, update the line to:
+## 2.2 Password Length
 
-**Note**: After updating the email address, you need to generate a new GPG key.
-You will also be unable to read your passwords that were stored with the old email address.
+BashPass allows you to set a default password length, which it will use when generating passwords.
+Out of the box, BashPass will generate passwords with a length of `14` characters.
+Once set, you can still override this value when generating passwords.
 
-```
-email: newemail@gmail.com
-```
-
-## Configuring the Clipboard Timer
-
-By default, the timer for copying passwords is set to `10` seconds.
-This timer is the duration you have to paste the password that you copied using the `copy` option.
-You can modify the duration of the timer in the config file by editing the following line:
+For example, to change the default password length to `16`, you can add the following entry to the configuration file:
 
 ```
-timer: 10
+length: 16
 ```
 
-**Example**: To update the timer to `15` seconds, update the line to:
+## 2.3 Password Store Location
+
+BashPass will store all password files in a specified location, also known as the password store.
+This location must be present in your home directory (`~`).
+By default, the password store is located in `~/.local/share/bashpass`.
+
+
+For example, to change the passowrd store location to `~/.passwords`, you can add the following entry to the configuration file:
+
+**Note**: The password store location may not include the `~` character. As its added by BashPass.
 
 ```
-timer: 15
+location: .passwords
 ```
 
+## 2.4 Timer
 
-## Configuring the Default Password Length
+When using the `-c` or `--copy` option, BashPass will clear the clipboard after a specified amount of time.
+This time is specified in seconds, and defaults to `10` seconds.
+However, adding an `timer` entry to the configuration file will allow you to change the default value.
 
-The default length for all randomly generated passwords is `14` characters if no specific length is given when prompted (since version: `2.0`).
-You can change this length to as many characters as you want by editing the following line in the config file:
-
-```
-length: 14
-```
-
-
-**Example**: To update the default password length to `25` characters, update the line to:
+For example, to change the default timer to `5` seconds, you can add the following entry to the configuration file:
 
 ```
-length: 25
+timer: 5
 ```
-
-
-## Configuring the Git Repository URL
-
-If you want to use the `synchronize` functionality, you need to configure a URL that BashPass will use to push to the remote Git repository.
-You can configure this by adding the following line to your config file:
-
-```
-gitRepo: <URL TO THE GIT REPOSITORY>
-```
-
-
-**Example**: To use `AntonVanAssche/BashPass` as the remote repository, update the line to:
-
-```
-gitRepo: git@github.com:AntonVanAssche/BashPass.git
-```
-
-
-**Note**: It is recommended to use the `SSH` option as shown above.

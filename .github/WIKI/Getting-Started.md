@@ -1,4 +1,8 @@
-## Dependencies
+This page provides instructions on how to get started with BashPass.
+It covers the installation, updating, and uninstalling of BashPass.
+As well as the prerequisites and dependencies required to run BashPass.
+
+# 1. Dependencies
 
 -   `bash >= 3.0`
 
@@ -19,19 +23,17 @@
 
 -   `git`
 
-## Installation
+# 2. Installation
 
-### Generating your GPG key
+## 2.1 Generating your GPG key
 
-Before you install BashPass, you'll have to generate a GPG key.
-Run the following command in your terminal to start key generation process:
+Before you install BashPass, you'll have to generate a GPG key:
 
 ```console
 $ gpg --full-generate-key
 ```
 
-Once you run this command, you'll be asked to select a encryption protocol.
-Select the first option (`RSA`).
+Select the first option (`RSA`):
 
 ```
 Please select what kind of key you want:
@@ -45,8 +47,7 @@ Please select what kind of key you want:
 Your selection? 1
 ```
 
-Now you'll be prompted to choose a keysize.
-The default option (`3072`) is fine, for a stronger key select `4096`.
+Enter the keysize, the default option (`3072`) is fine, for a stronger key select `4096`:
 
 ```
 RSA keys may be between 1024 and 4096 bits long.
@@ -54,8 +55,7 @@ What keysize do you want? (3072)
 Requested keysize is 3072 bits
 ```
 
-After selecting the keysize, you'll be asked how long you want the key to be valid.
-The default option 1 (`key does not expire`) is fine.
+Enter time to expire, the default option (`0`) is fine:
 
 ```
 Please specify how long the key should be valid.
@@ -69,28 +69,25 @@ Key does not expire at all
 Is this correct? (y/N) y
 ```
 
-Now it's time to set a name for the key.
-This can be anything (example: `BashPass`).
+Choose a name for the key, this can be anything you like:
 
 ```
 Real name: Bashpass
 ```
 
-Once you've set a name for the key, it's time to set the email address, this is **IMPORTANT** to remember, you'll need this later to configure BashPass.
+Enter the email address you want to use:
 
 ```
 Email address: example@gmail.com
 ```
 
-The final step to generate your GPG key is to set a comment, this isn't needed but can be useful in case you have more than one GPG key on your computer.
-After this just confirm the settings and you're done.
+Finally, enter a comment, this can be anything you like, empty is fine:
 
 ```
 Comment: BashPass encryption key
 ```
 
-Now your key will be generated.
-Once this is done you'll see something like this:
+Once all the options are set, you should a see a message like this:
 
 ```
 pub   rsa3072 2022-04-22 [SC]
@@ -99,25 +96,10 @@ uid           [ultimate] Bashpass (Key to use BashPass) <example@gmail.com>
 sub   rsa3072 2022-04-22 [E]
 ```
 
-Note you can see the key fingerprint (`86F27E3CAA49BB273653B39763BBB2BD91082EE1`), this string contains the key ID.
-This are the last 8 characters ( `91082EE1`) of the fingerprint.
-This part is **IMPORTANT** to remember, you'll need this later to configure BashPass (see: [Post installation](#post-installation)).
+Within the output, you will find the key fingerprint, in this case `86F27E3CAA49BB273653B39763BBB2BD91082EE1`.
+From this fingerprint, you can extract the key ID, in this case `91082EE1`, which we will use later.
 
-### Installation by using the one-liners
-
-As of BashPass 3.1, the one-liners provided in the `scripts/` directory can no longer be used to install BashPass, due to the removal of the `install.sh`, `update.sh`, and `uninstall.sh` scripts.
-Instead, BashPass now uses two Makefiles (`GNUmakefile` and `BSDmakefile`) for installation, updating, and uninstalling, reducing the codebase and making BashPass more maintainable.
-This change makes it easier to maintain the code and reduces unnecessary scripts.
-
-The `GNUmakefile` and `BSDmakefile` are two different makefiles used by different operating systems.
-The `GNUmakefile` is used by most Linux distributions, including Debian and Fedora, as well as macOS, while the `BSDmakefile` is used by BSD-based operating systems like FreeBSD and OpenBSD.
-
-The reason for having two makefiles is that the syntax and features of the `make` command can vary between these operating systems.
-By providing two different makefiles, BashPass can be installed on a wide variety of systems without requiring the user to modify the makefile for their specific platform.
-
-Therefore, if you want to install BashPass, please see the [Installation by downloading the tarball/zip (recommended)](#install-by-the-tarballzip-recommended) section.
-
-### Installation By downloading the tarball/zip (recommended)
+## 2.2 Installation By downloading the tarball/zip (recommended)
 
 If you prefer to download the provided tarball or zip, you can download them from the [release page](https://github.com/AntonVanAssche/BashPass/releases/latest/) of the GitHub repository.
 This is the recommended way to install BashPass, since it allows you to verify the authenticity of the tarball.
@@ -178,117 +160,70 @@ Once the tarball is extracted, it is time to install BashPass, by using the `mak
 
 ```console
 $ cd BashPass-X.X
-$ make install
+
+# Linux and macOS
+$ sudo make install
+
+# BSD
+$ doas make install
 ```
 
-Alternatively, you can install BashPass by running the following commands:
-
-**Note**: Lines beginning with `#` must be executed as root, use `sudo` or `doas` depending on your operating system.
-
--   For Linux and BSD:
-
-```console
-$ mkdir -p ~/.config/bashpass/
-$ mkdir -p ~/.local/share/bashpass/
-# cp -r BashPass-X.X/bashpass /usr/bin/bashpass
-# cp -r BashPass-X.X/docs/* /usr/share/man/man1/
-$ cp -r BashPass-X.X/config/ ~/.config/bashpass/
-```
-
--   For Mac OS:
-
-```console
-$ mkdir -p ~/.config/bashpass/
-$ mkdir -p ~/.local/share/bashpass/
-# cp -r BashPass-X.X/bashpass /usr/local/bin/bashpass
-# cp -r BashPass-X.X/docs/* /usr/local/share/man/man1/
-$ cp -r BashPass-X.X/config/ ~/.config/bashpass/
-```
-
-### Installation by cloning the repository
+## 2.3 Installation by cloning the repository
 
 Once you have generated your GPG key, you can proceed to install BashPass.
-BashPass can be installed by cloning the repository and running the `make install` command.
+BashPass can be installed by cloning the repository and running the `make install` command as a privileged user.
 
 **Note**: Replace `X.X` in the commands below with the version number you want to install.
 
 ```console
 $ git clone https://www.github.com/AntonVanAssche/BashPass.git --branch X.X
 $ cd BashPass-X.X
-$ make install
+
+# Linux and macOS
+$ sudo make install
+
+# BSD
+$ doas make install
 ```
 
-### Post installation
+## 2.4 Post installation
 
-When you launch BashPass for the first time, you will be asked to enter the key ID and email address associated with the GPG key that you generated (see: [Generating your gpg key](#generating-your-gpg-key)).
+Upon first run, BashPass will ask you to enter the key ID associated with the GPG key you generated (see: [Generating your gpg key](#generating-your-gpg-key)).
 
 ```
-Enter the key ID of the GPG key you want to use: 91082EE1
-Enter the email address you created the gpg key with: example@gmail.com
+Enter the key ID associated with your GPG key: 91082EE1
 ```
 
 That's it, you can now start using BashPass!
 
-## Updating
+# 3.0 Updating
 
-Updating BashPass to it's latest version is fairly straightforward, this can be achieved by cloning the repository and running the `make update` command.
-Alternatively, you can also download the latest release, extract it and run the `make update` command from the extracted directory.
+To update BashPass, you can follow the same steps as the installation process.
 
-**Note**: Replace `X.X` in the commands below with the version number you want to install.
+# 4.0 Uninstalling
+
+Uninstalling BashPass is also fairly straightforward, `make uninstall` can be used to remove BashPass from your system.
 
 ```console
-$ git clone https://www.github.com/AntonVanAssche/BashPass.git --branch X.X
-$ cd BashPass-X.X
-$ make update
+# Linux and macOS
+$ sudo make uninstall
+
+# BSD
+$ doas make uninstall
 ```
 
-Alternatively, you can update BashPass by running the following commands:
-
-**Note**: Lines beginning with `#` must be executed as root, use `sudo` or `doas` depending on your operating system.
+Alternatively, you can uninstall BashPass by running the following commands as a privileged user:
 
 -   For Linux and BSD:
 
 ```console
-# cp -r BashPass-X.X/bashpass /usr/bin/bashpass
-# cp -r BashPass-X.X/docs/* /usr/share/man/man1/
+$ rm -rf /usr/bin/bashpass
+$ rm -rf /usr/share/man/man1/bashpass.{1,conf.1}.gz
 ```
 
--   For Mac OS:
+-   For macOS:
 
 ```console
-# cp -r BashPass-X.X/bashpass /usr/local/bin/bashpass
-# cp -r BashPass-X.X/docs/* /usr/local/share/man/man1/
-```
-
-## Uninstalling
-
-Uninstalling BashPass is also fairly straightforward, this can be achieved by cloning the repository and running the `make uninstall` command.
-Alternatively, you can also download the latest release, extract it and run the `make uninstall` command from the extracted directory.
-
-Keep in mind that this will remove all configuration files and data associated with BashPass, with the exception of the password store location.
-
-**Note**: Replace `X.X` in the commands below with the version number you want to install.
-
-```console
-$ git clone https://www.github.com/AntonVanAssche/BashPass.git --branch X.X
-$ cd BashPass-X.X
-$ make uninstall
-```
-
-Alternatively, you can uninstall BashPass by running the following commands:
-
-**Note**: Lines beginning with `#` must be executed as root, use `sudo` or `doas` depending on your operating system.
-
--   For Linux and BSD:
-
-```console
-# rm -rf /usr/bin/bashpass
-# rm -rf /usr/share/man/man1/bashpass.{1,conf.1}.gz
-```
-
--   For Mac OS:
-
-```console
-# rm -rf /usr/local/bin/bashpass
-# rm -rf /usr/local/share/man/man1/bashpass.{1,conf.1}.gz
+$ rm -rf /usr/local/bin/bashpass
+$ rm -rf /usr/local/share/man/man1/bashpass.{1,conf.1}.gz
 ```

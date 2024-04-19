@@ -1,128 +1,104 @@
-Welcome to the BashPass user guide!
-This guide provides an overview of all the features of BashPass, from creating a password to synchronizing your passwords with a remote git repository.
+This page provides instructions on how to use BashPass.
 
-## Help option
-
-If you are not sure about the correct option to use, simply run bashpass with the `--help` or `-h` option. This will display all the features of BashPass.
-
-**Note**: the `[name]` is optional.
+# 1. Basic Command Structure
 
 ```
-bashpass [option] [name]                            - Basic command structure.
+Usage: bashpass [OPTION] [NAME | SYNC_COMMAND]
 
 Options:
---help      or -h                                   - Show this help message.
---version   or -v                                   - Show the version number
---list      or -l                                   - List all password.
---add       or -a                            [name] - Add a password.
---update    or -u                            [name] - Update a password.
---delete    or -d                            [name] - Delete a password.
---show      or -s                            [name] - Show a password.
---copy      or -c                            [name] - Copy a password to the clipboard.
---sync      or -S    [synchronize command]          - Synchronize password(s) with a git repository.
+    --help    | -h                      Show this help message.
+    --version | -v                      Show the version number.
+    --add     | -a              [NAME]  Add a password.
+    --copy    | -c              [NAME]  Copy a password to the clipboard.
+    --delete  | -d              [NAME]  Delete a password.
+    --show    | -s              [NAME]  Show a password.
+    --update  | -u              [NAME]  Update a password.
+    --list    | -l                      List all passwords.
+    --sync    | -S       [SYNC_COMMAND] Synchronize password(s) with a git repository.
 
-Synchronize command:
-    upload           - Upload local password(s) to a remote repository.
-    download         - Download password(s) from a remote repository.
+Synchronize commands:
+    upload                              Upload local password(s) to a remote repository.
+    download                            Download password(s) from a remote repository.
+
+Note:
+    [NAME] is an optional argument. If not provided, the script will prompt you to enter it.
 ```
 
-Examples:
+# 2. Options
 
--  `bashpass --add gmail`
--  `bashpass --delete gmail`
--  `bashpass --show gmail`
--  `bashpass --list`
+## 2.1 `--help` | `-h`
 
-## Adding a password
+Show a brief help message.
 
-To add a password, use the `--add` or `-a` option.
+## 2.2 `--version` | `-v`
+
+Display the version number of your BashPass installation.
+
+## 2.3 `--add` | `-a`
+
+Add a new password to the system. The password can be either self-chosen or auto-generated.
+If no `NAME` is specified, BashPass will ask for it.
 
 ```console
-$ bashpass --add [password]
+$ bashpass --add gmail
 ```
 
-BashPass will prompt you to choose whether you want to generate a password or not.
-If you want to enter the password manually, type 'n' and then press 'enter'.
-Otherwise, just press 'enter'.
+## 2.2 `--copy` | `-c`
 
-```
-Do you want to generate a password [Y/n]: y
-```
-
-If you choose to generate the password, another prompt will appear asking you to enter the desired password length.
-The default length is 14, but this can be changed in the configuration file.
-Press 'enter' to use the default length, or enter a number and press 'enter' to specify a different length.
-
-```
-Give the length of the password (Default: 14):
-```
-
-## Updating a password
-
-This feature allows you to update an existing password. To use this option, run BashPass with the `--update` or `-u` flag.
+Copy the password of the specified `NAME` to the clipboard.
+The clipboard will be cleared after a certain amount of time, specified in the configuration file.
 
 ```console
-$ bashpass --update [password]
+$ bashpass --copy gmail
 ```
 
-This will ask the same questions as the `--add` feature.
+## 2.3 `--delete` | `-d`
 
-## Deleting a password
+> :warning: Be careful, BashPass will not ask for confirmation!
 
-To delete a password from your system, run BashPass with the `--delete` or `-d` option.
-
-**Note**: Be careful with this option, once you delete a password there is no way to recover it.
+Delete the password of the specified `NAME` from the system.
 
 ```console
-$ bashpass -d [password]
+$ bashpass --delete gmail
 ```
 
-## Show a password
+## 2.4 `--show` | `-s`
 
-This feature will display the password in your terminal.
+> :warning: BashPass wil print the password in clear text to the terminal.
 
-**NOTE**: this will return the password in plain text.
+Print the password of the specified NAME to stdout.
 
 ```console
-$ bashpass --show [password]
+$ bashpass --show gmail
 ```
 
-## Copy a password
+## 2.5 `--update` | `-u`
 
-This feature is more secure than the `--show` option because the clipboard will be cleared after a certain amount of time (default is 10 seconds), and the password will never be shown in the terminal.
-You can use this feature by using the `--copy` or `-c` flag.
+> :warning: BashPass will overwrite the previous password!
+
+Update the password of the specified `NAME`.
+The password can be either self-chosen or auto-generated.
 
 ```console
-$ bashpass --copy [password]
+$ bashpass --update gmail
 ```
 
-## Synchronize a password
+## 2.6 `--list` | `-l`
 
-BashPass provides a feature to synchronize your local passwords with a remote git repository.
-The synchronization functionality requires git to be installed on your system.
+List all the names of the passwords stored in the password store.
 
-It's recommended to set up an SSH key with the remote git server, whether it's a self-hosted one or a third-party provider like GitHub or GitLab.
-BashPass should work with both options.
+```console
+$ bashpass --list
+```
 
-By default, BashPass stores passwords in `~/.local/share/bashpass/`.
-You can use this location as a git repository or set up a different location as a git repository.
-It's up to you to choose which option suits you best.
+## 2.7 `--sync` | `-S`
 
-**Note**: You'll have to import your GPG key on every device you want to use the synchronization functionality.
-You can follow this guide https://www.debuntu.org/how-to-importexport-gpg-key-pair/ for importing and exporting your GPG keys.
+> :warning: The password store must be initialized with a remote Git repository before using this command.
 
-### Upload
-
-The `upload` option will upload all local changes to the remote git repository.
+Sync the password store with a remote Git repository.
+The `SYNC_COMMAND` can be either `upload` or `download`.
 
 ```console
 $ bashpass --sync upload
-```
-
-### Download
-
-The `download` option will download all changes from the remote git repository to the user's local machine.
-
-```console
 $ bashpass --sync download
 ```
