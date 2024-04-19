@@ -1,59 +1,79 @@
-.TH "BASHPASS.CONF" "1" "2023-03-27" "BASHPASS.CONF 2023-03-27" "BASHPASS.CONF" "1"
+.TH "BASHPASS.CONF" "1" "2024-04-19" "BASHPASS.CONF 2024-04-19" "BASHPASS.CONF" "1"
 .ie \n(.g .ds Aq \(aq
 .el       .ds Aq
 .ad l
 .nh
+
 .SH "NAME"
 bashpass.conf \- BashPass configuration file
+
 .SH "SYNOPSIS"
 bashpass.conf
 .RE
+
 .SH "DESCRIPTION"
-The \fBbashpass.conf\fR file is used to configure BashPass. It contains various settings such as the user's email address and GPG key ID.
+The \fBbashpass.conf\fR file is used to configure BashPass.
+It contains various settings such as the user's GPG key ID.
 .RE
+
 .SH "FILE FORMAT"
-The file consists of several parameters, each in the format \fBparameter: setting\fR. Values following the colon are strings and do not need to be quoted.
+The file consists of several parameters, each in the format \fBparameter: setting\fR.
+Values following the colon are strings and do not need to be quoted.
 .RE
+
 .SH "PARAMETERS"
-\fBlocation\fR
-.RS 4
-This parameter contains the location where the program will save passwords.
+
 .RE
-.PP
-\fBtimer\fR
-.RS 4
-This parameter contains the amount of time, in seconds, to wait before clearing the clipboard after copying a password with the \fB--copy\fR (\fB-c\fR) option.
-.RE
-.PP
-\fBlength\fR
-.RS 4
-This parameter contains the default length for generating a new password.
-.RE
-.PP
-\fBemail\fR
-.RS 4
-This parameter contains the user's email address used during GPG key generation.
-.RE
-.PP
 \fBkeyID\fR
 .RS 4
-This parameter contains the ID of the GPG key used to encrypt/decrypt passwords.
-.RE
+The GPG key ID used to encrypt and decrypt the password file.
+BashPass will prompt for one, if none is found.
 .PP
-\fBgitRepo\fR
-.RS 4
-This parameter contains the URL for synchronizing passwords between the local device and a remote git repository.
+
 .RE
+\fBlength\fR
+.RS 4
+The preferred default length for newly generated passwords.
+Length can still be set manually when generating a new password.
+.PP
+
+.RE
+\fBlocation\fR
+.RS 4
+The path where BashPass has to store the password file, also known as the password store.
+.PP
+
+.RE
+\fBtimer\fR
+.RS 4
+The preferred time, specified in seconds, BashPass will wait before clearing the clipboard when using the \fB--copy\fR option.
+.PP
+
+.SH "EXAMPLE"
+\fBkeyID\fR: 2345678
+.RE
+\fBlength\fR: 20
+.RE
+\fBlocation\fR: .config/bashpass/passwords
+.RE
+\fBtimer\fR: 10
+.PP
+
 .SH "FILES AND DIRECTORIES"
 ~/.config/bashpass/bashpass.conf
-.RE
+.PP
+
 .SH "SEE ALSO"
 \fBbashpass\fR(1)
+.PP
+
 .SH "AUTHOR"
 \fBAnton Van Assche\fR <\fIhttps://www.github.com/AntonVanAssche\fR>
+.PP
+
 .SH "BUGS"
 For bug reports and other issues regarding \fBBashPass\fR, including suggestions, please report to the GitHub link below, through which the project is developed.
 .PP
 .RS 2
-\fIhttps://github.com/AntonVanAssche/BashPass\fR
+<\fIhttps://github.com/AntonVanAssche/BashPass\fR>
 .RE
