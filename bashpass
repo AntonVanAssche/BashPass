@@ -46,25 +46,6 @@ get_setting() {
     return 1
 }
 
-# GnuPG keys are generated using a e-mailaddress specified by the user. In order to
-# encrypt our password files, we need this e-mailaddress, whenever BashPass can not
-# find an e-mailaddress within the user's configuration file, it will prompt the user
-# to enter one, and write it to the configuration file afterwards
-ask_for_email() {
-    local regex="^[a-z0-9!#\$%&'*+/=?^_\`{|}~-]+(\.[a-z0-9!#$%&'*+/=?^_\`{|}~-]+)*@([a-z0-9]([a-z0-9-]*[a-z0-9])?\.)+[a-z0-9]([a-z0-9-]*[a-z0-9])?\$"
-    local email
-
-    read -rp 'Enter the email address associated with your GPG key: ' email
-
-    if [[ "${email}" =~ ${regex} ]]; then
-        printf 'email: %s\n' "${email}" >> "${CONFIG_FILE}"
-    else
-        error 'invalid email address' 2
-    fi
-
-    printf '%s' "${email}"
-}
-
 # A user can have multiple GnuPG keys located on their system, therefore is a good idea
 # to ask for a specific key, by prompting the user to enter a key ID. Afterwards we can
 # simpply append it to the configuration file to save it.
@@ -93,14 +74,12 @@ ask_for_git_repo() {
 # The following variables will be used to store the user's settings. When no value is
 # found in the configuration file, the user will either be prompted to enter the value,
 # or a default value will be used.
-CONFIGURED_EMAIL="$(get_setting 'email' || ask_for_email)"
 CONFIGURED_GIT_REPO="$(get_setting 'gitRepo')"
 CONFIGURED_KEY_ID="$(get_setting 'keyID' || ask_for_key_id)"
 CONFIGURED_PASSWD_LENGTH="$(get_setting 'length' || printf '14')"
 CONFIGURED_PASSWD_STORE="${HOME}/$(get_setting 'location' || printf '.local/share/bashpass')"
 CONFIGURED_TIMER="$(get_setting 'timer' || printf '10')"
 
-readonly CONFIGURED_EMAIL
 readonly CONFIGURED_GIT_REPO
 readonly CONFIGURED_KEY_ID
 readonly CONFIGURED_PASSWD_LENGTH
