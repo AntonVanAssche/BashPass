@@ -64,23 +64,14 @@ ask_for_key_id() {
     printf '%s' "${key_id}"
 }
 
-ask_for_git_repo() {
-    local git_repo
-    read -rp 'Enter the git repository URL: ' git_repo
-    printf 'gitRepo: %s\n' "${git_repo}" >> "${CONFIG_FILE}"
-    printf '%s' "${git_repo}"
-}
-
 # The following variables will be used to store the user's settings. When no value is
 # found in the configuration file, the user will either be prompted to enter the value,
 # or a default value will be used.
-CONFIGURED_GIT_REPO="$(get_setting 'gitRepo')"
 CONFIGURED_KEY_ID="$(get_setting 'keyID' || ask_for_key_id)"
 CONFIGURED_PASSWD_LENGTH="$(get_setting 'length' || printf '14')"
 CONFIGURED_PASSWD_STORE="${HOME}/$(get_setting 'location' || printf '.local/share/bashpass')"
 CONFIGURED_TIMER="$(get_setting 'timer' || printf '10')"
 
-readonly CONFIGURED_GIT_REPO
 readonly CONFIGURED_KEY_ID
 readonly CONFIGURED_PASSWD_LENGTH
 readonly CONFIGURED_PASSWD_STORE
@@ -316,7 +307,6 @@ passwd_sync() {
 
     has git || error 'git is not installed' 1
 
-    [[ -z "${CONFIGURED_GIT_REPO}" ]] && ask_for_git_repo
     [[ -d "${CONFIGURED_PASSWD_STORE}/.git/" ]] || \
         error "${CONFIGURED_PASSWD_STORE} is not a git repository" 128
 
