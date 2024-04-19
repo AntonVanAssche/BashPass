@@ -5,24 +5,137 @@ set -o noglob   # Disable globbing.
 set +o xtrace   # Disable debug mode.
 set -o pipefail # Don't hide errors within pipes.
 
-# Current version.
-readonly VERSION="3.2"
+# Restrict new password file permissions to only the current user.
+umask 077
 
-# Whenever an error occurs, we want to notify the user about it.
-# This is a basic function that wil print the corresponding error
-# message to stderr, and will exit with the given exit status.
-# To ensure security, we will also remove the raw password file
-# if it exists, to prevent the user from accidentally leaking
-# the password. Although 'rm' isn't a built-in, there is no
-# other way to achieve this without it.
-error_out() {
-    [[ -z "${pass_name}" ]] || \
-        [[ -f "${configured_pass_location}/${pass_name}" ]] && \
-            rm -rf "${configured_pass_location:?}/${pass_name}"
+readonly VERSION="3.2"
+readonly NAME="BashPass"
+readonly SCRIPT_NAME="${0##*/}"
+
+error() {
+    local error_msg="${1}"
+    local error_code="${2}"
+
+    printf 'Error: %s.\n' "${error_msg}" >&2
+    exit "${error_code}"
+}
+
+[[ "${UID}" -eq 0 ]] && error 'cannot run with superuser privileges' 1
+
+readonly CONFIG_DIR="${HOME}/.config/bashpass"
+readonly CONFIG_FILE="${CONFIG_DIR}/bashpass.conf"
+
+[[ -d "${CONFIG_DIR}" ]] || mkdir -p "${CONFIG_DIR}"
+[[ -f "${CONFIG_FILE}" ]] || :> "${CONFIG_FILE}"
+
+# Since we can not use external tool like 'grep' and 'cut' to ensure compatibility,
+# we need a way to retrieve the user's settings from their configuration file.
+# This function will read the file, and return the value once the requested setting
+# is found. It basically does the same as 'grep "setting" "${config}" | cut -d" " -f2',
+# but then with pure bash instead.
+get_setting() {
+    local setting="${1}"
+
+    while read -r; do
+        if [[ "${REPLY}" =~ ^${setting} ]]; then
+            printf '%s' "${REPLY#*: }"
+            return 0
+        fi
+    done < "${CONFIG_FILE}"
+
+    return 1
+}
+
+# GnuPG keys are generated using a e-mailaddress specified by the user. In order to
+# encrypt our password files, we need this e-mailaddress, whenever BashPass can not
+# find an e-mailaddress within the user's configuration file, it will prompt the user
+# to enter one, and write it to the configuration file afterwards
+ask_for_email() {
+    local regex="^[a-z0-9!#\$%&'*+/=?^_\`{|}~-]+(\.[a-z0-9!#$%&'*+/=?^_\`{|}~-]+)*@([a-z0-9]([a-z0-9-]*[a-z0-9])?\.)+[a-z0-9]([a-z0-9-]*[a-z0-9])?\$"
+    local email
+
+    read -rp 'Enter the email address associated with your GPG key: ' email
+
+    if [[ "${email}" =~ ${regex} ]]; then
+        printf 'email: %s\n' "${email}" >> "${CONFIG_FILE}"
+    else
+        error 'invalid email address' 2
+    fi
+
+    printf '%s' "${email}"
+}
+
+# A user can have multiple GnuPG keys located on their system, therefore is a good idea
+# to ask for a specific key, by prompting the user to enter a key ID. Afterwards we can
+# simpply append it to the configuration file to save it.
+ask_for_key_id() {
+    local regex="^[0-9A-Fa-f]{8,8}$"
+    local key_id
+
+    read -rp 'Enter the key ID associated with your GPG key: ' key_id
+
+    if [[ "${key_id}" =~ ${regex} ]]; then
+        printf 'keyID: %s\n' "${key_id}" >> "${CONFIG_FILE}"
+    else
+        error 'invalid key ID' 2
+    fi
+
+    printf '%s' "${key_id}"
+}
+
+ask_for_git_repo() {
+    local git_repo
+    read -rp 'Enter the git repository URL: ' git_repo
+    printf 'gitRepo: %s\n' "${git_repo}" >> "${CONFIG_FILE}"
+    printf '%s' "${git_repo}"
+}
+
+CONFIGURED_EMAIL="$(get_setting 'email' || ask_for_email)"
+CONFIGURED_GIT_REPO="$(get_setting 'gitRepo')"
+CONFIGURED_KEY_ID="$(get_setting 'keyID' || ask_for_key_id)"
+CONFIGURED_PASSWD_LENGTH="$(get_setting 'length')"
+CONFIGURED_PASSWD_STORE="${HOME}/$(get_setting 'location')"
+CONFIGURED_TIMER="$(get_setting 'timer')"
+
+readonly CONFIGURED_EMAIL
+readonly CONFIGURED_GIT_REPO
+readonly CONFIGURED_KEY_ID
+readonly CONFIGURED_PASSWD_LENGTH
+readonly CONFIGURED_PASSWD_STORE
+readonly CONFIGURED_TIMER
+
+mkdir -p "${CONFIGURED_PASSWD_STORE}"
+
+usage() {
+    printf '%s' "\
+${NAME}, a password manager written in Bash.
+
+Version: ${VERSION}
+Usage: ${SCRIPT_NAME} [OPTION] [NAME | SYNC_COMMAND]
+
+Options:
+    --help    | -h                      Show this help message.
+    --version | -v                      Show the version number.
+    --add     | -a              [NAME]  Add a password.
+    --copy    | -c              [NAME]  Copy a password to the clipboard.
+    --delete  | -d              [NAME]  Delete a password.
+    --show    | -s              [NAME]  Show a password.
+    --update  | -u              [NAME]  Update a password.
+    --list    | -l                      List all passwords.
+    --sync    | -S       [SYNC_COMMAND] Synchronize password(s) with a git repository.
+
+Synchronize commands:
+    upload                              Upload local password(s) to a remote repository.
+    download                            Download password(s) from a remote repository.
+
+Note:
+    [NAME] is an optional argument. If not provided, the script will prompt you to enter it.
+"
+}
+
+version() {
+    printf 'BashPass version: %s' "${VERSION}"
     printf '\n'
-    printf 'An error occurred: %s' "${1}" >&2
-    printf '\n'
-    exit "${2}"
 }
 
 # Surprisingly, 'sleep' is an external program and not a Bash built-in.
@@ -36,463 +149,234 @@ sleep() {
 # Wrapper for 'command -v' to avoid spamming '> /dev/null'.
 # It also protects against user aliasses and functions.
 has() {
-    command=$(command -v "${1}") 2> /dev/null || error_out "${1} is required" 127
-    [[ -x ${command} ]] || error_out "${1} is not an executable" 1
+    local command
+    command=$(command -v "${1}") 2> /dev/null || return 2
+    [[ -x ${command} ]] || return  1
 }
 
-# Assign the path of the config file to the variable '${config}'.
-config_path="${HOME}/.config/bashpass"
-config="${config_path}/bashpass.conf"
+set_passwd_name() {
+    local passwd_name="${1}"
+    local functionality="${2}"
+    [[ -z "${passwd_name}" ]] && \
+        read -rp "Enter the password name to ${functionality}: " passwd_name
 
-# Detect the config file.
-[[ ! -f ${config} ]] && error_out "config file not found" 2
-
-# Since we can not use external tool like 'grep' and 'cut' to ensure compatibility,
-# we need a way to retrieve the user's settings from their configuration file.
-# This function will read the file, and return the value once the requested setting
-# is found. It basically does the same as 'grep "setting" "${config}" | cut -d" " -f2',
-# but then with pure bash instead.
-get_setting() {
-    while read -r; do
-        if [[ "${REPLY}" =~ ^${1} ]]; then
-            printf '%s' "${REPLY#*: }"
-            break
-        fi
-    done < "${config}"
+    printf '%s' "${passwd_name}"
 }
 
-# Get the necessary configurations from the configuration file,
-# using the 'get_setting' function.
-# We require the use of '|| :' to prevent the script from exiting
-# if the key-value pair is not found in the config file.
-# (especially needed for the '${configured_email} variable').
-configured_email="$(get_setting 'email')" || :
-configured_key_id="$(get_setting 'keyID')" || :
-configured_pass_location="${HOME}/$(get_setting 'location')" || :
-configured_timer="$(get_setting 'timer')" || :
-configured_pass_length="$(get_setting 'length')" || :
-configured_git_repo="$(get_setting 'gitRepo')" || :
+set_passwd() {
+    local passwd_name="${1}"
+    local gen passwd passwd1 passwd2 passwd_length
 
-# Print out all available options.
-help() {
-    printf '%s' "\
-BashPass version: ${VERSION}
-A password manager written in Bash.
+    read -rp 'Generate a password? [Y/n]: ' gen
 
-${0##*/} [option] [name]                            - Basic command structure.
-
-Options:
---help      or -h                                   - show this help message.
---version   or -v                                   - show the version number
---list      or -l                                   - list all password.
---add       or -a                            [name] - add a password.
---update    or -u                            [name] - update a password.
---delete    or -d                            [name] - delete a password.
---show      or -s                            [name] - show a password.
---copy      or -c                            [name] - copy a password to the clipboard.
---sync      or -S    [synchronize command]          - synchronize password(s) with a git repository.
-
-synchronize command:
-    upload           - Upload local password(s) to a remote repository.
-    download         - Download password(s) from a remote repository.
-"
-}
-
-# Print out the current version.
-version() {
-    printf 'BashPass version: %s' "${VERSION}"
-    printf '\n'
-}
-
-# Function to ask for a name.
-set_name() {
-    pass_name="${1}"
-    functionality="${2}"
-
-    if [[ -z "${pass_name}" ]]; then
-        printf 'Enter the name of the password you want to %s: ' "${functionality}"
-        read -r pass_name
-    fi
-}
-
-# To prevent the user from making unnecessary operations on passwords that don't exist,
-# we can use this function to check if the password exists. If it doesn't, we will
-# notify the user about it, and exit the script.
-check_password_exists() {
-    pass_name="${1}"
-
-    [[ -f "${configured_pass_location}/${pass_name}.gpg" ]] || \
-        error_out "password '${pass_name}' doesn't exist." 1
-}
-
-# We want the user to be able to either enter a password, or generate a random one.
-# Here we prompt the user to choose between the two options. If the user chooses
-# to generate a random password, we will ask for the length of the password.
-# Otherwise we will ask the user to enter a password twice, to ensure that the
-# user didn't make a typo, if he/she does that, we will ask the user to enter
-# the password again until the passwords match.
-set_password() {
-    printf 'Do you want to generate a password [Y/n]: '
-    read -r random
-
-    case "${random}" in
+    case "${gen}" in
         [Nn])
-            printf 'Enter a password for %s: ' "'${pass_name}'"
-            read -rs password1
+            read -rsp 'Enter the password: ' passwd1
             printf '\n'
 
-            [[ -z "${password1}" ]] && error_out "the password cannot be empty." 1
+            [[ -z "${passwd1}" ]] && error 'password cannot be empty' 2
 
-            printf 'Retype the password for %s: ' "'${pass_name}'"
-            read -rs password2
-            printf '\n'
-
-            while [[ "${password1}" != "${password2}" ]]; do
-                printf 'Passwords didn'\''t match, please try again: '
-                read -rs password2
+            while [[ "${passwd1}" != "${passwd2}" ]]; do
+                read -rsp 'Re-enter the password: ' passwd2
                 printf '\n'
             done
 
-            password=${password1}
+            passwd="${passwd1}"
             ;;
         *)
-            printf 'Enter a password length (Default: %s): ' "'${configured_pass_length}'"
-            read -r pass_length
+            read -rp "Enter the password length (default ${CONFIGURED_PASSWD_LENGTH}): " \
+                passwd_length
 
-            [[ -z ${pass_length} ]] && pass_length=${configured_pass_length}
+            [[ -z "${passwd_length}" ]] && passwd_length="${CONFIGURED_PASSWD_LENGTH}"
+            [[ ${passwd_length} =~ ^[1-9]([0-9])?+$ ]] || \
+                error "the password length must be a number." 1
 
-            # Since we don't want the user to enter a non-numeric value,
-            # we can use a regular expression to check if the input is a number.
-            # If it isn't, we will error out. We also want to prevent the user
-            # that the password length is at least 1 character long (so we can actually
-            # generate a password, without 'dd' complaining about a negative count).
-            [[ ${pass_length} =~ ^[1-9]([0-9])?+$ ]] || \
-                error_out "the password length must be a number." 1
-
-            # To generate a random password, we need read random bytes from '/dev/urandom'.
-            # Using 'tr' we can then translate the random bytes to a character set we want.
-            # After that we can use 'dd' to only take the first ${pass_length} characters.
-            password=$(LC_ALL=C \
+            passwd=$(LC_ALL=C \
                 tr -dc 'A-Za-z0-9!"#$%&'\''()*+,-./:;<=>?@[\]^_`{|}~ ' < /dev/urandom | \
-                dd ibs=1 obs=1 count="${pass_length}" 2> /dev/null) || :
+                dd ibs=1 obs=1 count="${passwd_length}" 2> /dev/null) || :
             ;;
     esac
 
-    # Write password to the 'password' file.
-    [[ -z ${password} ]] && \
-        error_out "failed to save the password '${pass_name}'" 1
+    [[ -z "${passwd}" ]] && error 'password cannot be empty' 2
 
-    printf '%s' "${password}" > "${configured_pass_location}/${pass_name}"
+    printf '%s' "${passwd}" > "${CONFIGURED_PASSWD_STORE}/${passwd_name}"
 }
 
-# The function encrypts the password using GnuPG and stores it in a file called '${name].gpg'
-# If a password with the same name already exists in the password directory, the user is
-# prompted to either overwrite the existing password or choose a different name for
-# the new password. The decrypted password file is removed after reading to prevent
-# the password from being leaked afterwards.
-add() {
-    # If a name argument was not provided, prompt the user to enter one.
-    set_name "${1}" "add"
+check_passwd_exists() {
+    local passwd_name="${1}"
+    [[ -f "${CONFIGURED_PASSWD_STORE}/${passwd_name}.gpg" ]] || \
+        error "password '${passwd_name}' not found" 2
+}
 
-    # If we were not able to set a name, exit with an error.
-    [[ -z "${pass_name}" ]] && error_out "failed to set a name" 1
+passwd_add() {
+    local passwd_name="${1}"
+    local passwd_file
+    local overwrite
+    passwd_name=$(set_passwd_name "${passwd_name}" 'add')
+    passwd_file="${CONFIGURED_PASSWD_STORE}/${passwd_name}.gpg"
 
-    # Whenever we detect that a password with the same name already exists,
-    # we don't want to overwrite it straight away, because the user might
-    # have made a typo when entering the name, and we don't want to lose
-    # the password that was already saved.
-    # We will ask the user whether he wants to overwrite the existing password,
-    # or whether he wants to choose a different name.
-    while [[ -f ${configured_pass_location}/${pass_name}.gpg ]]; do
-        printf 'A password with the name %s already exists.' "'${pass_name}'"
-        printf '\n'
-        printf 'Do you want to overwrite the existing password [y/N]: '
-        read -r overwrite
-
+    while [[ -f "${CONFIGURED_PASSWD_STORE}/${passwd_name}.gpg" ]]; do
+        read -rp "Password '${passwd_name}' already exists. Overwrite? [y/N]: " overwrite
         case "${overwrite}" in
             [Yy])
-                rm -rf "${configured_pass_location}/${pass_name}.gpg"
+                rm -rf "${CONFIGURED_PASSWD_STORE}/${passwd_name}.gpg"
                 ;;
             *)
-                printf 'Enter a new name: '
-                read -r pass_name
+                read -rp 'Enter a new password name: ' passwd_name
                 ;;
         esac
     done
 
-    # Ask the user whether he'd like to generate a random password.
-    set_password
+    set_passwd "${passwd_name}"
+    ${GPG_CMD} --encrypt --quiet --output "${passwd_file}" \
+        --recipient "${CONFIGURED_KEY_ID}" "${passwd_file%.gpg}"
+    rm -rf "${passwd_file%.gpg}"
 
-    # Encrypte the password file using gpg.
-   "${gpg_command}" --encrypt --quiet --output "${configured_pass_location}/${pass_name}.gpg" \
-        --recipient "${configured_key_id}" "${configured_pass_location}/${pass_name}"
-
-    printf 'Password %s has been successfully saved' "'${pass_name}'"
-    printf '\n'
-
-    # Remove the plain text password file after encrypting it,
-    # to prevent the password from being leaked afterwards.
-    # We use ':?' to ensure this never expands to '/*'
-    rm -rf "${configured_pass_location:?}/${pass_name}"
+    printf 'Password added successfully.\n'
 }
 
-# This function decrypts the password file, and will ask the user to enter a new password.
-# Afterward, the password file will be encrypted again, and the decrypted file will be
-# removed to prevent the password from being leaked afterwards. Just like we do in the
-# 'add' function.
-update() {
-    # If a name argument was not provided, prompt the user to enter one.
-    # Afterward, we will check if the password exists or not.
-    set_name "${1}" "update"
-    check_password_exists "${pass_name}"
+passwd_update() {
+    local passwd_name="${1}"
+    local passwd_file
+    passwd_name=$(set_passwd_name "${passwd_name}" 'update')
+    passwd_file="${CONFIGURED_PASSWD_STORE}/${passwd_name}.gpg"
 
-    # Decrypte the password file.
-    "${gpg_command}" --decrypt --quiet --output "${configured_pass_location}/${pass_name}" \
-        "${configured_pass_location}/${pass_name}.gpg"
+    check_passwd_exists "${passwd_name}"
 
-    # Ask if the user want to generate a random password.
-    set_password
+    rm -rf "${passwd_file}"
+    set_passwd "${passwd_name}"
+    ${GPG_CMD} --encrypt --quiet --output "${passwd_file}" \
+        --recipient "${CONFIGURED_KEY_ID}" "${passwd_file%.gpg}"
+    rm -rf "${passwd_file%.gpg}"
 
-    # Remove the ecrypted password file to prevent gpg from asking to overwrite.
-    rm -rf "${configured_pass_location:?}/${pass_name}.gpg"
-
-    # Encrypte the password file using gpg.
-    "${gpg_command}" --encrypt --quiet --output "${configured_pass_location}/${pass_name}.gpg" \
-        --recipient "${configured_key_id}" "${configured_pass_location}/${pass_name}"
-
-    printf 'Password %s has been successfully updated' "'${pass_name}'"
-    printf '\n'
-
-    # Remove the plain text password file after encrypting it,
-    # to prevent the password from being leaked afterwards.
-    # We use ':?' to ensure this never expands to '/*'
-    rm -rf "${configured_pass_location:?}/${pass_name}"
+    printf 'Password updated successfully.\n'
 }
 
-# This function will delete the password file with the given name.
-# Be careful when using this function, because it will delete the password
-# without asking for confirmation.
-delete() {
-    # If a name argument was not provided, prompt the user to enter one.
-    # Afterward, we will check if the password exists or not.
-    set_name "${1}" "delete"
-    check_password_exists "${pass_name}"
+passwd_delete() {
+    local passwd_name="${1}"
+    local passwd_file
+    passwd_name=$(set_passwd_name "${passwd_name}" 'delete')
+    passwd_file="${CONFIGURED_PASSWD_STORE}/${passwd_name}.gpg"
 
-    rm -rf "${configured_pass_location}/${pass_name}.gpg"
-    printf 'Password %s has been successfully deleted' "'${pass_name}'"
-    printf '\n'
+    check_passwd_exists "${passwd_name}"
+    rm -rf "${passwd_file}"
+
+    printf 'Password deleted successfully.\n'
 }
 
-# This function will decrypt the password file and show the password to the user.
-# Be aware that the password will be shown in plain text, and the terminal won't
-# be cleared afterwards, so other people might be able to see the password.
-show() {
-    # Ask for a name when no name was given using ${2}.
-    set_name "${1}" "show"
-    check_password_exists "${pass_name}"
+passwd_show() {
+    local passwd_name="${1}"
+    local passwd_file
+    passwd_name=$(set_passwd_name "${passwd_name}" 'show')
+    passwd_file="${CONFIGURED_PASSWD_STORE}/${passwd_name}.gpg"
 
-    # Decrypte the password file and show the password
-    printf 'Password: %s' "$(${gpg_command} --decrypt \
-        --quiet "${configured_pass_location}/${pass_name}.gpg")"
-    printf '\n'
+    check_passwd_exists "${passwd_name}"
+    printf 'Password: %s\n' "$(${GPG_CMD} --decrypt --quiet --output - "${passwd_file}")"
 }
 
-# This function will decrypt the password file and copy it to the clipboard.
-# We are able to use xclip, xsel or wl-copy to copy the password to the clipboard.
-# After the timer has expired, the password will be removed from the clipboard.
-# This is a security measure to prevent the password from being leaked, it also makes
-# this feature more secure than the 'show' function.
-copy() {
-    # Detect 'pbcopy' (macOS), 'xclip' (X11), 'xsel' (X11) or'wl-copy' (Wayland).
-    # Determine which clipboard command to use.
-    if command -v pbcopy &> /dev/null; then
-        copy_clipboard_command="pbcopy"
-        clear_clipboard_command="pbcopy < /dev/null"
-    elif command -v xclip &> /dev/null; then
-        copy_clipboard_command="xclip -selection clipboard"
-        clear_clipboard_command="xclip -selection clipboard < /dev/null"
-    elif command -v xsel &> /dev/null; then
-        copy_clipboard_command="xsel --clipboard"
-        clear_clipboard_command="xsel --clipboard < /dev/null"
-    elif command -v wl-copy &> /dev/null; then
-        copy_clipboard_command="wl-copy"
-        clear_clipboard_command="wl-copy --clear"
+passwd_list() {
+    local passwd_name
+
+    printf 'The following passwords are stored:\n'
+
+    set +o noglob
+    for passwd_name in "${CONFIGURED_PASSWD_STORE:?}"/*.gpg; do
+        passwd_name="${passwd_name##*/}"
+        passwd_name="${passwd_name%%.gpg}"
+        printf '%s\n' "${passwd_name}"
+    done
+    set -o noglob
+}
+
+passwd_copy() {
+    local copy_clipboard_command clear_clipboard_command
+    local passwd_name="${1}"
+    local passwd_file
+    pass_name=$(set_passwd_name "${passwd_name}" 'copy')
+    passwd_file="${CONFIGURED_PASSWD_STORE}/${passwd_name}.gpg"
+
+    if has pbcopy; then
+         copy_clipboard_command="pbcopy"
+         clear_clipboard_command="pbcopy < /dev/null"
+    elif has xclip; then
+         copy_clipboard_command="xclip -selection clipboard"
+         clear_clipboard_command="xclip -selection clipboard < /dev/null"
+    elif has xsel; then
+         copy_clipboard_command="xsel --clipboard"
+         clear_clipboard_command="xsel --clipboard < /dev/null"
+    elif has wl-copy; then
+         copy_clipboard_command="wl-copy"
+         clear_clipboard_command="wl-copy --clear"
     else
-        error_out \
-            "'pbcopy' (macOS) 'xclip' (X11), 'xsel' (X11) or'wl-copy' (Wayland) is required" 127
+        error 'no suitable clipboard manager found' 1
     fi
 
-    # If a name argument was not provided, prompt the user to enter one.
-    # Afterward, we will check if the password exists or not.
-    set_name "${1}" "copy"
-    check_password_exists "${pass_name}"
+    check_passwd_exists "${pass_name}"
 
     # Ignore terminal interrupts (CTRL+C).
     # We do this to prevent the ability to kill the script while
     # the password is still in the clipboard.
     trap '' INT
 
-    # Decrypte the password file and copy it to the clipboard using xclip, xsel or wl-copy.
-    # This WON'T show the password inside the terminal output.
-    if "${gpg_command}" --decrypt --quiet "${configured_pass_location}/${pass_name}.gpg" | \
-        ${copy_clipboard_command}; then
-        printf 'Password %s has been copied to the clipboard' "'${pass_name}'"
-        printf '\n'
-    else
-        error_out "failed to copy password '${pass_name}' to the clipboard." 1
-    fi
+    ${copy_clipboard_command} "$(${GPG_CMD} --decrypt --quiet --output - \
+        "${CONFIGURED_PASSWD_STORE}/${pass_name}.gpg")" || \
+        error 'failed to copy password to clipboard' 1
 
-    # Wait for the timer to end, and then clear the clipboard.
-    # The duration ('timer') can be changed in the config file.
-    sleep "${configured_timer}" || kill 0
+    sleep "${CONFIGURED_TIMER}" || kill 0
     ${clear_clipboard_command}
 
     printf 'Clipboard has been cleared to ensure it cannot be leaked.'
     printf '\n'
 }
 
-# This function will list out all the names of the password files.
-list() {
-    # Enable globbing for only this function.
-    set +o noglob
+passwd_sync() {
+    local sync_cmd="${1}"
 
-    # We have to use a for loop to loop through all the files in the directory.
-    # The downside of this is that it will output the absolute path to the file.
-    # Therefore we have to remove the path and the file extension, using variable
-    # substitution.
-    for p in "${configured_pass_location}"/*.gpg; do
-        # Remove the path to the file.
-        p="${p##*/}"
+    has git || error 'git is not installed' 1
 
-        # Remove the file extension.
-        p="${p%%.gpg}"
+    [[ -z "${CONFIGURED_GIT_REPO}" ]] && ask_for_git_repo
+    [[ -d "${CONFIGURED_PASSWD_STORE}/.git/" ]] || \
+        error "${CONFIGURED_PASSWD_STORE} is not a git repository" 128
 
-        printf 'Name: %s' "${p}"
-        printf '\n'
-    done
-
-    # Disable globbing.
-    set -o noglob
-}
-
-# Upload or download encrypted password(s) to/from a git repository.
-# The user can chose whether he wants to locally host his git server or trust a
-# third party like GitHub, eather way BashPass should work with both options.
-# It's recommended to configure 'SSH' between the devices and the git server
-# for optimal user experience.
-sync() {
-    # Detect 'git'
-    has "git"
-
-    # This feature may only work when the user has configured a git repository,
-    # and the password directory is indeed a git repository.
-    # The user can configure the URL to the git repository in the config file.
-    # To detect whether the password directory is a git repository we check
-    # whether the '.git' directory exists.
-    [[ -z ${configured_git_repo} ]] && \
-        error_out "URL to git repository not specified in config" 1
-    [[ -d "${configured_pass_location}/.git/" ]] || \
-        error_out "${configured_pass_location} isn't a git repository" 1
-
-    # The '--git-dir' and '--work-tree' options allow the user to synchronize
-    # their password(s) regardless of their current working directory (pwd).
-    # See: https://stackoverflow.com/questions/7622616/executing-a-git-pull-from-a-different-directory
-    case "${1}" in
-        [Uu]pload)
-            git --git-dir="${configured_pass_location}/.git/" \
-                --work-tree="${configured_pass_location}" add .
-            git --git-dir="${configured_pass_location}/.git/" \
-                --work-tree="${configured_pass_location}" \
-                commit -m "synchronize passwords ($(printf '%(%d/%m/%Y)T at %(%T)T)')"
-
-            if git --git-dir="${configured_pass_location}/.git/" \
-                --work-tree="${configured_pass_location}" push; then
-                printf '\n'
-                printf 'Remote password(s) successfully synchronized with local.'
-            else
-                error_out "failed to upload password(s) to ${configured_git_repo}" 1
-            fi
+    case "${sync_cmd}" in
+        "upload")
+            git -C "${CONFIGURED_PASSWD_STORE}" add -A
+            git -C "${CONFIGURED_PASSWD_STORE}" commit \
+                -m "Upload: $(printf '%(%d/%m/%Y)T at %(%T)T')"
+            git -C "${CONFIGURED_PASSWD_STORE}" push
             ;;
-        [Dd]ownload)
-            if git --git-dir="${configured_pass_location}/.git/" \
-                --work-tree="${configured_pass_location}" pull; then
-                printf '\n'
-                printf 'Local password(s) successfully synchronized with remote.'
-            else
-                error_out "failed to download password(s) from ${configured_git_repo}" 1
-            fi
+        "download")
+            git -C "${CONFIGURED_PASSWD_STORE}" pull
             ;;
         *)
-            error_out "unknown option '${1}'" 22
+            error "synchronize command '${sync_cmd}' not found" 2
             ;;
     esac
 
-    printf '\n'
-    printf 'Be aware you'\''ll need to import/export your GPG key.'
-    printf '\n'
+    printf 'Be aware you'\''ll need to import/export your GPG key.\n'
 }
 
-main() {
-    # We only want non-root users to use BashPass.
-    # This is because BashPass uses GnuPG to encrypt the passwords,
-    # and GnuPG uses the user's home directory to store the keys.
-    # Therefore if the user is root, the keys will be stored in the root's home directory.
-    [[ "${UID}" == 0 ]] && error_out "permission denied" 13
-
-    # Create the necessary directories if they doesn't exists.
-    mkdir -p "${configured_pass_location}"
-
-    # Detect both 'gpg' and 'gpg2', when both are installed
-    # 'gpg2' will be used, since it's more secure.
-    # But since some operating systems package 'gpg2',
-    # but the command is still 'gpg' we need to check for both.
-    command -v gpg &> /dev/null && gpg_command="gpg"
-    command -v gpg2 &> /dev/null && gpg_command="gpg2"
-
-    has "${gpg_command}"
-
-    # A user can have multiple GnuPG keys located on their system,
-    # therefore is a good idea to ask for a specific key, by prompting
-    # the user to enter a key ID. Afterwards we can simpply append it to
-    # the configuration file to save it.
-    if [[ -z ${configured_key_id} ]]; then
-        printf 'Enter the key ID of the GPG key you want to use: '
-        read -r key_id
-        printf 'keyID: %s\n' "${key_id}" >> "${config}"
-    fi
-
-    # GnuPG keys are generated using a e-mailaddress specified by the user.
-    # In order to encrypt our password files, we need this e-mailaddress,
-    # whenever BashPass can not find an e-mailaddress within the user's configuration
-    # file, it will prompt the user to enter one, and write it to the configuration file
-    # afterwards
-    if [[ -z ${configured_email} ]]; then
-        printf 'Enter the email address you created the gpg key with: '
-        read -r email
-        printf 'email: %s\n' "${email}" >> "${config}"
-    fi
-
-    # Restrict new password file permissions to only the
-    # current user.
-    umask 077
-
-    case "${1}" in
-        "--help"| "-h") help;;
-        "--version"| "-v") version;;
-        "--add"| "-a") add "${2}";;
-        "--update"| "-u") update "${2}";;
-        "--delete"| "-d") delete "${2}";;
-        "--show"| "-s") show "${2}";;
-        "--copy"| "-c") copy "${2}";;
-        "--list"| "-l") list;;
-        "--sync"| "-S") sync "${2}" "${3}";;
-        *) error_out "option '${1}' not found" 22;;
-    esac
-}
-
-# Check if an argument '${1}' is given.
-if [[ "${1}" ]]; then
-    main "${@}"
+if has gpg2; then
+    readonly GPG_CMD="gpg2"
+elif has gpg; then
+    readonly GPG_CMD="gpg"
 else
-    help
+    error "GnuPG is not installed" 1
 fi
+
+case "${1}" in
+    "--add"    | "-a") passwd_add "${2}";;
+    "--copy"   | "-c") passwd_copy "${2}";;
+    "--delete" | "-d") passwd_delete "${2}";;
+    "--help"   | "-h") usage;;
+    "--list"   | "-l") passwd_list;;
+    "--show"   | "-s") passwd_show "${2}";;
+    "--sync"   | "-S") passwd_sync "${2}";;
+    "--update" | "-u") passwd_update "${2}";;
+    "--version"| "-v") version;;
+    *)
+        usage >&2
+        printf '\n' >&2
+        error "option '${1}' not found" 2
+        ;;
+esac
