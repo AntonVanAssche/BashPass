@@ -35,3 +35,39 @@ jobs:
         with:
           name: deb
           path: bashpass_${{ env.RELEASE_VERSION }}_all.deb
+
+  build-rpm:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set env
+        run: |
+          printf 'RELEASE_VERSION=%s' "${GITHUB_REF#refs/*/v}" >> ${GITHUB_ENV}
+
+      - uses: actions/checkout@v3
+        with:
+          path: bashpass-${{ env.RELEASE_VERSION }}
+          ref: refs/tags/v${{env.RELEASE_VERSION }}
+
+      - name: Install required packages
+        run: |
+          /usr/bin/sudo /usr/bin/apt update
+          /usr/bin/sudo /usr/bin/apt install -y rpm
+
+      - name: Build RPM
+        run: |
+          /usr/bin/sed -i "s/RELEASE_VERSION/${{ env.RELEASE_VERSION }}/" bashpass-${{ env.RELEASE_VERSION }}/pkgs/rpm/bashpass.spec
+
+          /usr/bin/mkdir -pv ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
+          /usr/bin/cp -r bashpass-${{ env.RELEASE_VERSION }}/pkgs/rpm/bashpass.spec ~/rpmbuild/SPECS/
+
+          /usr/bin/tar -czf "bashpass-${{ env.RELEASE_VERSION }}.tar.gz"  "bashpass-${{ env.RELEASE_VERSION }}"
+          /usr/bin/mv -v "bashpass-${{ env.RELEASE_VERSION }}.tar.gz" ~/rpmbuild/SOURCES/
+
+          /usr/bin/rpmbuild -bb ~/rpmbuild/SPECS/bashpass.spec
+          /usr/bin/cp -rv ~/rpmbuild/RPMS/noarch/* .
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: rpm
+          path: bashpass-${{ env.RELEASE_VERSION }}-1.noarch.rpm
