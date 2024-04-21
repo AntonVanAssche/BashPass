@@ -1,0 +1,9 @@
+Source: bashpass
+Section: utils
+Priority: optional
+Maintainer: Anton Van Assche <https://github.com/AntonVanAssche>
+Package: bashpass
+Version: RELEASE_VERSION
+Architecture: all
+Depends: bash, gnupg2
+Description: A command-line based password manager written in Bash.
