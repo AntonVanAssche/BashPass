@@ -196,11 +196,11 @@ Enter the key ID associated with your GPG key: 91082EE1
 
 That's it, you can now start using BashPass!
 
-# 3.0 Updating
+# 3. Updating
 
 To update BashPass, you can follow the same steps as the installation process.
 
-# 4.0 Uninstalling
+# 4. Uninstalling
 
 Uninstalling BashPass is also fairly straightforward, `make uninstall` can be used to remove BashPass from your system.
 
@@ -226,4 +226,15 @@ $ rm -rf /usr/share/man/man1/bashpass.{1,conf.1}.gz
 ```console
 $ rm -rf /usr/local/bin/bashpass
 $ rm -rf /usr/local/share/man/man1/bashpass.{1,conf.1}.gz
+```
+
+# 4. Bash tab completion
+
+To enable tab completion for BashPass options and stored password names within the Bash prompt,
+users can utilize the provided [`bashpass-completion.sh`](https://github.com/AntonVanAssche/BashPass/blob/master/scripts/bashpass-completion.sh)
+script located in the [`scripts`](https://github.com/AntonVanAssche/BashPass/tree/master/scripts) directory.
+By appending the line below to their `.bashrc` file:
+
+```bash
+. /path/to/bashpass-completion.sh
 ```
