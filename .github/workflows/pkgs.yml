@@ -25,9 +25,11 @@ jobs:
 
           /usr/bin/mkdir -pv bashpass-${{ env.RELEASE_VERSION }}/pkgs/deb/usr/bin
           /usr/bin/mkdir -pv bashpass-${{ env.RELEASE_VERSION }}/pkgs/deb/usr/share/man/man1
+          /usr/bin/mkdir -pv bashpass-${{ env.RELEASE_VERSION }}/pkgs/deb/usr/share/bash-completion/completions
 
           /usr/bin/cp -rv bashpass-${{ env.RELEASE_VERSION }}/bashpass bashpass-${{ env.RELEASE_VERSION }}/pkgs/deb/usr/bin/
           /usr/bin/cp -rv bashpass-${{ env.RELEASE_VERSION }}/docs/man/bashpass{,.conf}.1.gz bashpass-${{ env.RELEASE_VERSION }}/pkgs/deb/usr/share/man/man1/
+          /usr/bin/cp -rv bashpass-${{ env.RELEASE_VERSION }}/scripts/bashpass-completion.sh bashpass-${{ env.RELEASE_VERSION }}/pkgs/deb//usr/share/bash-completion/completions/bashpass
 
           /usr/bin/dpkg-deb --build bashpass-${{ env.RELEASE_VERSION }}/pkgs/deb/ "bashpass_${{ env.RELEASE_VERSION }}_all.deb"
 
