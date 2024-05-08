@@ -181,7 +181,7 @@ check_passwd_exists() {
         error "password '${passwd_name}' not found" 2
 }
 
-passwd_add() {
+add_passwd() {
     local passwd_name="${1}"
     local passwd_file
     local overwrite
@@ -208,7 +208,7 @@ passwd_add() {
     printf 'Password added successfully.\n'
 }
 
-passwd_update() {
+update_passwd() {
     local passwd_name="${1}"
     local passwd_file
     passwd_name=$(set_passwd_name "${passwd_name}" 'update')
@@ -225,7 +225,7 @@ passwd_update() {
     printf 'Password updated successfully.\n'
 }
 
-passwd_delete() {
+delete_passwd() {
     local passwd_name="${1}"
     local passwd_file
     passwd_name=$(set_passwd_name "${passwd_name}" 'delete')
@@ -237,7 +237,7 @@ passwd_delete() {
     printf 'Password deleted successfully.\n'
 }
 
-passwd_show() {
+show_passwd() {
     local passwd_name="${1}"
     local passwd_file
     passwd_name=$(set_passwd_name "${passwd_name}" 'show')
@@ -247,7 +247,7 @@ passwd_show() {
     printf 'Password: %s\n' "$(${GPG_CMD} --decrypt --quiet --output - "${passwd_file}")"
 }
 
-passwd_list() {
+list_passwd() {
     local passwd_name
 
     printf 'The following passwords are stored:\n'
@@ -261,7 +261,7 @@ passwd_list() {
     set -o noglob
 }
 
-passwd_copy() {
+copy_passwd() {
     local copy_clipboard_command clear_clipboard_command
     local passwd_name="${1}"
     local passwd_file
@@ -302,7 +302,7 @@ passwd_copy() {
     printf '\n'
 }
 
-passwd_sync() {
+sync_passwd() {
     local sync_cmd="${1}"
 
     has git || error 'git is not installed' 1
@@ -337,14 +337,14 @@ else
 fi
 
 case "${1}" in
-    "--add"    | "-a") passwd_add "${2}";;
-    "--copy"   | "-c") passwd_copy "${2}";;
-    "--delete" | "-d") passwd_delete "${2}";;
+    "--add"    | "-a") add_passwd "${2}";;
+    "--copy"   | "-c") copy_passwd "${2}";;
+    "--delete" | "-d") delete_passwd "${2}";;
     "--help"   | "-h") usage;;
-    "--list"   | "-l") passwd_list;;
-    "--show"   | "-s") passwd_show "${2}";;
-    "--sync"   | "-S") passwd_sync "${2}";;
-    "--update" | "-u") passwd_update "${2}";;
+    "--list"   | "-l") list_passwd;;
+    "--show"   | "-s") show_passwd "${2}";;
+    "--sync"   | "-S") sync_passwd "${2}";;
+    "--update" | "-u") update_passwd "${2}";;
     "--version"| "-v") version;;
     *)
         usage >&2
