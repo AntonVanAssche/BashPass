@@ -8,13 +8,13 @@ Usage: bashpass [OPTION] [NAME | SYNC_COMMAND]
 Options:
     --help    | -h                      Show this help message.
     --version | -v                      Show the version number.
-    --add     | -a              [NAME]  Add a password.
-    --copy    | -c              [NAME]  Copy a password to the clipboard.
-    --delete  | -d              [NAME]  Delete a password.
-    --show    | -s              [NAME]  Show a password.
-    --update  | -u              [NAME]  Update a password.
+    --add     | -a [NAME]               Add a password.
+    --copy    | -c [NAME]               Copy a password to the clipboard.
+    --delete  | -d [NAME]               Delete a password.
+    --show    | -s [NAME]               Show a password.
+    --update  | -u [NAME]               Update a password.
     --list    | -l                      List all passwords.
-    --sync    | -S       [SYNC_COMMAND] Synchronize password(s) with a git repository.
+    --sync    | -S [SYNC_COMMAND]       Synchronize password(s) with a git repository.
 
 Synchronize commands:
     upload                              Upload local password(s) to a remote repository.
