@@ -47,7 +47,14 @@ readonly PASSWD_LENGTH="${BASHPASS_PASSWD_LENGTH:-14}"
 readonly PASSWD_STORE="${BASHPASS_PASSWD_STORE:-${HOME}/.local/share/bashpass}"
 readonly TIMER="${BASHPASS_TIMER:-10}"
 
-mkdir -p "${PASSWD_STORE}"
+[[ "${PASSWD_LENGTH}" =~ ^[1-9][0-9]*$ ]] ||
+    error 'invalid BASHPASS_PASSWD_LENGTH, must be a positive number' 2
+
+[[ "${TIMER}" =~ ^[0-9]+$ ]] ||
+    error 'invalid BASHPASS_TIMER, must be a positive number' 2
+
+mkdir -p "${PASSWD_STORE}" ||
+    error 'cannot create password store directory' 1
 
 usage() {
     printf '%s' "\
