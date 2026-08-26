@@ -22,62 +22,39 @@ error() {
 
 [[ "${UID}" -eq 0 ]] && error 'cannot run with superuser privileges' 1
 
-readonly CONFIG_DIR="${HOME}/.config/bashpass"
-readonly CONFIG_FILE="${CONFIG_DIR}/bashpass.conf"
-
-[[ -d "${CONFIG_DIR}" ]] || mkdir -p "${CONFIG_DIR}"
-[[ -f "${CONFIG_FILE}" ]] || :> "${CONFIG_FILE}"
-
-# Since we can not use external tool like 'grep' and 'cut' to ensure compatibility,
-# we need a way to retrieve the user's settings from their configuration file.
-# This function will read the file, and return the value once the requested setting
-# is found. It basically does the same as 'grep "setting" "${config}" | cut -d" " -f2',
-# but then with pure bash instead.
-get_setting() {
-    local setting="${1}"
-
-    while read -r; do
-        if [[ "${REPLY}" =~ ^${setting} ]]; then
-            printf '%s' "${REPLY#*: }"
-            return 0
-        fi
-    done < "${CONFIG_FILE}"
-
-    return 1
-}
-
-# A user can have multiple GnuPG keys located on their system, therefore is a good idea
-# to ask for a specific key, by prompting the user to enter a key ID. Afterwards we can
-# simpply append it to the configuration file to save it.
+# A user may have multiple GnuPG keys configured on their system, therefore
+# when no key ID is configured, it's a good idea to prompt the user to enter
+# one as long as none is configured.
+#
+# This will not make the key ID persistent. The user should still set the
+# environment variable himself to use a specific key ID every time BashPass is
+# run.
 ask_for_key_id() {
-    local regex="^[0-9A-Fa-f]{8,8}$"
     local key_id
 
-    read -rp 'Enter the key ID associated with your GPG key: ' key_id
+    while [[ ${key_id} =~ ^[0-9A-Fa-f]{8,40}$ ]]; do
+        read -rp 'Enter the GPG key ID: ' key_id
+    done
 
-    if [[ "${key_id}" =~ ${regex} ]]; then
-        printf 'keyID: %s\n' "${key_id}" >> "${CONFIG_FILE}"
-    else
-        error 'invalid key ID' 2
-    fi
-
-    printf '%s' "${key_id}"
+    printf '%s' "$key_id"
 }
 
-# The following variables will be used to store the user's settings. When no value is
-# found in the configuration file, the user will either be prompted to enter the value,
-# or a default value will be used.
-CONFIGURED_KEY_ID="$(get_setting 'keyID' || ask_for_key_id)"
-CONFIGURED_PASSWD_LENGTH="$(get_setting 'length' || printf '14')"
-CONFIGURED_PASSWD_STORE="${HOME}/$(get_setting 'location' || printf '.local/share/bashpass')"
-CONFIGURED_TIMER="$(get_setting 'timer' || printf '10')"
+# The following variables will be used to store the user's settings. When no
+# value is configured using "$BASHPASS_*" environment variables, the user will
+# either be prompted to enter the value, or a default value will be used.
+readonly KEY_ID="${BASHPASS_KEY_ID:-$(ask_for_key_id)}"
+readonly PASSWD_LENGTH="${BASHPASS_PASSWD_LENGTH:-14}"
+readonly PASSWD_STORE="${BASHPASS_PASSWD_STORE:-${HOME}/.local/share/bashpass}"
+readonly TIMER="${BASHPASS_TIMER:-10}"
 
-readonly CONFIGURED_KEY_ID
-readonly CONFIGURED_PASSWD_LENGTH
-readonly CONFIGURED_PASSWD_STORE
-readonly CONFIGURED_TIMER
+[[ "${PASSWD_LENGTH}" =~ ^[1-9][0-9]*$ ]] ||
+    error 'invalid BASHPASS_PASSWD_LENGTH, must be a positive number' 2
 
-mkdir -p "${CONFIGURED_PASSWD_STORE}"
+[[ "${TIMER}" =~ ^[0-9]+$ ]] ||
+    error 'invalid BASHPASS_TIMER, must be a positive number' 2
+
+mkdir -p "${PASSWD_STORE}" ||
+    error 'cannot create password store directory' 1
 
 usage() {
     printf '%s' "\
@@ -157,10 +134,10 @@ set_passwd() {
             passwd="${passwd1}"
             ;;
         *)
-            read -rp "Enter the password length (default ${CONFIGURED_PASSWD_LENGTH}): " \
+            read -rp "Enter the password length (default ${PASSWD_LENGTH}): " \
                 passwd_length
 
-            [[ -z "${passwd_length}" ]] && passwd_length="${CONFIGURED_PASSWD_LENGTH}"
+            [[ -z "${passwd_length}" ]] && passwd_length="${PASSWD_LENGTH}"
             [[ ${passwd_length} =~ ^[1-9]([0-9])?+$ ]] || \
                 error "the password length must be a number." 1
 
@@ -172,12 +149,12 @@ set_passwd() {
 
     [[ -z "${passwd}" ]] && error 'password cannot be empty' 2
 
-    printf '%s' "${passwd}" > "${CONFIGURED_PASSWD_STORE}/${passwd_name}"
+    printf '%s' "${passwd}" > "${PASSWD_STORE}/${passwd_name}"
 }
 
 check_passwd_exists() {
     local passwd_name="${1}"
-    [[ -f "${CONFIGURED_PASSWD_STORE}/${passwd_name}.gpg" ]] || \
+    [[ -f "${PASSWD_STORE}/${passwd_name}.gpg" ]] || \
         error "password '${passwd_name}' not found" 2
 }
 
@@ -186,13 +163,13 @@ add_passwd() {
     local passwd_file
     local overwrite
     passwd_name=$(set_passwd_name "${passwd_name}" 'add')
-    passwd_file="${CONFIGURED_PASSWD_STORE}/${passwd_name}.gpg"
+    passwd_file="${PASSWD_STORE}/${passwd_name}.gpg"
 
-    while [[ -f "${CONFIGURED_PASSWD_STORE}/${passwd_name}.gpg" ]]; do
+    while [[ -f "${PASSWD_STORE}/${passwd_name}.gpg" ]]; do
         read -rp "Password '${passwd_name}' already exists. Overwrite? [y/N]: " overwrite
         case "${overwrite}" in
             [Yy])
-                rm -rf "${CONFIGURED_PASSWD_STORE}/${passwd_name}.gpg"
+                rm -rf "${PASSWD_STORE}/${passwd_name}.gpg"
                 ;;
             *)
                 read -rp 'Enter a new password name: ' passwd_name
@@ -202,7 +179,7 @@ add_passwd() {
 
     set_passwd "${passwd_name}"
     ${GPG_CMD} --encrypt --quiet --output "${passwd_file}" \
-        --recipient "${CONFIGURED_KEY_ID}" "${passwd_file%.gpg}"
+        --recipient "${KEY_ID}" "${passwd_file%.gpg}"
     rm -rf "${passwd_file%.gpg}"
 
     printf 'Password added successfully.\n'
@@ -212,14 +189,14 @@ update_passwd() {
     local passwd_name="${1}"
     local passwd_file
     passwd_name=$(set_passwd_name "${passwd_name}" 'update')
-    passwd_file="${CONFIGURED_PASSWD_STORE}/${passwd_name}.gpg"
+    passwd_file="${PASSWD_STORE}/${passwd_name}.gpg"
 
     check_passwd_exists "${passwd_name}"
 
     rm -rf "${passwd_file}"
     set_passwd "${passwd_name}"
     ${GPG_CMD} --encrypt --quiet --output "${passwd_file}" \
-        --recipient "${CONFIGURED_KEY_ID}" "${passwd_file%.gpg}"
+        --recipient "${KEY_ID}" "${passwd_file%.gpg}"
     rm -rf "${passwd_file%.gpg}"
 
     printf 'Password updated successfully.\n'
@@ -229,7 +206,7 @@ delete_passwd() {
     local passwd_name="${1}"
     local passwd_file
     passwd_name=$(set_passwd_name "${passwd_name}" 'delete')
-    passwd_file="${CONFIGURED_PASSWD_STORE}/${passwd_name}.gpg"
+    passwd_file="${PASSWD_STORE}/${passwd_name}.gpg"
 
     check_passwd_exists "${passwd_name}"
     rm -rf "${passwd_file}"
@@ -241,7 +218,7 @@ show_passwd() {
     local passwd_name="${1}"
     local passwd_file
     passwd_name=$(set_passwd_name "${passwd_name}" 'show')
-    passwd_file="${CONFIGURED_PASSWD_STORE}/${passwd_name}.gpg"
+    passwd_file="${PASSWD_STORE}/${passwd_name}.gpg"
 
     check_passwd_exists "${passwd_name}"
     printf 'Password: %s\n' "$(${GPG_CMD} --decrypt --quiet --output - "${passwd_file}")"
@@ -253,7 +230,7 @@ list_passwd() {
     printf 'The following passwords are stored:\n'
 
     set +o noglob
-    for passwd_name in "${CONFIGURED_PASSWD_STORE:?}"/*.gpg; do
+    for passwd_name in "${PASSWD_STORE:?}"/*.gpg; do
         passwd_name="${passwd_name##*/}"
         passwd_name="${passwd_name%%.gpg}"
         printf '%s\n' "${passwd_name}"
@@ -266,7 +243,7 @@ copy_passwd() {
     local passwd_name="${1}"
     local passwd_file
     pass_name=$(set_passwd_name "${passwd_name}" 'copy')
-    passwd_file="${CONFIGURED_PASSWD_STORE}/${passwd_name}.gpg"
+    passwd_file="${PASSWD_STORE}/${passwd_name}.gpg"
 
     if has pbcopy; then
          copy_clipboard_command="pbcopy"
@@ -292,10 +269,10 @@ copy_passwd() {
     trap '' INT
 
     ${copy_clipboard_command} "$(${GPG_CMD} --decrypt --quiet --output - \
-        "${CONFIGURED_PASSWD_STORE}/${pass_name}.gpg")" || \
+        "${PASSWD_STORE}/${pass_name}.gpg")" || \
         error 'failed to copy password to clipboard' 1
 
-    sleep "${CONFIGURED_TIMER}" || kill 0
+    sleep "${TIMER}" || kill 0
     ${clear_clipboard_command}
 
     printf 'Clipboard has been cleared to ensure it cannot be leaked.'
@@ -307,18 +284,18 @@ sync_passwd() {
 
     has git || error 'git is not installed' 1
 
-    [[ -d "${CONFIGURED_PASSWD_STORE}/.git/" ]] || \
-        error "${CONFIGURED_PASSWD_STORE} is not a git repository" 128
+    [[ -d "${PASSWD_STORE}/.git/" ]] || \
+        error "${PASSWD_STORE} is not a git repository" 128
 
     case "${sync_cmd}" in
         "upload")
-            git -C "${CONFIGURED_PASSWD_STORE}" add -A
-            git -C "${CONFIGURED_PASSWD_STORE}" commit \
+            git -C "${PASSWD_STORE}" add -A
+            git -C "${PASSWD_STORE}" commit \
                 -m "Upload: $(printf '%(%d/%m/%Y)T at %(%T)T')"
-            git -C "${CONFIGURED_PASSWD_STORE}" push
+            git -C "${PASSWD_STORE}" push
             ;;
         "download")
-            git -C "${CONFIGURED_PASSWD_STORE}" pull
+            git -C "${PASSWD_STORE}" pull
             ;;
         *)
             error "synchronize command '${sync_cmd}' not found" 2
