@@ -220,7 +220,7 @@ delete_passwd() {
     passwd_file="${PASSWD_STORE}/${passwd_name}.gpg"
 
     check_passwd_exists "${passwd_name}"
-    rm -rf "${passwd_file}"
+    rm -f -- "${passwd_file}"
 
     printf 'Password deleted successfully.\n'
 }
