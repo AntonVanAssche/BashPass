@@ -44,15 +44,15 @@ ask_for_key_id() {
 # either be prompted to enter the value, or a default value will be used.
 readonly CLIPBOARD_CLEAR_CMD="${BASHPASS_CLIPBOARD_CLEAR_CMD:-wl-copy --clear}"
 readonly CLIPBOARD_COPY_CMD="${BASHPASS_CLIPBOARD_COPY_CMD:-wl-copy}"
+readonly CLIPBOARD_TIMER="${BASHPASS_CLIPBOARD_TIMER:-10}"
 readonly KEY_ID="${BASHPASS_KEY_ID:-$(ask_for_key_id)}"
 readonly PASSWD_LENGTH="${BASHPASS_PASSWD_LENGTH:-14}"
 readonly PASSWD_STORE="${BASHPASS_PASSWD_STORE:-${HOME}/.local/share/bashpass}"
-readonly TIMER="${BASHPASS_TIMER:-10}"
 
 [[ "${PASSWD_LENGTH}" =~ ^[1-9][0-9]*$ ]] ||
     error 'invalid BASHPASS_PASSWD_LENGTH, must be a positive number' 2
 
-[[ "${TIMER}" =~ ^[0-9]+$ ]] ||
+[[ "${CLIPBOARD_TIMER}" =~ ^[0-9]+$ ]] ||
     error 'invalid BASHPASS_TIMER, must be a positive number' 2
 
 mkdir -p "${PASSWD_STORE}" ||
@@ -273,7 +273,7 @@ copy_passwd() {
     ${CLIPBOARD_COPY_CMD} "$(${GPG_CMD} --decrypt --quiet --output - "${passwd_file}")" || \
         error 'failed to copy password to clipboard' 1
 
-    sleep "${TIMER}" || kill 0
+    sleep "${CLIPBOARD_TIMER}" || kill 0
 
     ${CLIPBOARD_CLEAR_CMD} || error 'failed to clear clipboard' 1
 
