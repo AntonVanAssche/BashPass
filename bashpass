@@ -42,6 +42,8 @@ ask_for_key_id() {
 # The following variables will be used to store the user's settings. When no
 # value is configured using "$BASHPASS_*" environment variables, the user will
 # either be prompted to enter the value, or a default value will be used.
+readonly CLIPBOARD_CLEAR_CMD="${BASHPASS_CLIPBOARD_CLEAR_CMD:-wl-copy --clear}"
+readonly CLIPBOARD_COPY_CMD="${BASHPASS_CLIPBOARD_COPY_CMD:-wl-copy}"
 readonly KEY_ID="${BASHPASS_KEY_ID:-$(ask_for_key_id)}"
 readonly PASSWD_LENGTH="${BASHPASS_PASSWD_LENGTH:-14}"
 readonly PASSWD_STORE="${BASHPASS_PASSWD_STORE:-${HOME}/.local/share/bashpass}"
@@ -250,44 +252,32 @@ list_passwd() {
 }
 
 copy_passwd() {
-    local copy_clipboard_command clear_clipboard_command
     local passwd_name="${1}"
     local passwd_file
-    pass_name=$(set_passwd_name "${passwd_name}" 'copy')
+    passwd_name=$(set_passwd_name "${passwd_name}" 'copy')
     passwd_file="${PASSWD_STORE}/${passwd_name}.gpg"
 
-    if has pbcopy; then
-         copy_clipboard_command="pbcopy"
-         clear_clipboard_command="pbcopy < /dev/null"
-    elif has xclip; then
-         copy_clipboard_command="xclip -selection clipboard"
-         clear_clipboard_command="xclip -selection clipboard < /dev/null"
-    elif has xsel; then
-         copy_clipboard_command="xsel --clipboard"
-         clear_clipboard_command="xsel --clipboard < /dev/null"
-    elif has wl-copy; then
-         copy_clipboard_command="wl-copy"
-         clear_clipboard_command="wl-copy --clear"
-    else
-        error 'no suitable clipboard manager found' 1
-    fi
+    check_passwd_exists "${passwd_name}"
 
-    check_passwd_exists "${pass_name}"
+    [[ -n "${CLIPBOARD_COPY_CMD}" ]] ||
+        error 'clipboard copy command is not configured' 1
+
+    [[ -n "${CLIPBOARD_CLEAR_CMD}" ]] ||
+        error 'clipboard clear command is not configured' 1
 
     # Ignore terminal interrupts (CTRL+C).
     # We do this to prevent the ability to kill the script while
     # the password is still in the clipboard.
     trap '' INT
 
-    ${copy_clipboard_command} "$(${GPG_CMD} --decrypt --quiet --output - \
-        "${PASSWD_STORE}/${pass_name}.gpg")" || \
+    ${CLIPBOARD_COPY_CMD} "$(${GPG_CMD} --decrypt --quiet --output - "${passwd_file}")" || \
         error 'failed to copy password to clipboard' 1
 
     sleep "${TIMER}" || kill 0
-    ${clear_clipboard_command}
 
-    printf 'Clipboard has been cleared to ensure it cannot be leaked.'
-    printf '\n'
+    ${CLIPBOARD_CLEAR_CMD} || error 'failed to clear clipboard' 1
+
+    printf 'Clipboard has been cleared to ensure it cannot be leaked.\n'
 }
 
 sync_passwd() {
