@@ -112,6 +112,9 @@ set_passwd_name() {
     [[ -z "${passwd_name}" ]] && \
         read -rp "Enter the password name to ${functionality}: " passwd_name
 
+    [[ $passwd_name =~ ^[A-Za-z0-9_.@+-]+$ ]] || \
+        error 'password name contains invalid characters' 2
+
     printf '%s' "${passwd_name}"
 }
 
