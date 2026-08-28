@@ -169,6 +169,12 @@ encrypt_passwd() {
     "${GPG_CMD}" --batch --yes --encrypt --quiet --output "${passwd_file}" --recipient "${KEY_ID}"
 }
 
+decrypt_passwd() {
+    local passwd_file="${1}"
+
+    "${GPG_CMD}" --decrypt --quiet --output - "${passwd_file}"
+}
+
 check_passwd_exists() {
     local passwd_name="${1}"
     [[ -f "${PASSWD_STORE}/${passwd_name}.gpg" ]] || \
@@ -234,7 +240,7 @@ show_passwd() {
     passwd_file="${PASSWD_STORE}/${passwd_name}.gpg"
 
     check_passwd_exists "${passwd_name}"
-    printf '%s\n' "$(${GPG_CMD} --decrypt --quiet --output - "${passwd_file}")"
+    printf '%s\n' "$(decrypt_passwd "${passwd_file}")"
 }
 
 list_passwd() {
@@ -270,7 +276,7 @@ copy_passwd() {
     # the password is still in the clipboard.
     trap '' INT
 
-    ${CLIPBOARD_COPY_CMD} "$(${GPG_CMD} --decrypt --quiet --output - "${passwd_file}")" || \
+    ${CLIPBOARD_COPY_CMD} "$(decrypt_passwd "${passwd_file}")" || \
         error 'failed to copy password to clipboard' 1
 
     sleep "${CLIPBOARD_TIMER}" || kill 0
