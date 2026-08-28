@@ -117,24 +117,30 @@ set_passwd() {
     local passwd_name="${1}"
     local gen passwd passwd1 passwd2 passwd_length
 
-    read -rp 'Generate a password? [Y/n]: ' gen
+    # This function's stdout is piped to GPG, so stdin is no longer connected
+    # to the terminal. We open /dev/tty on file descriptor 3 so interactive input
+    # and output use the terminal instead of the pipe, leaving stdout for the
+    # plaintext password passed to GPG.
+    exec 3<>/dev/tty || error 'cannot open terminal' 1
+
+    read -u 3 -rp 'Generate a password? [Y/n]: ' gen
 
     case "${gen}" in
         [Nn])
-            read -rsp 'Enter the password: ' passwd1
-            printf '\n'
+            read -u 3 -rsp 'Enter the password: ' passwd1
+            printf '\n' >&3
 
             [[ -z "${passwd1}" ]] && error 'password cannot be empty' 2
 
             while [[ "${passwd1}" != "${passwd2}" ]]; do
-                read -rsp 'Re-enter the password: ' passwd2
-                printf '\n'
+                read -u 3 -rsp 'Re-enter the password: ' passwd2
+                printf '\n' >&3
             done
 
             passwd="${passwd1}"
             ;;
         *)
-            read -rp "Enter the password length (default ${PASSWD_LENGTH}): " \
+            read -u 3 -rp "Enter the password length (default ${PASSWD_LENGTH}): " \
                 passwd_length
 
             [[ -z "${passwd_length}" ]] && passwd_length="${PASSWD_LENGTH}"
@@ -142,14 +148,23 @@ set_passwd() {
                 error "the password length must be a number." 1
 
             passwd=$(LC_ALL=C \
-                tr -dc 'A-Za-z0-9!"#$%&'\''()*+,-./:;<=>?@[\]^_`{|}~ ' < /dev/urandom | \
+                tr -dc 'A-Za-z0-9!"#$%&'\''()*+,-./:;<=>?@[\]^_`{|}~' < /dev/urandom | \
                 dd ibs=1 obs=1 count="${passwd_length}" 2> /dev/null) || :
             ;;
     esac
 
     [[ -z "${passwd}" ]] && error 'password cannot be empty' 2
 
-    printf '%s' "${passwd}" > "${PASSWD_STORE}/${passwd_name}"
+    printf '%s' "${passwd}"
+
+    # Since we opened /dev/tty for the interactive input, we need to close it.
+    exec 3>&-
+}
+
+encrypt_passwd() {
+    local passwd_file="${1}"
+
+    "${GPG_CMD}" --batch --yes --encrypt --quiet --output "${passwd_file}" --recipient "${KEY_ID}"
 }
 
 check_passwd_exists() {
@@ -165,22 +180,23 @@ add_passwd() {
     passwd_name=$(set_passwd_name "${passwd_name}" 'add')
     passwd_file="${PASSWD_STORE}/${passwd_name}.gpg"
 
-    while [[ -f "${PASSWD_STORE}/${passwd_name}.gpg" ]]; do
-        read -rp "Password '${passwd_name}' already exists. Overwrite? [y/N]: " overwrite
+    while [[ -f "${passwd_file}" ]]; do
+        read -rp \
+            "Password '${passwd_name}' already exists. Overwrite? [y/N]: " \
+            overwrite
+
         case "${overwrite}" in
             [Yy])
-                rm -rf "${PASSWD_STORE}/${passwd_name}.gpg"
+                break
                 ;;
             *)
                 read -rp 'Enter a new password name: ' passwd_name
+                passwd_file="${PASSWD_STORE}/${passwd_name}.gpg"
                 ;;
         esac
     done
 
-    set_passwd "${passwd_name}"
-    ${GPG_CMD} --encrypt --quiet --output "${passwd_file}" \
-        --recipient "${KEY_ID}" "${passwd_file%.gpg}"
-    rm -rf "${passwd_file%.gpg}"
+    set_passwd "${passwd_name}" | encrypt_passwd "${passwd_file}"
 
     printf 'Password added successfully.\n'
 }
@@ -192,12 +208,7 @@ update_passwd() {
     passwd_file="${PASSWD_STORE}/${passwd_name}.gpg"
 
     check_passwd_exists "${passwd_name}"
-
-    rm -rf "${passwd_file}"
-    set_passwd "${passwd_name}"
-    ${GPG_CMD} --encrypt --quiet --output "${passwd_file}" \
-        --recipient "${KEY_ID}" "${passwd_file%.gpg}"
-    rm -rf "${passwd_file%.gpg}"
+    set_passwd "${passwd_name}" | encrypt_passwd "${passwd_file}"
 
     printf 'Password updated successfully.\n'
 }
@@ -209,7 +220,7 @@ delete_passwd() {
     passwd_file="${PASSWD_STORE}/${passwd_name}.gpg"
 
     check_passwd_exists "${passwd_name}"
-    rm -rf "${passwd_file}"
+    rm -f -- "${passwd_file}"
 
     printf 'Password deleted successfully.\n'
 }
@@ -221,7 +232,7 @@ show_passwd() {
     passwd_file="${PASSWD_STORE}/${passwd_name}.gpg"
 
     check_passwd_exists "${passwd_name}"
-    printf 'Password: %s\n' "$(${GPG_CMD} --decrypt --quiet --output - "${passwd_file}")"
+    printf '%s\n' "$(${GPG_CMD} --decrypt --quiet --output - "${passwd_file}")"
 }
 
 list_passwd() {
