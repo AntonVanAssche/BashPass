@@ -42,15 +42,17 @@ ask_for_key_id() {
 # The following variables will be used to store the user's settings. When no
 # value is configured using "$BASHPASS_*" environment variables, the user will
 # either be prompted to enter the value, or a default value will be used.
+readonly CLIPBOARD_CLEAR_CMD="${BASHPASS_CLIPBOARD_CLEAR_CMD:-wl-copy --clear}"
+readonly CLIPBOARD_COPY_CMD="${BASHPASS_CLIPBOARD_COPY_CMD:-wl-copy}"
+readonly CLIPBOARD_TIMER="${BASHPASS_CLIPBOARD_TIMER:-10}"
 readonly KEY_ID="${BASHPASS_KEY_ID:-$(ask_for_key_id)}"
 readonly PASSWD_LENGTH="${BASHPASS_PASSWD_LENGTH:-14}"
 readonly PASSWD_STORE="${BASHPASS_PASSWD_STORE:-${HOME}/.local/share/bashpass}"
-readonly TIMER="${BASHPASS_TIMER:-10}"
 
 [[ "${PASSWD_LENGTH}" =~ ^[1-9][0-9]*$ ]] ||
     error 'invalid BASHPASS_PASSWD_LENGTH, must be a positive number' 2
 
-[[ "${TIMER}" =~ ^[0-9]+$ ]] ||
+[[ "${CLIPBOARD_TIMER}" =~ ^[0-9]+$ ]] ||
     error 'invalid BASHPASS_TIMER, must be a positive number' 2
 
 mkdir -p "${PASSWD_STORE}" ||
@@ -110,6 +112,9 @@ set_passwd_name() {
     [[ -z "${passwd_name}" ]] && \
         read -rp "Enter the password name to ${functionality}: " passwd_name
 
+    [[ $passwd_name =~ ^[A-Za-z0-9_.@+-]+$ ]] || \
+        error 'password name contains invalid characters' 2
+
     printf '%s' "${passwd_name}"
 }
 
@@ -165,6 +170,12 @@ encrypt_passwd() {
     local passwd_file="${1}"
 
     "${GPG_CMD}" --batch --yes --encrypt --quiet --output "${passwd_file}" --recipient "${KEY_ID}"
+}
+
+decrypt_passwd() {
+    local passwd_file="${1}"
+
+    "${GPG_CMD}" --decrypt --quiet --output - "${passwd_file}"
 }
 
 check_passwd_exists() {
@@ -232,7 +243,7 @@ show_passwd() {
     passwd_file="${PASSWD_STORE}/${passwd_name}.gpg"
 
     check_passwd_exists "${passwd_name}"
-    printf '%s\n' "$(${GPG_CMD} --decrypt --quiet --output - "${passwd_file}")"
+    printf '%s\n' "$(decrypt_passwd "${passwd_file}")"
 }
 
 list_passwd() {
@@ -250,44 +261,32 @@ list_passwd() {
 }
 
 copy_passwd() {
-    local copy_clipboard_command clear_clipboard_command
     local passwd_name="${1}"
     local passwd_file
-    pass_name=$(set_passwd_name "${passwd_name}" 'copy')
+    passwd_name=$(set_passwd_name "${passwd_name}" 'copy')
     passwd_file="${PASSWD_STORE}/${passwd_name}.gpg"
 
-    if has pbcopy; then
-         copy_clipboard_command="pbcopy"
-         clear_clipboard_command="pbcopy < /dev/null"
-    elif has xclip; then
-         copy_clipboard_command="xclip -selection clipboard"
-         clear_clipboard_command="xclip -selection clipboard < /dev/null"
-    elif has xsel; then
-         copy_clipboard_command="xsel --clipboard"
-         clear_clipboard_command="xsel --clipboard < /dev/null"
-    elif has wl-copy; then
-         copy_clipboard_command="wl-copy"
-         clear_clipboard_command="wl-copy --clear"
-    else
-        error 'no suitable clipboard manager found' 1
-    fi
+    check_passwd_exists "${passwd_name}"
 
-    check_passwd_exists "${pass_name}"
+    [[ -n "${CLIPBOARD_COPY_CMD}" ]] ||
+        error 'clipboard copy command is not configured' 1
+
+    [[ -n "${CLIPBOARD_CLEAR_CMD}" ]] ||
+        error 'clipboard clear command is not configured' 1
 
     # Ignore terminal interrupts (CTRL+C).
     # We do this to prevent the ability to kill the script while
     # the password is still in the clipboard.
     trap '' INT
 
-    ${copy_clipboard_command} "$(${GPG_CMD} --decrypt --quiet --output - \
-        "${PASSWD_STORE}/${pass_name}.gpg")" || \
+    ${CLIPBOARD_COPY_CMD} "$(decrypt_passwd "${passwd_file}")" || \
         error 'failed to copy password to clipboard' 1
 
-    sleep "${TIMER}" || kill 0
-    ${clear_clipboard_command}
+    sleep "${CLIPBOARD_TIMER}" || kill 0
 
-    printf 'Clipboard has been cleared to ensure it cannot be leaked.'
-    printf '\n'
+    ${CLIPBOARD_CLEAR_CMD} || error 'failed to clear clipboard' 1
+
+    printf 'Clipboard has been cleared to ensure it cannot be leaked.\n'
 }
 
 sync_passwd() {

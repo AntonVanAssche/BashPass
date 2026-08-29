@@ -10,15 +10,6 @@ As well as the prerequisites and dependencies required to run BashPass.
 
 -   `gpg` or `gpg2`
 
-**Clipboard support**:
-
--   X11
-    -   `xclip` or `xsel`
--   Wayland
-    -   `wl-clipboard`
--   macOS
-    -   `pbcopy`
-
 **Synchronization support**:
 
 -   `git`
