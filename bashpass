@@ -32,7 +32,7 @@ error() {
 ask_for_key_id() {
     local key_id
 
-    while [[ ${key_id} =~ ^[0-9A-Fa-f]{8,40}$ ]]; do
+    while ! [[ ${key_id} =~ ^[0-9A-Fa-f]{8,40}$ ]]; do
         read -rp 'Enter the GPG key ID: ' key_id
     done
 
