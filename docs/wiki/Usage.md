@@ -3,25 +3,28 @@ This page provides instructions on how to use BashPass.
 # 1. Basic Command Structure
 
 ```
-Usage: bashpass [OPTION] [NAME | SYNC_COMMAND]
+Usage:
+    bashpass [OPTION] [NAME]
+
+Commands:
+    -a, --add [NAME]       Add a password.
+    -c, --copy [NAME]      Copy a password to the clipboard.
+    -d, --delete [NAME]    Delete a password.
+    -l, --list             List all passwords.
+    -s, --show [NAME]      Show a password.
+    -u, --update [NAME]    Update a password.
+    -S, --sync COMMAND     Synchronize with a Git repository.
 
 Options:
-    --help    | -h                      Show this help message.
-    --version | -v                      Show the version number.
-    --add     | -a [NAME]               Add a password.
-    --copy    | -c [NAME]               Copy a password to the clipboard.
-    --delete  | -d [NAME]               Delete a password.
-    --show    | -s [NAME]               Show a password.
-    --update  | -u [NAME]               Update a password.
-    --list    | -l                      List all passwords.
-    --sync    | -S [SYNC_COMMAND]       Synchronize password(s) with a git repository.
+    -h, --help             Show this help message.
+    -v, --version          Show the version number.
 
-Synchronize commands:
-    push                                Push local password(s) to a remote repository.
-    pull                                Pull password(s) from a remote repository.
+Sync commands:
+    push                   Push local passwords to a remote repository.
+    pull                   Pull passwords from a remote repository.
 
-Note:
-    [NAME] is an optional argument. If not provided, the script will prompt you to enter it.
+Arguments:
+    NAME                   Password name. If omitted, you will be prompted.
 ```
 
 # 2. Options
