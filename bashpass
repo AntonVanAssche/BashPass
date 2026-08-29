@@ -77,8 +77,8 @@ Options:
     --sync    | -S [SYNC_COMMAND]       Synchronize password(s) with a git repository.
 
 Synchronize commands:
-    upload                              Upload local password(s) to a remote repository.
-    download                            Download password(s) from a remote repository.
+    push                                Push local password(s) to a remote repository.
+    pull                                Pull password(s) from a remote repository.
 
 Note:
     [NAME] is an optional argument. If not provided, the script will prompt you to enter it.
@@ -298,21 +298,21 @@ sync_passwd() {
         error "${PASSWD_STORE} is not a git repository" 128
 
     case "${sync_cmd}" in
-        "upload")
-            git -C "${PASSWD_STORE}" add -A
-            git -C "${PASSWD_STORE}" commit \
-                -m "Upload: $(printf '%(%d/%m/%Y)T at %(%T)T')"
-            git -C "${PASSWD_STORE}" push
+        push)
+            git -C "${CONFIGURED_PASSWD_STORE}" add -A
+            git -C "${CONFIGURED_PASSWD_STORE}" diff --cached --quiet && return 0
+            git -C "${CONFIGURED_PASSWD_STORE}" commit -m "Update passwords"
+            git -C "${CONFIGURED_PASSWD_STORE}" push
             ;;
-        "download")
-            git -C "${PASSWD_STORE}" pull
+
+        pull)
+            git -C "${CONFIGURED_PASSWD_STORE}" pull --ff-only
             ;;
+
         *)
-            error "synchronize command '${sync_cmd}' not found" 2
+            error "unknown sync operation: ${sync_cmd}" 2
             ;;
     esac
-
-    printf 'Be aware you'\''ll need to import/export your GPG key.\n'
 }
 
 if has gpg2; then

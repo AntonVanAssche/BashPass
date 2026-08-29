@@ -17,8 +17,8 @@ Options:
     --sync    | -S [SYNC_COMMAND]       Synchronize password(s) with a git repository.
 
 Synchronize commands:
-    upload                              Upload local password(s) to a remote repository.
-    download                            Download password(s) from a remote repository.
+    push                                Push local password(s) to a remote repository.
+    pull                                Pull password(s) from a remote repository.
 
 Note:
     [NAME] is an optional argument. If not provided, the script will prompt you to enter it.
@@ -96,9 +96,9 @@ $ bashpass --list
 > :warning: The password store must be initialized with a remote Git repository before using this command.
 
 Sync the password store with a remote Git repository.
-The `SYNC_COMMAND` can be either `upload` or `download`.
+The `SYNC_COMMAND` can be either `push` or `pull`.
 
 ```console
-$ bashpass --sync upload
-$ bashpass --sync download
+$ bashpass --sync push
+$ bashpass --sync pull
 ```
