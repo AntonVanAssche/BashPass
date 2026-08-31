@@ -72,6 +72,7 @@ Commands:
     -l, --list             List all passwords.
     -s, --show [NAME]      Show a password.
     -u, --update [NAME]    Update a password.
+    -G, --git COMMAND      Interact with Git. Wrapper for 'git -C \${BASHPASS_PASSWD_STORE} COMMAND'.
     -S, --sync COMMAND     Synchronize with a Git repository.
 
 Options:
@@ -325,6 +326,12 @@ sync_passwd() {
     esac
 }
 
+git_passwd() {
+    has git || error 'git is not installed' 1
+
+    git -C "${PASSWD_STORE}" "${@}"
+}
+
 if has gpg2; then
     readonly GPG_CMD="gpg2"
 elif has gpg; then
@@ -341,6 +348,7 @@ case "${1}" in
     "--list"   | "-l") list_passwd;;
     "--show"   | "-s") show_passwd "${2}";;
     "--sync"   | "-S") sync_passwd "${2}";;
+    "--git"    | "-G") git_passwd "${@:2}";;
     "--update" | "-u") update_passwd "${2}";;
     "--version"| "-v") version;;
     *)

@@ -1,6 +1,6 @@
 This page provides instructions on how to use BashPass.
 
-# 1. Basic Command Structure
+# Basic Command Structure
 
 ```
 Usage:
@@ -27,17 +27,17 @@ Arguments:
     NAME                   Password name. If omitted, you will be prompted.
 ```
 
-# 2. Options
+# Options
 
-## 2.1 `--help` | `-h`
+##  `--help` | `-h`
 
 Show a brief help message.
 
-## 2.2 `--version` | `-v`
+##  `--version` | `-v`
 
 Display the version number of your BashPass installation.
 
-## 2.3 `--add` | `-a`
+##  `--add` | `-a`
 
 Add a new password to the system. The password can be either self-chosen or auto-generated.
 If no `NAME` is specified, BashPass will ask for it.
@@ -46,7 +46,7 @@ If no `NAME` is specified, BashPass will ask for it.
 $ bashpass --add gmail
 ```
 
-## 2.2 `--copy` | `-c`
+##  `--copy` | `-c`
 
 Copy the password of the specified `NAME` to the clipboard.
 The clipboard will be cleared after a certain amount of time, specified in the configuration file.
@@ -55,7 +55,7 @@ The clipboard will be cleared after a certain amount of time, specified in the c
 $ bashpass --copy gmail
 ```
 
-## 2.3 `--delete` | `-d`
+##  `--delete` | `-d`
 
 > :warning: Be careful, BashPass will not ask for confirmation!
 
@@ -65,7 +65,7 @@ Delete the password of the specified `NAME` from the system.
 $ bashpass --delete gmail
 ```
 
-## 2.4 `--show` | `-s`
+##  `--show` | `-s`
 
 > :warning: BashPass wil print the password in clear text to the terminal.
 
@@ -75,7 +75,7 @@ Print the password of the specified NAME to stdout.
 $ bashpass --show gmail
 ```
 
-## 2.5 `--update` | `-u`
+##  `--update` | `-u`
 
 > :warning: BashPass will overwrite the previous password!
 
@@ -86,7 +86,7 @@ The password can be either self-chosen or auto-generated.
 $ bashpass --update gmail
 ```
 
-## 2.6 `--list` | `-l`
+##  `--list` | `-l`
 
 List all the names of the passwords stored in the password store.
 
@@ -94,7 +94,17 @@ List all the names of the passwords stored in the password store.
 $ bashpass --list
 ```
 
-## 2.7 `--sync` | `-S`
+##  `--git` | `-G`
+
+Interact with git with the password store as working directory.
+This essentially is a wrapper around `git -C ${BASHPASS_PASSWD_STORE} COMMAND`.
+
+```console
+$ bashpass --git init
+$ bashpass --git add foo.gpg
+```
+
+##  `--sync` | `-S`
 
 > :warning: The password store must be initialized with a remote Git repository before using this command.
 
