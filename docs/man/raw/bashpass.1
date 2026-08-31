@@ -1,102 +1,169 @@
-.TH "BASHPASS" "1" "2024-04-21" "BASHPASS 2024-04-21" "BASHPASS" "1"
-.ie \n(.g .ds Aq \(aq
-.el       .ds Aq
+.TH "BASHPASS" "1" "2026-08-31" "BASHPASS" "BASHPASS"
+.ie \n(.g .ds Aq (aq
+.el .ds Aq (aq
 .ad l
 .nh
 
-.SH "NAME"
-BashPass \- command-line based password manager written in Bash.
+.SH NAME
+bashpass - local command-line password manager written in Bash
 
-.SH "SYNOPSIS"
-bashpass [\fIOPTION\fR] [\fINAME\fR | \fISYNC_COMMAND\fR]
-.RE
+.SH SYNOPSIS
+.B bashpass
+[\fIOPTION\fR] [\fINAME\fR]
+.br
+.B bashpass
+.B -G
+.I COMMAND
+[\fIARGUMENT\fR ...]
 
-.SH "DESCRIPTION"
-Together with \fBGnuPG\fR, this command-line based password manager allows the user to safely save passwords on his devices.
-All passwords are 100% stored locally and encrypted with the users own GPG key, so you don't have to trust a third party to store your passwords.
-.RE
+.SH DESCRIPTION
+.B BashPass
+is a command-line password manager written in Bash.
+Together with
+.BR gpg (1),
+it stores passwords locally.
 
-.SH "OPTIONS"
+Passwords are encrypted using the user's GnuPG key before being stored in
+the password store. BashPass does not require a remote service to store
+passwords.
 
-.RE
-\fB--help\fR | \fB-h\fR
-.RS 4
+The password store can optionally be managed as a Git repository using the
+.BR -G
+option.
+
+Password names may contain letters, numbers, underscores, periods, @, plus
+signs, and hyphens.
+
+.SH COMMANDS
+
+.TP
+.BR -a ", " --add " [" NAME ]
+Add a password. The password can either be entered manually or generated
+automatically. If \fINAME\fR is omitted, BashPass prompts for one.
+
+.TP
+.BR -c ", " --copy " [" NAME ]
+Copy a password to the clipboard. The clipboard is cleared after the
+configured timeout. If \fINAME\fR is omitted, BashPass prompts for one.
+
+.TP
+.BR -d ", " --delete " [" NAME ]
+Delete a password without asking for confirmation. If \fINAME\fR is omitted,
+BashPass prompts for one.
+
+.TP
+.BR -l ", " --list
+List all passwords in the password store.
+
+.TP
+.BR -s ", " --show " [" NAME ]
+Print a password to standard output. If \fINAME\fR is omitted, BashPass
+prompts for one.
+
+.TP
+.BR -u ", " --update " [" NAME ]
+Update an existing password. The password can either be entered manually or
+generated automatically. If \fINAME\fR is omitted, BashPass prompts for one.
+
+.TP
+.BR -G ", " --git " COMMAND " [" ARGUMENT ...]
+Run a Git command with the password store as its working directory. Arguments
+are passed directly to Git.
+
+.SH OPTIONS
+
+.TP
+.BR -h ", " --help
 Show a brief help message.
-.PP
 
-.RE
-\fB--version\fR | \fB-v\fR
-.RS 4
-Display the version number of your BashPass installation.
-.PP
+.TP
+.BR -v ", " --version
+Show the BashPass version.
 
-.RE
-\fB--add\fR | \fB-a\fR [\fINAME\fR]
-.RS 4
-Add a new password to the system. The password can be either self-chosen or auto-generated.
-If no \fINAME\fR is specified, BashPass will ask for it.
-.PP
+.SH ENVIRONMENT
 
-.RE
-\fB--copy\fR | \fB-c\fR [\fINAME\fR]
-.RS 4
-Copy the password of the specified \fINAME\fR to the clipboard.
-The clipboard will be cleared after a certain amount of time, specified in the configuration file.
-.PP
+BashPass is configured using environment variables. Settings not explicitly
+configured use their default values.
 
-.RE
-\fB--delete\fR | \fB-d\fR [\fINAME\fR]
-.RS 4
-Delete the password of the specified \fINAME\fR from the system.
-.PP
+.TP
+.B BASHPASS_KEY_ID
+GnuPG key ID used to encrypt passwords. If unset, BashPass prompts for a key
+ID when it starts. The value may be the last 8 characters or the complete
+40-character GnuPG fingerprint.
 
-.RE
-\fB--show\fR | \fB-s\fR [\fINAME\fR]
-.RS 4
-Print the password of the specified \fINAME\fR to stdout.
-.PP
+.TP
+.B BASHPASS_PASSWD_LENGTH
+Default length of generated passwords. The default is 14 characters. This
+value can be overridden when adding or updating a password.
 
-.RE
-\fB--update\fR | \fB-u\fR [\fINAME\fR]
-.RS 4
-Update the password of the specified \fINAME\fR.
-The password can be either self-chosen or auto-generated.
-.PP
+.TP
+.B BASHPASS_PASSWD_STORE
+Location of the password store. The default is
+.IR ~/.local/share/bashpass .
 
-.RE
-\fB--list\fR | \fB-l\fR
-.RS 4
-List all the names of the passwords stored in the password store.
-.PP
+.TP
+.B BASHPASS_CLIPBOARD_COPY_CMD
+Command used to copy a password to the clipboard. The default is
+.BR "wl-copy" .
 
-.RE
-\fB--sync\fR | \fB-S\fR [\fISYNC_COMMAND\fR]
-.RS 4
-Sync the password store with a remote Git repository.
-The \fISYNC_COMMAND\fR can be either \fBupload\fR or \fBdownload\fR.
-.PP
+.TP
+.B BASHPASS_CLIPBOARD_CLEAR_CMD
+Command used to clear the clipboard. The default is
+.BR "wl-copy --clear" .
 
-.SH "FILES AND DIRECTORIES"
-/usr/bin/bashpass (\fBLinux and BSD\fR)
-.RE
-/usr/share/bin/bashpass (\fBmacOS\fR)
-.RE
-~/.config/bashpass/bashpass.conf
-.RE
-~/.local/share/bashpass/
-.PP
+.TP
+.B BASHPASS_CLIPBOARD_TIMER
+Number of seconds a copied password remains in the clipboard. The default is
+10 seconds.
 
-.SH "SEE ALSO"
-\fBbashpass.conf\fR(1)
-.PP
+.SH EXAMPLES
 
-.SH "AUTHOR"
-\fBAnton Van Assche\fR <\fIhttps://www.github.com/AntonVanAssche\fR>
-.PP
+.TP
+.B bashpass -a github
+Add a password named
+.IR github .
 
-.SH "BUGS"
-For bug reports and other issues regarding \fBBashPass\fR, including suggestions, please report to the GitHub link below, through which the project is developed.
-.PP
-.RS 2
-<\fIhttps://github.com/AntonVanAssche/BashPass\fR>
-.RE
+.TP
+.B bashpass -c github
+Copy the
+.I github
+password to the clipboard.
+
+.TP
+.B bashpass -d github
+Delete the
+.I github
+password without asking for confirmation.
+
+.TP
+.B API_KEY="$(bashpass -s api-key)"
+Use a password directly in a shell variable.
+
+.TP
+.B bashpass -G init
+Initialize the password store as a Git repository.
+
+.TP
+.B bashpass -G add -A
+Stage all changes in the password store.
+
+.TP
+.B bashpass -G commit -m "Update passwords"
+Commit changes using Git.
+
+.TP
+.B bashpass -G push
+Push the password store to its configured remote.
+
+.SH FILES
+
+.TP
+.I ~/.local/share/bashpass/
+Default password store.
+
+.SH AUTHOR
+Anton Van Assche <https://github.com/AntonVanAssche>
+
+.SH BUGS
+Report bugs, suggestions, and other issues at the BashPass project repository:
+<https://github.com/AntonVanAssche/BashPass>
