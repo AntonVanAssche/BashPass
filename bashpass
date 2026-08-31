@@ -32,7 +32,7 @@ error() {
 ask_for_key_id() {
     local key_id
 
-    while [[ ${key_id} =~ ^[0-9A-Fa-f]{8,40}$ ]]; do
+    while ! [[ ${key_id} =~ ^[0-9A-Fa-f]{8,40}$ ]]; do
         read -rp 'Enter the GPG key ID: ' key_id
     done
 
@@ -62,26 +62,32 @@ usage() {
     printf '%s' "\
 ${NAME}, a password manager written in Bash.
 
-Version: ${VERSION}
-Usage: ${SCRIPT_NAME} [OPTION] [NAME | SYNC_COMMAND]
+Usage:
+    ${SCRIPT_NAME} [OPTION] [NAME]
+
+Commands:
+    -a, --add [NAME]       Add a password.
+    -c, --copy [NAME]      Copy a password to the clipboard.
+    -d, --delete [NAME]    Delete a password.
+    -l, --list             List all passwords.
+    -s, --show [NAME]      Show a password.
+    -u, --update [NAME]    Update a password.
+    -G, --git COMMAND      Interact with Git. Wrapper for 'git -C \${BASHPASS_PASSWD_STORE} COMMAND'.
 
 Options:
-    --help    | -h                      Show this help message.
-    --version | -v                      Show the version number.
-    --add     | -a [NAME]               Add a password.
-    --copy    | -c [NAME]               Copy a password to the clipboard.
-    --delete  | -d [NAME]               Delete a password.
-    --show    | -s [NAME]               Show a password.
-    --update  | -u [NAME]               Update a password.
-    --list    | -l                      List all passwords.
-    --sync    | -S [SYNC_COMMAND]       Synchronize password(s) with a git repository.
+    -h, --help             Show this help message.
+    -v, --version          Show the version number.
 
-Synchronize commands:
-    upload                              Upload local password(s) to a remote repository.
-    download                            Download password(s) from a remote repository.
+Arguments:
+    NAME                   Password name. If omitted, you will be prompted.
 
-Note:
-    [NAME] is an optional argument. If not provided, the script will prompt you to enter it.
+Environment:
+    BASHPASS_CLIPBOARD_CLEAR_CMD
+    BASHPASS_CLIPBOARD_COPY_CMD
+    BASHPASS_CLIPBOARD_TIMER
+    BASHPASS_KEY_ID
+    BASHPASS_PASSWD_LENGTH
+    BASHPASS_PASSWD_STORE
 "
 }
 
@@ -289,30 +295,10 @@ copy_passwd() {
     printf 'Clipboard has been cleared to ensure it cannot be leaked.\n'
 }
 
-sync_passwd() {
-    local sync_cmd="${1}"
-
+git_passwd() {
     has git || error 'git is not installed' 1
 
-    [[ -d "${PASSWD_STORE}/.git/" ]] || \
-        error "${PASSWD_STORE} is not a git repository" 128
-
-    case "${sync_cmd}" in
-        "upload")
-            git -C "${PASSWD_STORE}" add -A
-            git -C "${PASSWD_STORE}" commit \
-                -m "Upload: $(printf '%(%d/%m/%Y)T at %(%T)T')"
-            git -C "${PASSWD_STORE}" push
-            ;;
-        "download")
-            git -C "${PASSWD_STORE}" pull
-            ;;
-        *)
-            error "synchronize command '${sync_cmd}' not found" 2
-            ;;
-    esac
-
-    printf 'Be aware you'\''ll need to import/export your GPG key.\n'
+    git -C "${PASSWD_STORE}" "${@}"
 }
 
 if has gpg2; then
@@ -330,7 +316,7 @@ case "${1}" in
     "--help"   | "-h") usage;;
     "--list"   | "-l") list_passwd;;
     "--show"   | "-s") show_passwd "${2}";;
-    "--sync"   | "-S") sync_passwd "${2}";;
+    "--git"    | "-G") git_passwd "${@:2}";;
     "--update" | "-u") update_passwd "${2}";;
     "--version"| "-v") version;;
     *)
