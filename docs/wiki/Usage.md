@@ -103,15 +103,3 @@ This essentially is a wrapper around `git -C ${BASHPASS_PASSWD_STORE} COMMAND`.
 $ bashpass --git init
 $ bashpass --git add foo.gpg
 ```
-
-##  `--sync` | `-S`
-
-> :warning: The password store must be initialized with a remote Git repository before using this command.
-
-Sync the password store with a remote Git repository.
-The `SYNC_COMMAND` can be either `push` or `pull`.
-
-```console
-$ bashpass --sync push
-$ bashpass --sync pull
-```

@@ -73,15 +73,10 @@ Commands:
     -s, --show [NAME]      Show a password.
     -u, --update [NAME]    Update a password.
     -G, --git COMMAND      Interact with Git. Wrapper for 'git -C \${BASHPASS_PASSWD_STORE} COMMAND'.
-    -S, --sync COMMAND     Synchronize with a Git repository.
 
 Options:
     -h, --help             Show this help message.
     -v, --version          Show the version number.
-
-Sync commands:
-    push                   Push local passwords to a remote repository.
-    pull                   Pull passwords from a remote repository.
 
 Arguments:
     NAME                   Password name. If omitted, you will be prompted.
@@ -300,32 +295,6 @@ copy_passwd() {
     printf 'Clipboard has been cleared to ensure it cannot be leaked.\n'
 }
 
-sync_passwd() {
-    local sync_cmd="${1}"
-
-    has git || error 'git is not installed' 1
-
-    [[ -d "${PASSWD_STORE}/.git/" ]] || \
-        error "${PASSWD_STORE} is not a git repository" 128
-
-    case "${sync_cmd}" in
-        push)
-            git -C "${CONFIGURED_PASSWD_STORE}" add -A
-            git -C "${CONFIGURED_PASSWD_STORE}" diff --cached --quiet && return 0
-            git -C "${CONFIGURED_PASSWD_STORE}" commit -m "Update passwords"
-            git -C "${CONFIGURED_PASSWD_STORE}" push
-            ;;
-
-        pull)
-            git -C "${CONFIGURED_PASSWD_STORE}" pull --ff-only
-            ;;
-
-        *)
-            error "unknown sync operation: ${sync_cmd}" 2
-            ;;
-    esac
-}
-
 git_passwd() {
     has git || error 'git is not installed' 1
 
@@ -347,7 +316,6 @@ case "${1}" in
     "--help"   | "-h") usage;;
     "--list"   | "-l") list_passwd;;
     "--show"   | "-s") show_passwd "${2}";;
-    "--sync"   | "-S") sync_passwd "${2}";;
     "--git"    | "-G") git_passwd "${@:2}";;
     "--update" | "-u") update_passwd "${2}";;
     "--version"| "-v") version;;
