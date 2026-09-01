@@ -118,7 +118,7 @@ All documentation regarding BashPass is maintained in the master branch, and pul
 
 BashPass has 2 types of documentation:
 
-- **man page**: `docs/man/raw/`
+- **man page**: `man/bashpass.1`
 - **GitHub README**: `README.md`
 
 ## 6.3 Documentation Style
