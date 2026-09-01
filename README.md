@@ -106,8 +106,9 @@ commit messages, branches, remotes, signing, and other Git features.
 
 ## Bash completion
 
-BashPass includes optional Bash completion for commands and stored password
-names. Source `scripts/bashpass-completion.sh` from your `.bashrc`:
+BashPass includes optional Bash completion for commands, stored password names,
+and Git commands when Git's Bash completion is available. Source `scripts/bashpass-completion.sh`
+from your `.bashrc`:
 
 ```bash
 . /path/to/bashpass-completion.sh
