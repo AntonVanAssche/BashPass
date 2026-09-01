@@ -96,16 +96,16 @@ For your contribution to be accepted, your changes must meet the 2 main criteria
 - **Bash 3.0 Compatibility**: Make sure your code is compatible with Bash 3.0 and above.
 
 ```console
-$ shellcheck bashpass
+shellcheck bashpass
 ```
 
 Source: [Bash 3.0](https://ftp.gnu.org/gnu/bash/bash-3.0.tar.gz)
 
 ```console
-$ tar -xvf bash-3.0.tar.gz
-$ cd bash-3.0/
-$ ./configure
-$ make -j 4
+tar -xvf bash-3.0.tar.gz
+cd bash-3.0/
+./configure
+make -j 4
 ```
 
 # 6. Guide for Documentation Contributions
@@ -117,8 +117,9 @@ All documentation regarding BashPass is maintained in the master branch, and pul
 ## 6.2 Documentation Location
 
 BashPass has 2 types of documentation:
-- **man pages**: `docs/man/raw/`
-- **GitHub wiki**: `docs/wiki/`
+
+- **man page**: `docs/man/raw/`
+- **GitHub README**: `README.md`
 
 ## 6.3 Documentation Style
 
