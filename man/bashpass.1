@@ -1,0 +1,169 @@
+.TH "BASHPASS" "1" "2026-08-31" "BASHPASS" "BASHPASS"
+.ie \n(.g .ds Aq (aq
+.el .ds Aq (aq
+.ad l
+.nh
+
+.SH NAME
+bashpass - local command-line password manager written in Bash
+
+.SH SYNOPSIS
+.B bashpass
+[\fIOPTION\fR] [\fINAME\fR]
+.br
+.B bashpass
+.B -G
+.I COMMAND
+[\fIARGUMENT\fR ...]
+
+.SH DESCRIPTION
+.B BashPass
+is a command-line password manager written in Bash.
+Together with
+.BR gpg (1),
+it stores passwords locally.
+
+Passwords are encrypted using the user's GnuPG key before being stored in
+the password store. BashPass does not require a remote service to store
+passwords.
+
+The password store can optionally be managed as a Git repository using the
+.BR -G
+option.
+
+Password names may contain letters, numbers, underscores, periods, @, plus
+signs, and hyphens.
+
+.SH COMMANDS
+
+.TP
+.BR -a ", " --add " [" NAME ]
+Add a password. The password can either be entered manually or generated
+automatically. If \fINAME\fR is omitted, BashPass prompts for one.
+
+.TP
+.BR -c ", " --copy " [" NAME ]
+Copy a password to the clipboard. The clipboard is cleared after the
+configured timeout. If \fINAME\fR is omitted, BashPass prompts for one.
+
+.TP
+.BR -d ", " --delete " [" NAME ]
+Delete a password without asking for confirmation. If \fINAME\fR is omitted,
+BashPass prompts for one.
+
+.TP
+.BR -l ", " --list
+List all passwords in the password store.
+
+.TP
+.BR -s ", " --show " [" NAME ]
+Print a password to standard output. If \fINAME\fR is omitted, BashPass
+prompts for one.
+
+.TP
+.BR -u ", " --update " [" NAME ]
+Update an existing password. The password can either be entered manually or
+generated automatically. If \fINAME\fR is omitted, BashPass prompts for one.
+
+.TP
+.BR -G ", " --git " COMMAND " [" ARGUMENT ...]
+Run a Git command with the password store as its working directory. Arguments
+are passed directly to Git.
+
+.SH OPTIONS
+
+.TP
+.BR -h ", " --help
+Show a brief help message.
+
+.TP
+.BR -v ", " --version
+Show the BashPass version.
+
+.SH ENVIRONMENT
+
+BashPass is configured using environment variables. Settings not explicitly
+configured use their default values.
+
+.TP
+.B BASHPASS_KEY_ID
+GnuPG key ID used to encrypt passwords. If unset, BashPass prompts for a key
+ID when it starts. The value may be the last 8 characters or the complete
+40-character GnuPG fingerprint.
+
+.TP
+.B BASHPASS_PASSWD_LENGTH
+Default length of generated passwords. The default is 14 characters. This
+value can be overridden when adding or updating a password.
+
+.TP
+.B BASHPASS_PASSWD_STORE
+Location of the password store. The default is
+.IR ~/.local/share/bashpass .
+
+.TP
+.B BASHPASS_CLIPBOARD_COPY_CMD
+Command used to copy a password to the clipboard. The default is
+.BR "wl-copy" .
+
+.TP
+.B BASHPASS_CLIPBOARD_CLEAR_CMD
+Command used to clear the clipboard. The default is
+.BR "wl-copy --clear" .
+
+.TP
+.B BASHPASS_CLIPBOARD_TIMER
+Number of seconds a copied password remains in the clipboard. The default is
+10 seconds.
+
+.SH EXAMPLES
+
+.TP
+.B bashpass -a github
+Add a password named
+.IR github .
+
+.TP
+.B bashpass -c github
+Copy the
+.I github
+password to the clipboard.
+
+.TP
+.B bashpass -d github
+Delete the
+.I github
+password without asking for confirmation.
+
+.TP
+.B API_KEY="$(bashpass -s api-key)"
+Use a password directly in a shell variable.
+
+.TP
+.B bashpass -G init
+Initialize the password store as a Git repository.
+
+.TP
+.B bashpass -G add -A
+Stage all changes in the password store.
+
+.TP
+.B bashpass -G commit -m "Update passwords"
+Commit changes using Git.
+
+.TP
+.B bashpass -G push
+Push the password store to its configured remote.
+
+.SH FILES
+
+.TP
+.I ~/.local/share/bashpass/
+Default password store.
+
+.SH AUTHOR
+Anton Van Assche <https://github.com/AntonVanAssche>
+
+.SH BUGS
+Report bugs, suggestions, and other issues at the BashPass project repository:
+<https://github.com/AntonVanAssche/BashPass>

@@ -25,8 +25,7 @@ rm -rf %{buildroot}
 %{__mkdir_p} %{buildroot}%{_mandir}/man1
 %{__mkdir_p} %{buildroot}%{_datadir}/bash-completion/completions
 %{__install} -m 0755 %{name} %{buildroot}%{_bindir}/%{name}
-%{__install} -m 0644 docs/man/%{name}.1.gz %{buildroot}%{_mandir}/man1/%{name}.1.gz
-%{__install} -m 0644 docs/man/%{name}.conf.1.gz %{buildroot}%{_mandir}/man1/%{name}.conf.1.gz
+%{__install} -m 0644 docs/man/%{name}.1 %{buildroot}%{_mandir}/man1/%{name}.1
 %{__install} -m 0644 scripts/%{name}-completion.sh %{buildroot}%{_datadir}/bash-completion/completions/%{name}
 
 %clean
@@ -37,8 +36,7 @@ rm -rf %{buildroot}
 %{_datadir}/bash-completion/completions/%{name}
 
 %doc
-%{_mandir}/man1/%{name}.1.gz
-%{_mandir}/man1/%{name}.conf.1.gz
+%{_mandir}/man1/%{name}.1
 
 %license LICENSE.md
 
