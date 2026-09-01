@@ -32,7 +32,7 @@ To ensure consistency and readability of the codebase, please follow these guide
 - Output: Prefer `printf` over `echo`.
 - Piping: Avoid excessive piping (`|`).
 - Return Codes: Ensure return codes are meaningful and consistent.
-- Symtax: Use single quotes for strings without variables, and double quotes for those with variables.
+- Syntax: Use single quotes for strings without variables, and double quotes for those with variables.
 - Syntax: It's important to quote **EVERYTHING**.
 - Syntax: Utilize `(( ))` and `[[ ]]` syntax for loops and conditionals where applicable.
 - Syntax: Utilize compact test syntax for single-command tests, otherwise `if`/`fi` is suitable.
