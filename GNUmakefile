@@ -1,6 +1,6 @@
-PREFIX = $(HOME)/.local
 BIN = /usr/bin
 MAN_DIR = /usr/share/man/man1
+COMPLETION_DIR = /usr/share/bash-completion/completions
 OS := $(shell uname -s)
 
 # Check if the operating system is Linux
@@ -17,7 +17,9 @@ endif
 
 all:
 	@echo Run \'make install\' to install BashPass.
+	@echo Run \'make install-completion\' to install BashPass Bash completion.
 	@echo Run \'make uninstall\' to uninstall BashPass.
+	@echo Run \'make uninstall-completion\' to uninstall BashPass Bash completion.
 
 install:
 	@echo Installing BashPass...
@@ -31,3 +33,13 @@ uninstall:
 	rm -vf $(MAN_DIR)/bashpass.1
 	@echo BashPass uninstalled successfully!
 	@echo Bye, have a nice day!
+
+install-completion:
+	@echo Installing BashPass Bash completion...
+	install -v -m644 completion/bashpass $(COMPLETION_DIR)
+	@echo BashPass Bash completion installed successfully!
+
+uninstall-completion:
+	@echo Uninstalling BashPass Bash completion...
+	rm -vf $(COMPLETION_DIR)/bashpass
+	@echo BashPass Bash completion uninstalled successfully!

@@ -7,14 +7,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v7
 
       - name: ShellCheck on bashpass.
         run: |
-          shopt -s nullglob
-          shellcheck bashpass
-
-      - name: ShellCheck on scripts
-        run: |
-          shopt -s nullglob
-          shellcheck scripts/*
+          while read -r; do
+              shellcheck "${REPLY}"
+          done < <(grep -rIzl '^#![[:blank:]]*/.*\(bash\|env[[:blank:]]\+bash\)' .)
