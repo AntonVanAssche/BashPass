@@ -1,26 +1,16 @@
-# 1. Reporting Bugs
+# Contributing to BashPass
 
-If you come across a bug, feel free to report it by opening a new [issue](https://github.com/AntonVanAssche/BashPass/issues), and selecting the `Bug report` template.
+Contributions to BashPass are welcome. You can help by reporting issues, improving the code, or improving the documentation.
 
-# 2. Feature Requests
+## Issues
 
-If you'd like a new feature to be added, feel free to open a new [issue](https://github.com/AntonVanAssche/BashPass/issues), and select the `Feature request` template.
+If you find a bug, have a feature request, or have a question, open an [issue](https://github.com/AntonVanAssche/BashPass/issues) and provide enough information to explain the problem or suggestion.
 
-# 3. Questions
+## Code Contributions
 
-If you have any questions, feel free to open a new [issue](https://github.com/AntonVanAssche/BashPass/issues), and select the `Question or Support Request` template.
+Code contributions should be submitted through a pull request.
 
-# 4. Security Vulnerabilities
-
-If you discover a security vulnerability within BashPass, please open a new [issue](https://github.com/AntonVanAssche/BashPass/issues) and select the ` Report a security vulnerability ` template.
-
-# 5. Guide for Code Contributions
-
-## 5.1 Branch Model
-
-BashPass is developed mainly through the master branch, and pull requests should be [fork based](https://help.github.com/articles/using-pull-requests/).
-
-## 5.2 Code Style
+### Code Style
 
 To ensure consistency and readability of the codebase, please follow these guidelines when contributing to BashPass:
 
@@ -88,12 +78,14 @@ func() {
 }
 ```
 
-## 5.3 Acceptance Criteria
+### Acceptance Criteria
 
 For your contribution to be accepted, your changes must meet the 2 main criteria:
 
-- **ShellCheck**: Ensure your code passes ShellCheck.
-- **Bash 3.0 Compatibility**: Make sure your code is compatible with Bash 3.0 and above.
+- **ShellCheck**: The code must pass ShellCheck without errors.
+- **Bash 3.0 compatibility**: The code must remain compatible with Bash 3.0 and newer.
+
+Source: [ShellCheck](https://github.com/koalaman/shellcheck)
 
 ```console
 shellcheck bashpass
@@ -108,28 +100,18 @@ cd bash-3.0/
 make -j 4
 ```
 
-# 6. Guide for Documentation Contributions
+Then use the resulting Bash binary to test BashPass and verify that the changes work as expected.
 
-## 6.1 Branch model
+## Documentation Contributions
 
-All documentation regarding BashPass is maintained in the master branch, and pull requests should be [fork based](https://help.github.com/articles/using-pull-requests/).
+Documentation changes are welcome for both the man page and README:
 
-## 6.2 Documentation Location
+- `man/bashpass.1`
+- `README.md`
 
-BashPass has 2 types of documentation:
+Keep documentation clear, concise, and consistent with the actual behavior of BashPass.
+Avoid unnecessary detail and keep examples relevant to the feature being documented.
 
-- **man page**: `man/bashpass.1`
-- **GitHub README**: `README.md`
-
-## 6.3 Documentation Style
-
-To make sure that the documentation is useful and consistent, please follow these guidelines when writing and updating documentation:
-
-- Use clear and concise language.
-- Write in a style that is easy for non-technical users to understand.
-- Use proper grammar and spelling.
-- Provide examples wherever possible.
-
-# 7. License
+## License
 
 By contributing, you agree that your contributions will be licensed under the [MIT License](./LICENSE.md).
