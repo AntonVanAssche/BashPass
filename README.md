@@ -107,11 +107,18 @@ commit messages, branches, remotes, signing, and other Git features.
 ## Bash completion
 
 BashPass includes optional Bash completion for commands, stored password names,
-and Git commands when Git's Bash completion is available. Source `scripts/bashpass-completion.sh`
-from your `.bashrc`:
+and Git commands when Git's Bash completion is available. Source `completion/bashpass`.
+
+To install the completion script run:
 
 ```bash
-. /path/to/bashpass-completion.sh
+sudo make install-completion
+```
+
+Afterward, add the following to your `.bashrc`:
+
+```txt
+. /usr/share/bash-completion/completions/bashpass
 ```
 
 ## Contributing
