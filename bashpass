@@ -259,6 +259,8 @@ list_passwd() {
 
     set +o noglob
     for passwd_name in "${PASSWD_STORE:?}"/*.gpg; do
+        [[ -f "${passwd_name}" ]] || continue
+
         passwd_name="${passwd_name##*/}"
         passwd_name="${passwd_name%%.gpg}"
         printf '%s\n' "${passwd_name}"
