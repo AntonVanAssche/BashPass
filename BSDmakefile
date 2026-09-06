@@ -1,10 +1,14 @@
-BIN = /usr/bin
-MAN_DIR = /usr/share/man/man1
-COMPLETION_DIR = /etc/bash_completion.d
+PREFIX ?= /usr/local
+
+BIN = $(PREFIX)/bin
+MAN_DIR = $(PREFIX)/share/man/man1
+COMPLETION_DIR = $(PREFIX)/etc/bash_completion.d
 
 all:
 	@echo Run \'make install\' to install BashPass.
 	@echo Run \'make uninstall\' to uninstall BashPass.
+	@echo Run \'make install-completion\' to install BashPass Bash completion.
+	@echo Run \'make uninstall-completion\' to uninstall BashPass Bash completion.
 
 install:
 	@echo Installing BashPass...

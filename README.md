@@ -32,6 +32,13 @@ cd BashPass
 sudo make install
 ```
 
+By default, BashPass is installed under `/usr/local`.
+To install BashPass under a different prefix, set `PREFIX` when running `make install`:
+
+```console
+make install PREFIX="${HOME}/.local"
+```
+
 Alternatively, download a release from the [releases
 page](https://github.com/AntonVanAssche/BashPass/releases/latest).
 
@@ -113,6 +120,12 @@ To install the completion script run:
 
 ```bash
 sudo make install-completion
+```
+
+Similar to the installation of BashPass, you can set `PREFIX` when running `make install-completion`:
+
+```console
+make install-completion PREFIX="${HOME}/.local"
 ```
 
 Afterward, add the following to your `.bashrc`:
