@@ -25,6 +25,7 @@ uninstall:
 
 install-completion:
 	@echo Installing BashPass Bash completion...
+	mkdir -p $(COMPLETION_DIR)
 	install -v -m644 completion/bashpass $(COMPLETION_DIR)
 	@echo BashPass Bash completion installed successfully!
 
