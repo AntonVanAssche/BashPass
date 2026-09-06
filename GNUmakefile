@@ -1,19 +1,8 @@
-BIN = /usr/bin
-MAN_DIR = /usr/share/man/man1
-COMPLETION_DIR = /usr/share/bash-completion/completions
-OS := $(shell uname -s)
+PREFIX ?= /usr/local
 
-# Check if the operating system is Linux
-ifeq ($(OS),Linux)
-	BIN = /usr/bin
-	MAN_DIR = /usr/share/man/man1
-endif
-
-# Check if the operating system is macOS X
-ifeq ($(OS),Darwin)
-	BIN = /usr/local/bin
-	MAN_DIR = /usr/local/share/man/man1
-endif
+BIN = $(PREFIX)/bin
+MAN_DIR = $(PREFIX)/share/man/man1
+COMPLETION_DIR = $(PREFIX)/share/bash-completion/completions
 
 all:
 	@echo Run \'make install\' to install BashPass.
