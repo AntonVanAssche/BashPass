@@ -75,12 +75,12 @@ use their default values.
 | `BASHPASS_CLIPBOARD_CLEAR_CMD` | `wl-copy --clear` | Command used to clear the clipboard. |
 | `BASHPASS_CLIPBOARD_COPY_CMD` | `wl-copy` | Command used to copy a password to the clipboard. |
 | `BASHPASS_CLIPBOARD_TIMER` | `10` | Number of seconds a copied password remains in the clipboard. |
-| `BASHPASS_KEY_ID` | Prompt | GnuPG key ID used to encrypt passwords. |
+| `BASHPASS_KEY_ID` | Prompt when required | GnuPG key ID used to encrypt passwords. |
 | `BASHPASS_PASSWD_LENGTH` | `14` | Default length of generated passwords. |
 | `BASHPASS_PASSWD_STORE` | `~/.local/share/bashpass` | Location of the password store. |
 
 `BASHPASS_KEY_ID` may contain the last 8 characters or the complete 40-character GnuPG fingerprint.
-If it is unset, BashPass prompts for a key ID when it starts.
+If it is unset, BashPass prompts for a key ID when an encryption operation requires one.
 
 The default clipboard commands use `wl-copy` and therefore require a Wayland environment. Set
 `BASHPASS_CLIPBOARD_COPY_CMD` and `BASHPASS_CLIPBOARD_CLEAR_CMD` to commands appropriate for your
