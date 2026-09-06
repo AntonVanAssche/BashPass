@@ -45,7 +45,7 @@ ask_for_key_id() {
 readonly CLIPBOARD_CLEAR_CMD="${BASHPASS_CLIPBOARD_CLEAR_CMD:-wl-copy --clear}"
 readonly CLIPBOARD_COPY_CMD="${BASHPASS_CLIPBOARD_COPY_CMD:-wl-copy}"
 readonly CLIPBOARD_TIMER="${BASHPASS_CLIPBOARD_TIMER:-10}"
-readonly KEY_ID="${BASHPASS_KEY_ID:-$(ask_for_key_id)}"
+readonly KEY_ID="${BASHPASS_KEY_ID:-}"
 readonly PASSWD_LENGTH="${BASHPASS_PASSWD_LENGTH:-14}"
 readonly PASSWD_STORE="${BASHPASS_PASSWD_STORE:-${HOME}/.local/share/bashpass}"
 
@@ -174,8 +174,9 @@ set_passwd() {
 
 encrypt_passwd() {
     local passwd_file="${1}"
+    local key_id="${KEY_ID:-$(ask_for_key_id)}"
 
-    "${GPG_CMD}" --batch --yes --encrypt --quiet --output "${passwd_file}" --recipient "${KEY_ID}"
+    "${GPG_CMD}" --batch --yes --encrypt --quiet --output "${passwd_file}" --recipient "${key_id}"
 }
 
 decrypt_passwd() {
